@@ -1,0 +1,8 @@
+/book
+
+/build
+/lakefile.olean
+/lake-packages/*
+
+/.vscode
+/.lake

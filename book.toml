@@ -1,0 +1,12 @@
+[book]
+authors = ["Bernardo Borges"]
+language = "en"
+multilingual = false
+src = "docs"
+title = "Cutting Planes with Lean 4"
+
+[output.html]
+git-repository-url = "https://github.com/bernborgess/lean-cutting-planes"
+
+[output.html.playground.boring-prefixes]
+lean = "# "
