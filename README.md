@@ -2,7 +2,7 @@ Cutting Planes with Lean 4
 -----------------------
 [![](https://github.com/bernborgess/lean-cutting-planes/actions/workflows/mdbook.yml/badge.svg?branch=main)](https://github.com/bernborgess/lean-cutting-planes/actions/workflows/mdbook.yml)
 
-This project follows the research in Lean 4 Theorem Proving and Metaprogramming, 
+This project follows the research in [Lean 4 Theorem Proving](https://lean-lang.org/) and Metaprogramming, 
 where we where we aim to develop a Lean 4 library for formalizing and manipulating cutting planes
 in a verifiable manner, as they were described by [Jakob Nordström](https://jakobnordstrom.se/) in 
 [A Unified Proof System for Discrete Combinatorial Problems](https://jakobnordstrom.se/docs/presentations/TalkVeriPB_Dagstuhl23.pdf). 
