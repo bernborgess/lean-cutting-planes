@@ -1,5 +1,5 @@
 {
-    "name": "lean-cutting-planes DC",
+    "name": "lean-cutting-planes",
     "build": {
         "dockerfile": "Dockerfile"
     },
@@ -10,5 +10,5 @@
             ]
         }
     },
-    "onCreateCommand": "lake build"
+    "onCreateCommand": "lake exe cache get!"
 }
