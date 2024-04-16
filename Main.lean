@@ -16,15 +16,13 @@ def main : IO Unit := do
   let file ← IO.FS.lines path
 
   let header := file.get! 0
-  IO.println header
-  IO.println s!"#######################################"
-  IO.println s!"File has {file.size} lines."
-  -- file.forM IO.println
-  IO.println s!"#######################################"
+  let variables := ((header.split Char.isWhitespace).get! 2).toNat!
+  let constraints := file.size - 1
 
-  IO.println "Detecting counters..."
-  -- * #variable= {v} #constraint= {c}
-  IO.println "osh"
+  IO.println s!"#######################################"
+  IO.println s!"File has {constraints} constraints"
+  IO.println s!"and {variables} variables"
+  IO.println s!"#######################################"
 
 -- OPB file: https://www.cril.univ-artois.fr/PB24/OPBgeneral.pdf
 -- Parser : https://github.com/fgdorais/lean4-parser/blob/main/examples/BNF.lean
