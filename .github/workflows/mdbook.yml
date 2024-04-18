@@ -3,6 +3,8 @@ name: Deploy mdBook site to Pages
 on:
   push:
     branches: ["main"]
+    paths:
+      - 'docs/**' # only when docs/ changes
 
   workflow_dispatch:
 
