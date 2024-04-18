@@ -44,26 +44,11 @@ def PBSum {n : ℕ} (cs : Fin n → ℤ) (xs : Fin n → Fin 2) : Int :=
 def PBIneq {n : ℕ} (cs : Fin n → ℤ) (xs : Fin n → Fin 2) (const : Int) :=
   ∑ i, (cs i * xs i) ≥ const
 
-def step1 : PBIneq ![a] ![b] c = (∑ i, (![a] i * ![b] i) ≥ c) := by
-  exact rfl
-  done
-
-theorem outOfSum (a : Fin 1 → ℤ) (b : Fin 1 → ℤ) :
-  ∑ i, (a i * b i) = (a 0 * b 0)
-  := (sum_eq _).symm
-
-def step2 : (∑ i, (![(a:ℤ)] i * ![(b:Fin 2)] i) ≥ c) = ((![a] 0 * ![b] 0) ≥ c) := by
-  rw [outOfSum]
-  done
-
-def step3 : ((![(a:ℤ)] 0 * ![(b:Fin 2)] 0) ≥ c) = (a * b ≥ c) := by
-  sorry
-  done
-
 def expand1 : PBIneq ![a] ![b] c = (a * b ≥ c) := by
-  rw [step1]
-  rw [step2]
-  rw [step3]
+  have r1 : PBIneq ![a] ![b] c = (∑ i, (![a] i * ![b] i) ≥ c)               := by rfl
+  have r2 : ∑ i, (![a] i * ![b] i) = (![a] 0 * ![b] 0)                      := (sum_eq _).symm
+  have r3 : ((![(a:ℤ)] 0 * ![(b:Fin 2)] 0) ≥ c) = (((a:ℤ) * (b:Fin 2)) ≥ c) := by rfl
+  rw [r1,r2,r3]
   done
 
 example : PBIneq ![1] ![1] 1 := by
@@ -73,7 +58,7 @@ example : PBIneq ![1] ![1] 1 := by
   exact Int.le_refl 1
   done
 
-
+-- This will get boring soon...
 def expand2 : PBIneq ![a,b] ![c,d] e = (a * c + b * d ≥ e) := sorry
 
 example : PBIneq ![1,2] ![0,1] 2 := by
@@ -82,6 +67,5 @@ example : PBIneq ![1,2] ![0,1] 2 := by
   -- Prove 1 * 0 + 2 * 1 ≥ 2
   exact Int.le_refl 2
   done
-
 
 end PseudoBoolean
