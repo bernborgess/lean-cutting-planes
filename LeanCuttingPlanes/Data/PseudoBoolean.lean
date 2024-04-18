@@ -45,9 +45,9 @@ def PBIneq {n : ℕ} (cs : Fin n → ℤ) (xs : Fin n → Fin 2) (const : Int) :
   ∑ i, (cs i * xs i) ≥ const
 
 def expand1 : PBIneq ![a] ![b] c = (a * b ≥ c) := by
-  have r1 : PBIneq ![a] ![b] c = (∑ i, (![a] i * ![b] i) ≥ c)               := by rfl
-  have r2 : ∑ i, (![a] i * ![b] i) = (![a] 0 * ![b] 0)                      := (sum_eq _).symm
-  have r3 : ((![(a:ℤ)] 0 * ![(b:Fin 2)] 0) ≥ c) = (((a:ℤ) * (b:Fin 2)) ≥ c) := by rfl
+  have r1 : PBIneq ![a] ![b] c = (∑ i, (![a] i * ![b] i) ≥ c) := by rfl
+  have r2 : ∑ i, (![a] i * ![b] i) = (![a] 0 * ![b] 0)        := (sum_eq _).symm
+  have r3 : ((![a] 0 * ![b] 0) ≥ c) = (a * b ≥ c)             := by rfl
   rw [r1,r2,r3]
   done
 
@@ -59,7 +59,12 @@ example : PBIneq ![1] ![1] 1 := by
   done
 
 -- This will get boring soon...
-def expand2 : PBIneq ![a,b] ![c,d] e = (a * c + b * d ≥ e) := sorry
+def expand2 : PBIneq ![a,b] ![c,d] e = (a * c + b * d ≥ e) := by
+  have r1 : PBIneq ![a,b] ![c,d] e = (∑ i, (![a,b] i * ![c,d] i) ≥ e)                   := by rfl
+  have r2 : ∑ i, (![a,b] i * ![c,d] i) = (![a,b] 0 * ![c,d] 0) + (![a,b] 1 * ![c,d] 1)  := (sum_eq _).symm
+  have r3 : ((![a,b] 0 * ![c,d] 0) + (![a,b] 1 * ![c,d] 1) ≥ e) = (a * c + b * d ≥ e)   := by rfl
+  rw [r1,r2,r3]
+  done
 
 example : PBIneq ![1,2] ![0,1] 2 := by
   -- Change goal to 1 * 0 + 2 * 1 ≥ 2
