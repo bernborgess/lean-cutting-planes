@@ -29,6 +29,8 @@ We want to represent Pseudo-Boolean formulas to decide whether they are *satisfi
 $$-x_1 + 2x_2 - 3x_3 + 4x_4 - 5x_5 \ge 1 $$
 will be represented as
 ```lean
-def f : CP.Expr := [-1,2,-3,4,-5] [1,0,1,0,1] 1
+open PseudoBoolean
+
+def pb : PBInequality ![-1,2,-3,4,-5] ![1,0,1,0,1] 1 := sorry
 ```
 This notation is under development and is subject to changes.
