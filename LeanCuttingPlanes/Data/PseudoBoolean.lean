@@ -44,7 +44,21 @@ def PBSum {n : ℕ} (cs : Fin n → ℤ) (xs : Fin n → Fin 2) : Int :=
 def PBIneq {n : ℕ} (cs : Fin n → ℤ) (xs : Fin n → Fin 2) (const : Int) :=
   ∑ i, (cs i * xs i) ≥ const
 
-def expand1 : PBIneq ![a] ![b] c = (a * b ≥ c) := sorry
+def step1 : PBIneq ![a] ![b] c = (∑ i, (![a] i * ![b] i) ≥ c) := by
+  exact rfl
+  done
+
+def step2 : (∑ i, (![(a:ℤ)] i * ![(b:Fin 2)] i) ≥ c) = (a * b ≥ c) := by
+  sorry
+  done
+
+def expand1 : PBIneq ![a] ![b] c = (a * b ≥ c) := by
+  rw [step1]
+  rw [step2]
+  done
+
+example (a : Fin 3 → ℤ) (b : Fin 3 → ℤ) : ∑ i, (a i * b i) = (a 0 * b 0) + (a 1 * b 1) + (a 2 * b 2) :=
+  (sum_eq _).symm
 
 example : PBIneq ![1] ![1] 1 := by
   -- Expand the goal to 1 * 1 ≥ 1
