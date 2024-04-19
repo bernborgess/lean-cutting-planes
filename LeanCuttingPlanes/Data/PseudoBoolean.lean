@@ -28,4 +28,15 @@ example : PBInequality ![3,4] ![0,1] 2 := by
   exact Int.NonNeg.mk 2
   done
 
+example : ∃ xs ,(PBInequality ![1,2] xs 2) := by
+  have xs : Fin 2 → Fin 2 := ![0,1]
+  have h : PBInequality ![1, 2] xs 2 := by
+    have heq : xs = ![0,1] := sorry
+    rw [heq]
+    reduce
+    exact Int.le_refl 2
+    done
+  exact ⟨xs, h⟩
+  done
+
 end PseudoBoolean
