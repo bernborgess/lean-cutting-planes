@@ -23,9 +23,18 @@ example : PBInequality ![1,2] ![0,1] 2 := by
   exact Int.le_refl 2
   done
 
-example : PBInequality ![3,4] ![0,1] 2 := by
+theorem t1 : PBInequality ![3,4] ![0,1] 2 := by
   reduce
   exact Int.NonNeg.mk 2
   done
+
+example : ∃xs, PBInequality ![3,4] xs 2 :=
+  let xs := ![0,1]
+  let proof : PBInequality ![3, 4] xs 2 := by
+    reduce
+    exact Int.NonNeg.mk 2
+    done
+  ⟨xs,proof⟩
+
 
 end PseudoBoolean
