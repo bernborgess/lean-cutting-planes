@@ -2,3 +2,4 @@
 -- Import modules here that should be built as part of the library.
 import «LeanCuttingPlanes».Basic
 import «LeanCuttingPlanes».Data.PseudoBoolean
+import «LeanCuttingPlanes».Rules.Addition
