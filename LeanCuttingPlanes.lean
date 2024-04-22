@@ -3,3 +3,6 @@
 import «LeanCuttingPlanes».Basic
 import «LeanCuttingPlanes».Data.PseudoBoolean
 import «LeanCuttingPlanes».Rules.Addition
+import «LeanCuttingPlanes».Rules.Multiplication
+import «LeanCuttingPlanes».Rules.Division
+import «LeanCuttingPlanes».Rules.Saturation
