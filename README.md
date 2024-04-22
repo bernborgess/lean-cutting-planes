@@ -43,6 +43,7 @@ Now we can manipulate `PB`s, similarly to this `Toy Example`:
 ![toy_example](./docs/assets/toy_example.png "Toy Example")
 
 ```lean
+--                     w x y z
 example (c1 : PBProp ![1,2,1,0] 2)
         (c2 : PBProp ![1,2,4,2] 5)
         (c3 : PBProp ![0,0,0,-1] (-1))
