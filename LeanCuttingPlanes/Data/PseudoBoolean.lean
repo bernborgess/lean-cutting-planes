@@ -6,7 +6,7 @@ namespace PseudoBoolean
 
 open FinVec BigOperators
 
-def PBInequality {n : ℕ} (cs : Fin n → ℤ) (xs : Fin n → Fin 2) (const : Int) :=
+def PBInequality {n : ℕ} (cs : Fin n → ℤ) (xs : Fin n → Fin 2) (const : ℤ) :=
   ∑ i, (cs i * xs i) ≥ const
 
 example : PBInequality ![1] ![1] 1 := by
@@ -24,7 +24,7 @@ example : PBInequality ![3,4] ![0,1] 2 := by
   exact Int.NonNeg.mk 2
   done
 
-def PBProp (cs : Fin n → ℤ) (const : Int) := ∃xs, PBInequality cs xs const
+def PBProp (cs : Fin n → ℤ) (const : ℤ) := ∃xs, PBInequality cs xs const
 
 example : PBProp ![3,4] 2 :=
   let xs := ![0,1]

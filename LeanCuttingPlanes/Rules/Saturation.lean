@@ -7,7 +7,7 @@ open FinVec
 -- ∑i (a i * l i) ≥ A
 -- ⊢
 -- ∑i ( min(a i, A) * l i) ≥ A
-theorem Saturation {as : Fin n → ℤ} {A : Int}
+theorem Saturation {as : Fin n → ℤ} {A : ℤ}
   (ha : PBProp as A)
   : PBProp (map (min A) as) A := sorry
 

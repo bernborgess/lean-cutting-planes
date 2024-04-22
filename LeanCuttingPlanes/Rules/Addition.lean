@@ -7,7 +7,7 @@ namespace PseudoBoolean
 -- ∑i (b i * l i) ≥ B
 -- ⊢
 -- ∑i ((a i + b i) * l i) ≥ A + B
-theorem Addition {as bs : Fin n → ℤ} {A B: Int}
+theorem Addition {as bs : Fin n → ℤ} {A B: ℤ}
   (ha : PBProp as A)
   (hb : PBProp bs B)
   : PBProp (as + bs) (A + B) := sorry
