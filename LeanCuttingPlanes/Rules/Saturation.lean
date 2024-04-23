@@ -8,12 +8,13 @@ open FinVec
 -- ⊢
 -- ∑i ( min(a i, A) * l i) ≥ A
 theorem Saturation
-  {as : Fin n → ℤ} {A : ℤ} (ha : PBProp as A)
-  : PBProp (map (min A) as) A := sorry
+  {xs : Fin n → Fin 2}
+  {as : Fin n → ℤ} {A : ℤ} (ha : PBIneq as xs A)
+  : PBIneq (map (min A) as) xs A := sorry
 
-example (ha : PBProp ![3,4] 3)
-  : PBProp ![3,3] 3 := by
-  exact Saturation ha
+example (ha : PBIneq ![3,4] xs 3)
+  : PBIneq ![3,3] xs 3 := by
+  convert Saturation ha
   done
 
 end PseudoBoolean
