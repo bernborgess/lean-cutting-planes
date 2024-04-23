@@ -9,14 +9,16 @@ namespace PseudoBoolean
 -- ⊢
 -- ∑i (c * a i * l i) ≥ c*A
 theorem Multiplication
-  (as : Fin n → ℤ) (A : ℤ) (ha : PBProp as A)
-  (c : ℕ) (hc0 : c > 0)
-  : PBProp (as * c : Fin n → ℤ) (A * c) := sorry
+  {xs : Fin n → Fin 2}
+  {as : Fin n → ℤ} {A : ℤ} (ha : PBIneq as xs A)
+  {c : ℕ} (hc0 : c > 0)
+  : PBIneq (as * c : Fin n → ℤ) xs (A * c) := sorry
 
-example (ha : PBProp ![1,0] 3)
-  : PBProp ![2,0] 6 := by
+example
+  (ha : PBIneq ![1,0] xs 3)
+  : PBIneq ![2,0] xs 6 := by
   let h2z : 2 > 0 := Nat.zero_lt_succ 1
-  exact Multiplication ![1,0] 3 ha 2 h2z
+  apply Multiplication ha h2z
   done
 
 end PseudoBoolean

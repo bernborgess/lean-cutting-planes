@@ -33,7 +33,9 @@ will be represented as
 ```lean
 open PseudoBoolean
 
-def my_pb : PBProp ![-1,2,-3,4,-5] 1 := sorry
+variable {xs : Fin 5 → Fin 2}
+
+def my_pb : PBIneq ![-1,2,-3,4,-5] xs 1 := sorry
 ```
 
 This notation is under development and is subject to changes.
@@ -43,18 +45,20 @@ Now we can manipulate `PB`s, similarly to this `Toy Example`:
 ![toy_example](./docs/assets/toy_example.png "Toy Example")
 
 ```lean
+variable {xs : Fin 4 → Fin 2}
+
 --                     w x y z
-example (c1 : PBProp ![1,2,1,0] 2)
-        (c2 : PBProp ![1,2,4,2] 5)
-        (c3 : PBProp ![0,0,0,-1] (-1))
-        : PBProp ![1,2,2,0] 3
+example (c1 : PBIneq ![1,2,1,0] xs 2)
+        (c2 : PBIneq ![1,2,4,2] xs 5)
+        (c3 : PBIneq ![0,0,0,-1] xs (-1))
+        : PBIneq ![1,2,2,0] xs 3
   := by
   let h2z : 2 > 0 := Nat.zero_lt_succ 1
   let h3z : 3 > 0 := Nat.zero_lt_succ 2
-  let t1 : PBProp ![2,4,2,0] 4      := Multiplication ![1,2,1,0] 2 c1 2 h2z
-  let t2 : PBProp ![3,6,6,2] 9      := Addition ![2,4,2,0] 4 t1 ![1,2,4,2] 5 c2
-  let t3 : PBProp ![0,0,0,-2] (-2)  := Multiplication ![0,0,0,-1] (-1) c3 2 h2z
-  let t4 : PBProp ![3,6,6,0] 7      := Addition ![3,6,6,2] 9 t2 ![0,0,0,-2] (-2) t3
-  exact Division ![3,6,6,0] 7 t4 3 h3z
+  let t1 : PBIneq ![2,4,2,0] xs 4      := by apply Multiplication c1 h2z
+  let t2 : PBIneq ![3,6,6,2] xs 9      := by apply Addition t1 c2
+  let t3 : PBIneq ![0,0,0,-2] xs (-2)  := by apply Multiplication c3 h2z
+  let t4 : PBIneq ![3,6,6,0] xs 7      := by apply Addition t2 t3
+  exact Division t4 h3z
   done
 ```
