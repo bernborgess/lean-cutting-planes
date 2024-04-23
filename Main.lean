@@ -22,24 +22,5 @@ example (c1 : PBProp ![1,2,1,0] 2)
   done
 
 def main : IO Unit := do
-  let stdin ← IO.getStdin
-  IO.print s!"Enter the filename: "
-  let line ← stdin.getLine
-  let path := s!"example/{line.trim}.opb"
-  let fileExists ← System.FilePath.pathExists path
-
-  if ! fileExists then
-    IO.println s!"File {line.trim}.opb does not exist in the example folder!"
-    return ()
-
-  IO.println s!"Opening {path}"
-  let file ← IO.FS.readFile path
-
-  IO.println s!"This is your file: "
-  IO.println s!"#######################################"
-  IO.println file
-  IO.println s!"#######################################"
-
-  IO.println "Detecting counters..."
-  -- * #variable= {v} #constraint= {c}
-  IO.println "osh"
+  IO.println "This is lean-cutting-planes"
+  IO.println "A more useful executable may be delivered later."
