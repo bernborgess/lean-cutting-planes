@@ -39,12 +39,12 @@ def main : IO Unit := do
   let file ← IO.FS.lines path
 
   let header := file.get! 0
-  let variables := ((header.split Char.isWhitespace).get! 2).toNat!
+  let vars := ((header.split Char.isWhitespace).get! 2).toNat!
   let constraints := file.size - 1
 
   IO.println s!"#######################################"
   IO.println s!"File has {constraints} constraints"
-  IO.println s!"and {variables} variables"
+  IO.println s!"and {vars} variables"
   IO.println s!"#######################################"
 
 -- OPB file: https://www.cril.univ-artois.fr/PB24/OPBgeneral.pdf
