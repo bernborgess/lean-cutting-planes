@@ -14,11 +14,11 @@ theorem Multiplication
   {c : ℕ} (hc0 : c > 0)
   : PBIneq (as * c : Fin n → ℤ) xs (A * c) := sorry
 
-example (ha : PBIneq ![1,0] xs 3)
+example
+  (ha : PBIneq ![1,0] xs 3)
   : PBIneq ![2,0] xs 6 := by
   let h2z : 2 > 0 := Nat.zero_lt_succ 1
-  convert Multiplication ha h2z
-  exact List.ofFn_inj.mp rfl
+  apply Multiplication ha h2z
   done
 
 end PseudoBoolean

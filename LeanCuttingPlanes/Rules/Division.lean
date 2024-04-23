@@ -17,10 +17,11 @@ theorem Division
   {c : ℕ} (hc0 : c > 0)
   : PBIneq (map (ceildiv c) as) xs (ceildiv c A) := sorry
 
-example (ha : PBIneq ![3,4] xs 3)
+example
+  (ha : PBIneq ![3,4] xs 3)
   : PBIneq ![2,2] xs 2 := by
   let h2z : 2 > 0 := Nat.zero_lt_succ 1
-  convert Division ha h2z
+  apply Division ha h2z
   done
 
 end PseudoBoolean

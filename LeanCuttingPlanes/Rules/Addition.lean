@@ -13,9 +13,11 @@ theorem Addition
   {bs : Fin n → ℤ} {B : ℤ} (hb : PBIneq bs xs B)
   : PBIneq (as + bs) xs (A + B) := sorry
 
-example (ha : PBIneq ![1,0] xs 1) (hb : PBIneq ![1,1] xs 2)
-  : PBIneq (![1,0] + ![1,1]) xs (1 + 2) := by
-  convert Addition ha hb
+example
+  (ha : PBIneq ![1,0] xs 1)
+  (hb : PBIneq ![1,1] xs 2)
+  : PBIneq ![2,1] xs 3 := by
+  apply Addition ha hb
   done
 
 end PseudoBoolean
