@@ -41,27 +41,11 @@ theorem Addition
   : PBIneq (as + bs) xs (A + B) := by
   induction n
   .
-    rw [expandDefinitionOfPBIneq] at ha
-    -- -- should get me `ha : PBSum as xs ≥ A`
-    rw [expandDefinitionOfPBSum] at ha
-    -- -- should get me `ha : ∑ i, (![] i + ![] i) ≥ A`
+    rw [expandDefinitionOfPBIneq] at *
+    rw [expandDefinitionOfPBSum] at *
     have sumZero : PBSum ![] ![] = 0 := rfl
-    simp [sumZero] at ha
-
-    rw [expandDefinitionOfPBIneq] at hb
-    -- -- should get me `hb : PBSum bs xs ≥ B`
-    rw [expandDefinitionOfPBSum] at hb
-    -- -- should get me `hb : ∑ i, (![] i + ![] i) ≥ B`
-    simp [sumZero] at hb
-
-    -- Got ha : A ≤ 0 ; hb : B ≤ 0
-    have hk : (A + B) ≤ 0 := by exact Int.add_nonpos ha hb
-
-    simp only [Nat.zero_eq, Matrix.empty_add_empty]
-    rw [expandDefinitionOfPBIneq]
-    rw [expandDefinitionOfPBSum]
-    simp[sumZero]
-    exact hk
+    simp [sumZero] at *
+    exact Int.add_nonpos ha hb
 
   . sorry
   done
