@@ -6,8 +6,11 @@ namespace PseudoBoolean
 
 open FinVec BigOperators
 
+def PBSum (cs : Fin n → ℤ) (xs : Fin n → Fin 2) :=
+  ∑ i, (cs i * xs i)
+
 def PBIneq {n : ℕ} (cs : Fin n → ℤ) (xs : Fin n → Fin 2) (const : ℤ) :=
-  ∑ i, (cs i * xs i) ≥ const
+  PBSum cs xs ≥ const
 
 example : PBIneq ![1] ![1] 1 := by
   reduce                -- Expand the goal to 1 * 1 ≥ 1
