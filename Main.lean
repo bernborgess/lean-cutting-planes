@@ -14,7 +14,7 @@ def derived
   (c3 : PBIneq ![0,0,0,-1] xs (-1))
   : PBIneq ![1,2,2,0] xs 3
   := by
-  let h2z : 2 > 0 := Nat.zero_lt_succ 1
+  let h2z : (2:Int) > 0 := sorry -- Nat.zero_lt_succ 1
   let h3z : 3 > 0 := Nat.zero_lt_succ 2
   let t1 : PBIneq ![2,4,2,0] xs 4      := by apply Multiplication c1 h2z
   let t2 : PBIneq ![3,6,6,2] xs 9      := by apply Addition t1 c2

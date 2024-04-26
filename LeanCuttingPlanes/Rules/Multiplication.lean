@@ -28,6 +28,9 @@ theorem Multiplication
   rw [Finset.mul_sum Finset.univ (λ i ↦ as i * xs i) c |>.symm] -- ∑i, c * f i = c * ∑i, f i
   -- c * A ≤ c * ∑i, as i * xs i
 
+  -- Maybe this will work?
+  -- apply @Nat.cast ℤ at c
+
   apply mul_le_mul_iff_of_pos_left hc0 |>.mpr       -- (c * A ≤ c * B) ∧ (c > 0) → (A ≤ B)
   -- A ≤ ∑i, as i * xs i
 
