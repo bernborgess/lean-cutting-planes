@@ -4,39 +4,17 @@ namespace PseudoBoolean
 
 open BigOperators
 
--- lemma idk {a : Fin n → ℤ} {c : ℕ}: (∑i, c * a i) = (c * ∑i, a i) := by exact
---   (Finset.mul_sum Finset.univ (fun i => a i) ↑c).symm
-
-lemma yap {a c x : ℤ}
-  : (a * c * x) = (c * a * x) := by
-  have comm := Int.mul_comm a c
-  refine Lean.Omega.Int.mul_congr comm rfl
+lemma lil
+  {a b c : ℤ}
+  : (a * b * c) = (a * (b * c)) := by
+  exact Int.mul_assoc a b c
   done
 
-lemma dab
-  {c : ℤ}
-  {i : Fin n}
-  {as : Fin n → ℤ}
-  {xs : Fin n → Fin 2}
-  : (as i * c * xs i) = (c * as i * xs i) := by
-  exact yap
+lemma sub1
+  {as xs : Fin n → ℤ}
+  : (∑ x : Fin n, c * as x * (xs x)) = (∑ x : Fin n, c * (as x * (xs x))) := by
+  simp [lil]
   done
-
-
--- lemma skibid
---   {c : ℤ} {as : Fin n → ℤ}
---   {xs : Fin n → Fin 2}
---   : (∑i, (as i * c * xs i)) = (∑i,(c * (as i * xs i))) := by
---   sorry
---   done
-
-
--- lemma bro {A c : ℤ} {as : Fin n → ℤ}
---   {xs : Fin n → Fin 2}
---   : (A * c ≤ ∑ x : Fin n, as x * c * xs x) = (A * c ≤ ∑ x : Fin n, c * (as x * xs x)) := by
---   exact?
---   done
-
 
 -- Multiplication
 -- ∑i (a i * l i) ≥ A
@@ -47,20 +25,21 @@ lemma dab
 theorem Multiplication
   {xs : Fin n → Fin 2}
   {as : Fin n → ℤ} {A : ℤ} (ha : PBIneq as xs A)
-  {c : ℕ} (hc0 : c > 0)
-  : PBIneq (as * c : Fin n → ℤ) xs (A * c) := by
+  {c : ℤ} (hc0 : c > 0)
+  : PBIneq (c * as : Fin n → ℤ) xs (c * A) := by
   rw [PBIneq,PBSum] at *
   simp [Pi.smul_apply]
+  rw [sub1]
 
-  -- rw [yap] at
-
-  sorry
+  rw [Finset.mul_sum Finset.univ (λ i ↦ as i * xs i) c |>.symm]
+  apply mul_le_mul_iff_of_pos_left hc0 |>.mpr
+  exact ha
   done
 
 example
   (ha : PBIneq ![1,0] xs 3)
   : PBIneq ![2,0] xs 6 := by
-  let h2z : 2 > 0 := Nat.zero_lt_succ 1
+  let h2z : (2:ℤ) > 0 := by exact (Int.sign_eq_one_iff_pos 2).mp rfl
   apply Multiplication ha h2z
   done
 
