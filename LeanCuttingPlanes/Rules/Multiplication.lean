@@ -13,8 +13,7 @@ open BigOperators
 theorem Multiplication
   {xs : Fin n → Fin 2}
   {as : Fin n → ℤ} {A : ℤ} (ha : PBIneq as xs A)
-  -- TODO: change `c` to ℕ
-  {c : ℤ} (hc0 : c > 0)
+  {c : ℕ} (hc0 : 0 < c)
   : PBIneq (c * as : Fin n → ℤ) xs (c * A) := by
   rw [PBIneq,PBSum] at *
   -- ∑i, (c * as) i * (xs i) ≥ c * A
@@ -30,6 +29,7 @@ theorem Multiplication
 
   -- Maybe this will work?
   -- apply @Nat.cast ℤ at c
+  rw [←Int.ofNat_pos] at hc0
 
   apply mul_le_mul_iff_of_pos_left hc0 |>.mpr       -- (c * A ≤ c * B) ∧ (c > 0) → (A ≤ B)
   -- A ≤ ∑i, as i * xs i
@@ -40,7 +40,7 @@ theorem Multiplication
 example
   (ha : PBIneq ![1,0] xs 3)
   : PBIneq ![2,0] xs 6 := by
-  let h2z : (2:ℤ) > 0 := by exact Int.sign_eq_one_iff_pos 2 |>.mp rfl
+  let h2z : 2 > 0 := Nat.zero_lt_succ 1
   apply Multiplication ha h2z
   done
 
