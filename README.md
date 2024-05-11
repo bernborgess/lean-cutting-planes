@@ -27,7 +27,7 @@ Run `mdbook test` to test all `lean` code blocks.
 ## Example
 
 We want to represent Pseudo-Boolean formulas to decide whether they are _satisfiable_. For instance,
-$$-x_1 + 2x_2 - 3x_3 + 4x_4 - 5x_5 \ge 1 $$
+$$ \overline x_1 + 2x_2 + 3\overline x_3 + 4x_4 + 5\overline x_5 \ge 1 $$
 will be represented as
 
 ```lean
@@ -35,7 +35,7 @@ open PseudoBoolean
 
 variable {xs : Fin 5 → Fin 2}
 
-def my_pb : PBIneq ![-1,2,-3,4,-5] xs 1 := sorry
+def my_pb : PBIneq !![0,1;2,0;0,3;4,0;0,5] xs 1 := sorry
 ```
 
 This notation is under development and is subject to changes.
@@ -48,17 +48,19 @@ Now we can manipulate `PB`s, similarly to this `Toy Example`:
 variable {xs : Fin 4 → Fin 2}
 
 --                     w x y z
-example (c1 : PBIneq ![1,2,1,0] xs 2)
-        (c2 : PBIneq ![1,2,4,2] xs 5)
-        (c3 : PBIneq ![0,0,0,-1] xs (-1))
-        : PBIneq ![1,2,2,0] xs 3
+example (c1 : PBIneq !![1,0;2,0;1,0;0,0] xs 2)
+        (c2 : PBIneq !![1,0;2,0;4,0;2,0] xs 5)
+        (c3 : PBIneq !![0,0;0,0;0,0;0,1] xs 0)
+  : PBIneq !![1,0;2,0;2,0;0,0] xs 3
   := by
   let h2z : 2 > 0 := Nat.zero_lt_succ 1
   let h3z : 3 > 0 := Nat.zero_lt_succ 2
-  let t1 : PBIneq ![2,4,2,0] xs 4      := by apply Multiplication c1 h2z
-  let t2 : PBIneq ![3,6,6,2] xs 9      := by apply Addition t1 c2
-  let t3 : PBIneq ![0,0,0,-2] xs (-2)  := by apply Multiplication c3 h2z
-  let t4 : PBIneq ![3,6,6,0] xs 7      := by apply Addition t2 t3
-  exact Division t4 h3z
+  let t1 : PBIneq !![2,0;4,0;2,0;0,0] xs 4      := by apply Multiplication c1 h2z
+  let t2 : PBIneq !![3,0;6,0;6,0;2,0] xs 9      := by apply Addition t1 c2
+  let t3 : PBIneq !![0,0;0,0;0,0;0,2] xs 0      := by apply Multiplication c3 h2z
+  let t4 : PBIneq !![3,0;6,0;6,0;2,2] xs 9      := by apply Addition t2 t3
+  -- Regulate t4
+  let t5 : PBIneq !![3,0;6,0;6,0;0,0] xs 7      := by sorry
+  exact Division t5 h3z
   done
 ```
