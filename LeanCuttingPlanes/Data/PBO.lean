@@ -25,9 +25,7 @@ example : PBIneq !![1,0;2,0] ![0,1] 2 := by
 
 example : PBIneq !![3,0;4,0] ![0,1] 2 := by
   reduce
-  refine Nat.le.step ?_
-  refine Nat.le.step ?_
-  exact Nat.le.refl
+  simp
   done
 
 end PseudoBoolean
