@@ -1,9 +1,9 @@
 import «LeanCuttingPlanes».Data.PBO
 
 namespace PseudoBoolean
-open FinVec
+open FinVec Matrix
 
-def ceildiv (c : ℕ) (a : ℤ) := (a+c-1) / c
+def ceildiv (c : ℕ) (a : ℕ) := (a+c-1) / c
 
 -- Division
 -- ∑i (a i * l i) ≥ A
@@ -13,9 +13,10 @@ def ceildiv (c : ℕ) (a : ℤ) := (a+c-1) / c
 -- ∑i (ceil(a i / c) * l i) ≥ ceil(A / c)
 theorem Division
   {xs : Fin n → Fin 2}
-  {as : Fin n → ℤ} {A : ℤ} (ha : PBIneq as xs A)
+  {as : Matrix (Fin n) (Fin 2) ℕ} {A : ℕ} (ha : PBIneq as xs A)
   {c : ℕ} (hc0 : c > 0)
-  : PBIneq (map (ceildiv c) as) xs (ceildiv c A) := sorry
+  : PBIneq (as.map (ceildiv c)) xs (ceildiv c A) :=
+  sorry
 
 example
   (ha : PBIneq ![3,4] xs 3)
