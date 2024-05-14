@@ -19,6 +19,12 @@ def tighten (as : Matrix (Fin n) (Fin 2) ℕ) : Matrix (Fin n) (Fin 2) ℕ × �
 #eval tighten !![3,4]
 #eval tighten !![3,5]
 
+theorem Tighten
+  {xs : Fin n → Fin 2}
+  {as : Matrix (Fin n) (Fin 2) ℕ} {A : ℕ} (ha : PBIneq as xs A)
+  : PBIneq (tighten as |>.1) xs (A - (tighten as).2) := by
+  sorry
+
 -- Addition
 -- ∑i (a i * l i) ≥ A
 -- ∑i (b i * l i) ≥ B
@@ -28,7 +34,7 @@ theorem Addition
   {xs : Fin n → Fin 2}
   {as : Matrix (Fin n) (Fin 2) ℕ} {A : ℕ} (ha : PBIneq as xs A)
   {bs : Matrix (Fin n) (Fin 2) ℕ} {B : ℕ} (hb : PBIneq bs xs B)
-  : PBIneq (tighten (as + bs) |>.1) xs ((A + B) - (tighten (as+bs)).2) := by
+  : PBIneq (as + bs) xs (A + B) := by
   rw [PBIneq,PBSum] at *
   -- ⊢ (∑i, (as + bs) i * (xs i)) ≥ A + B
 
