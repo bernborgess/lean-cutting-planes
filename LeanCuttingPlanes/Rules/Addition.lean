@@ -2,22 +2,48 @@ import «LeanCuttingPlanes».Data.PBO
 
 namespace PseudoBoolean
 
-open BigOperators FinVec
+open BigOperators FinVec Matrix
 
 def tighten (as : Matrix (Fin n) (Fin 2) ℕ) : Matrix (Fin n) (Fin 2) ℕ × ℕ :=
   (t, ∑i, (as - t) i 0)
   where
   M := !![1,-1;-1,1]
+  A := !![1;-1]
   t := as.map Int.ofNat * M |>.map Int.toNat
+  v := as.map Int.ofNat * A |>.map Int.natAbs
+
+def eq : ℕ × ℕ → ℕ × ℕ
+| (a,b) => if a > b then (a-b,0) else (0,b-a)
+
+def rem : ℕ × ℕ → ℕ
+| (a,b) => min a b
+
+def tighten' (as : Matrix (Fin n) (Fin 2) ℤ) := -- : Matrix (Fin n) (Fin 2) ℕ × ℕ :=
+  ∑i:Fin n,
+    ![if as i 0 > as i 1 then as i 0 - as i 1 else as i 1 - as i 0,
+      min (as i 0) (as i 1)]
 
 #eval tighten !![1,0]
+#eval tighten' !![1,0]
+
 #eval tighten !![1,1]
+#eval tighten' !![1,1]
+
 #eval tighten !![2,1]
+#eval tighten' !![2,1]
+
 #eval tighten !![3,1]
+#eval tighten' !![3,1]
+
 #eval tighten !![3,2]
+#eval tighten !![3,2]
+
 #eval tighten !![3,3]
 #eval tighten !![3,4]
 #eval tighten !![3,5]
+
+#eval tighten !![3,5;1,1;4,2;4,5]
+#eval tighten' !![3,5;1,1;4,2;4,5]
 
 theorem Tighten
   {xs : Fin n → Fin 2}
