@@ -1,6 +1,4 @@
-import Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Data.Fin.Tuple.Reflection
-import Mathlib.Data.Fin.VecNotation
 import Mathlib.Data.Matrix.Notation
 
 namespace PseudoBoolean
