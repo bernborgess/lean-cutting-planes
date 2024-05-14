@@ -2,7 +2,11 @@ import «LeanCuttingPlanes».Data.PBO
 
 namespace PseudoBoolean
 
-open BigOperators
+open BigOperators FinVec
+
+-- def tighten (as : Matrix (Fin n) (Fin 2) ℕ) : Matrix (Fin n) (Fin 2) ℕ :=
+--   (as.map Int.ofNat) * !![1,-1;-1,1] |>.map Int.toNat
+
 
 -- Addition
 -- ∑i (a i * l i) ≥ A
@@ -11,8 +15,8 @@ open BigOperators
 -- ∑i ((a i + b i) * l i) ≥ A + B
 theorem Addition
   {xs : Fin n → Fin 2}
-  {as : Fin n → Fin 2 → ℕ} {A : ℕ} (ha : PBIneq as xs A)
-  {bs : Fin n → Fin 2 → ℕ} {B : ℕ} (hb : PBIneq bs xs B)
+  {as : Matrix (Fin n) (Fin 2) ℕ} {A : ℕ} (ha : PBIneq as xs A)
+  {bs : Matrix (Fin n) (Fin 2) ℕ} {B : ℕ} (hb : PBIneq bs xs B)
   : PBIneq (as + bs) xs (A + B) := by
   rw [PBIneq,PBSum] at *
   -- ⊢ (∑i, (as + bs) i * (xs i)) ≥ A + B
@@ -20,7 +24,7 @@ theorem Addition
   simp [Pi.add_apply]           -- (x + y) i = x i + y i
   -- ⊢ A + B ≤ ∑i, (as i + bs i) * xs i
 
-  simp [add_mul]                -- (a + b) * c = a * c + b * c
+  -- simp [add_mul]                -- (a + b) * c = a * c + b * c
   -- ⊢ A + B ≤ ∑i, as i * xs i + bs i * xs i
 
   simp [Finset.sum_add_distrib] -- ∑i,(f i + g i) = (∑i, f i) + (∑i, g i)

@@ -20,7 +20,7 @@ def derived
   let t2 : PBIneq !![3,0;6,0;6,0;2,0] xs 9      := by apply Addition t1 c2
   let t3 : PBIneq !![0,0;0,0;0,0;0,2] xs 0      := by apply Multiplication c3 h2z
   let t4 : PBIneq !![3,0;6,0;6,0;2,2] xs 9      := by apply Addition t2 t3
-  -- Regulate t4
+  -- Tighten t4
   let t5 : PBIneq !![3,0;6,0;6,0;0,0] xs 7      := by sorry
   exact Division t5 h3z
   done
