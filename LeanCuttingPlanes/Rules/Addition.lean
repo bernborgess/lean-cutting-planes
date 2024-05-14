@@ -4,9 +4,20 @@ namespace PseudoBoolean
 
 open BigOperators FinVec
 
--- def tighten (as : Matrix (Fin n) (Fin 2) ℕ) : Matrix (Fin n) (Fin 2) ℕ :=
---   (as.map Int.ofNat) * !![1,-1;-1,1] |>.map Int.toNat
+def tighten (as : Matrix (Fin n) (Fin 2) ℕ) : Matrix (Fin n) (Fin 2) ℕ × ℕ :=
+  (t, ∑i, (as - t) i 0)
+  where
+  M := !![1,-1;-1,1]
+  t := as.map Int.ofNat * M |>.map Int.toNat
 
+#eval tighten !![1,0]
+#eval tighten !![1,1]
+#eval tighten !![2,1]
+#eval tighten !![3,1]
+#eval tighten !![3,2]
+#eval tighten !![3,3]
+#eval tighten !![3,4]
+#eval tighten !![3,5]
 
 -- Addition
 -- ∑i (a i * l i) ≥ A
@@ -17,7 +28,7 @@ theorem Addition
   {xs : Fin n → Fin 2}
   {as : Matrix (Fin n) (Fin 2) ℕ} {A : ℕ} (ha : PBIneq as xs A)
   {bs : Matrix (Fin n) (Fin 2) ℕ} {B : ℕ} (hb : PBIneq bs xs B)
-  : PBIneq (as + bs) xs (A + B) := by
+  : PBIneq (tighten (as + bs) |>.1) xs ((A + B) - (tighten (as+bs)).2) := by
   rw [PBIneq,PBSum] at *
   -- ⊢ (∑i, (as + bs) i * (xs i)) ≥ A + B
 
