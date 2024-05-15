@@ -15,7 +15,7 @@ theorem Multiplication
   {as : Matrix (Fin n) (Fin 2) ℕ} {A : ℕ} (ha : PBIneq as xs A)
   {c : ℕ} (hc0 : 0 < c)
   : PBIneq (c • as) xs (c * A) := by
-  rw [PBIneq,PBSum] at *
+  unfold PBIneq PBSum at *
 
   -- ∑i, (c * as) i * (xs i) ≥ c * A
   simp [Pi.smul_apply]                              -- (c * as) i = c * (as i)
