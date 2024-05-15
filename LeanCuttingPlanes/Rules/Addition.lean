@@ -41,16 +41,9 @@ theorem Addition
   /-
   A + B ≤
     ∑ x : Fin n,
-      (
-          (if as x 1 + bs x 1 < as x 0 + bs x 0
-              then ![as x 0 + bs x 0 - (as x 1 + bs x 1), 0]
-              else ![0, as x 1 + bs x 1 - (as x 0 + bs x 0)]) 0
-        * ↑(xs x)
-        + (if as x 1 + bs x 1 < as x 0 + bs x 0
-              then ![as x 0 + bs x 0 - (as x 1 + bs x 1), 0]
-              else ![0, as x 1 + bs x 1 - (as x 0 + bs x 0)]) 1
-        * (1 - ↑(xs x))
-      )
+      (if as x 1 + bs x 1 < as x 0 + bs x 0
+        then ![as x 0 + bs x 0 - (as x 1 + bs x 1), 0]
+        else ![0, as x 1 + bs x 1 - (as x 0 + bs x 0)]) (1 - xs x)
     + ∑ x : Fin n, min (as x 0 + bs x 0) (as x 1 + bs x 1)
   -/
   sorry

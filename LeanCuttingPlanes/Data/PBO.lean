@@ -6,9 +6,9 @@ namespace PseudoBoolean
 open FinVec BigOperators
 
 def PBSum (cs : Matrix (Fin n) (Fin 2) ℕ) (xs : Fin n → Fin 2) :=
-  ∑ i, ((cs i) 0 * xs i + (cs i) 1 * (1 - xs i))
+  ∑ i, ((cs i) (1 - xs i))
 
-def PBIneq {n : ℕ} (cs : Matrix (Fin n) (Fin 2) ℕ) (xs : Fin n → Fin 2) (const : ℕ) :=
+def PBIneq (cs : Matrix (Fin n) (Fin 2) ℕ) (xs : Fin n → Fin 2) (const : ℕ) :=
   PBSum cs xs ≥ const
 
 example : PBIneq !![1,0] ![1] 1 := by
