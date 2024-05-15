@@ -16,29 +16,6 @@ def tighten (as : Matrix (Fin n) (Fin 2) ℕ) : Matrix (Fin n) (Fin 2) ℕ :=
 def getSlack (as : Matrix (Fin n) (Fin 2) ℕ) : ℕ :=
   ∑i : Fin n , min (as i 0) (as i 1)
 
-#eval tighten !![1,0;0,1;1,1;5,2]
-#eval getSlack !![1,0;0,1;1,1;5,2]
-
-#eval tighten !![1,0] = !![1,0]
-#eval getSlack !![1,0] = 0
-
-#eval tighten !![1,1] = !![0,0]
-
-#eval tighten !![2,1] = !![1,0]
-
-#eval tighten !![3,1] = !![2,0]
-
-#eval tighten !![3,2] = !![1,0]
-
-#eval tighten !![3,3] = !![0,0]
-
-#eval tighten !![3,4] = !![0,1]
-
-#eval tighten !![3,5] = !![0,2]
-#eval getSlack !![3,5] = 3
-
-#eval tighten !![3,5;1,1;4,2;4,5] = !![0,2;0,0;2,0;0,1]
-
 def AdditionProp
   (xs : Fin n → Fin 2)
   (as : Matrix (Fin n) (Fin 2) ℕ) (A : ℕ)
@@ -60,7 +37,22 @@ theorem Addition
   {bs : Matrix (Fin n) (Fin 2) ℕ} {B : ℕ} (hb : PBIneq bs xs B)
   : AdditionProp xs as A bs B := by
   unfold AdditionProp PBIneq PBSum getSlack tighten at *
-
+  simp
+  /-
+  A + B ≤
+    ∑ x : Fin n,
+      (
+          (if as x 1 + bs x 1 < as x 0 + bs x 0
+              then ![as x 0 + bs x 0 - (as x 1 + bs x 1), 0]
+              else ![0, as x 1 + bs x 1 - (as x 0 + bs x 0)]) 0
+        * ↑(xs x)
+        + (if as x 1 + bs x 1 < as x 0 + bs x 0
+              then ![as x 0 + bs x 0 - (as x 1 + bs x 1), 0]
+              else ![0, as x 1 + bs x 1 - (as x 0 + bs x 0)]) 1
+        * (1 - ↑(xs x))
+      )
+    + ∑ x : Fin n, min (as x 0 + bs x 0) (as x 1 + bs x 1)
+  -/
   sorry
   done
 
