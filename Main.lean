@@ -16,20 +16,22 @@ def derived
   := by
   let h2z : 2 > 0 := Nat.zero_lt_succ 1
   let h3z : 3 > 0 := Nat.zero_lt_succ 2
-  let t1 : PBIneq !![2,0;4,0;2,0;0,0] xs 4      := by apply Multiplication c1 h2z
-  let t2 : PBIneq !![3,0;6,0;6,0;2,0] xs 9      := by apply Addition t1 c2
-  let t3 : PBIneq !![0,0;0,0;0,0;0,2] xs 0      := by apply Multiplication c3 h2z
-  let t4 : PBIneq !![3,0;6,0;6,0;2,2] xs 9      := by apply Addition t2 t3
-  let t5 : PBIneq !![3,0;6,0;6,0;0,0] xs 7      := by apply Tighten t4
-  exact Division t5 h3z
+  let t1 : PBIneq !![2,0;4,0;2,0;0,0] xs 4  := by apply Multiplication c1 h2z
+  let t2 : PBIneq !![3,0;6,0;6,0;2,0] xs 9  := by apply Addition t1 c2
+  let t3 : PBIneq !![0,0;0,0;0,0;0,2] xs 0  := by apply Multiplication c3 h2z
+  let t4 : PBIneq !![3,0;6,0;6,0;0,0] xs 7  := by apply Addition t2 t3
+  exact Division t4 h3z
   done
 
 def resolved : ∃xs, PBIneq !![1,0;2,0;2,0;0,0] xs 3 :=
-  let xs := ![1,0,0,0]
-  let c1 : PBIneq !![1,0;2,0;1,0;0,0] xs 2 := by reduce ; sorry
-  let c2 : PBIneq !![1,0;2,0;4,0;2,0] xs 5 := by reduce ; sorry
-  let c3 : PBIneq !![0,0;0,0;0,0;0,1] xs 0 := by reduce ; sorry
-  ⟨xs,derived xs c1 c2 c3⟩
+  let xs := ![1,0,1,0]
+  let c1 : PBIneq !![1,0;2,0;1,0;0,0] xs 2 := by reduce ; simp
+  let c2 : PBIneq !![1,0;2,0;4,0;2,0] xs 5 := by reduce ; simp
+  let c3 : PBIneq !![0,0;0,0;0,0;0,1] xs 0 := by reduce ; simp
+  by
+  use xs
+  exact derived xs c1 c2 c3
+  done
 
 def main : IO Unit := do
   IO.println "This is lean-cutting-planes"
