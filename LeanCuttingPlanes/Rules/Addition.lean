@@ -4,22 +4,18 @@ namespace PseudoBoolean
 
 open BigOperators FinVec Matrix
 
-def tighten (as : Matrix (Fin n) (Fin 2) ℕ) : Matrix (Fin n) (Fin 2) ℕ :=
-  λ i : Fin n =>
-    let x := as i 0
-    let y := as i 1
-    if x > y then
-      ![x - y,0]
-    else
-      ![0,y - x]
+def tighten (as : Coeff n) : Coeff n :=
+  λ i : Fin n => let (p,n) := as i
+    if p > n then (p - n,0) else (0,n - p)
 
-def getSlack (as : Matrix (Fin n) (Fin 2) ℕ) : ℕ :=
-  ∑i : Fin n , min (as i 0) (as i 1)
+def getSlack (as : Coeff n) : ℕ :=
+  ∑ i : Fin n, let (p,n) := as i
+    min p n
 
 def AdditionProp
   (xs : Fin n → Fin 2)
-  (as : Matrix (Fin n) (Fin 2) ℕ) (A : ℕ)
-  (bs : Matrix (Fin n) (Fin 2) ℕ) (B : ℕ)
+  (as : Coeff n) (A : ℕ)
+  (bs : Coeff n) (B : ℕ)
   : Prop :=
   let abs := as + bs
   let ts := tighten abs
@@ -33,26 +29,32 @@ def AdditionProp
 -- ∑i ((a i + b i) * l i) ≥ A + B
 theorem Addition
   {xs : Fin n → Fin 2}
-  {as : Matrix (Fin n) (Fin 2) ℕ} {A : ℕ} (ha : PBIneq as xs A)
-  {bs : Matrix (Fin n) (Fin 2) ℕ} {B : ℕ} (hb : PBIneq bs xs B)
+  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
+  {bs : Coeff n} {B : ℕ} (hb : PBIneq bs xs B)
   : AdditionProp xs as A bs B := by
   unfold AdditionProp PBIneq PBSum getSlack tighten at *
   simp
+
   /-
   A + B ≤
-    ∑ x : Fin n,
-      (if as x 1 + bs x 1 < as x 0 + bs x 0
-        then ![as x 0 + bs x 0 - (as x 1 + bs x 1), 0]
-        else ![0, as x 1 + bs x 1 - (as x 0 + bs x 0)]) (1 - xs x)
-    + ∑ x : Fin n, min (as x 0 + bs x 0) (as x 1 + bs x 1)
+  (∑ x : Fin n,
+      if xs x = 1 then
+        (Decidable.rec (fun h => (0, (as x).2 + (bs x).2 - ((as x).1 + (bs x).1)))
+            (fun h => ((as x).1 + (bs x).1 - ((as x).2 + (bs x).2), 0))
+            (((as x).2 + (bs x).2).decLt ((as x).1 + (bs x).1))).1
+      else
+        (Decidable.rec (fun h => (0, (as x).2 + (bs x).2 - ((as x).1 + (bs x).1)))
+            (fun h => ((as x).1 + (bs x).1 - ((as x).2 + (bs x).2), 0))
+            (((as x).2 + (bs x).2).decLt ((as x).1 + (bs x).1))).2) +
+    ∑ x : Fin n, min ((as x).1 + (bs x).1) ((as x).2 + (bs x).2)
   -/
   sorry
   done
 
 example
-  (ha : PBIneq !![1,0;0,0] xs 1)
-  (hb : PBIneq !![1,0;1,0] xs 2)
-  : PBIneq !![2,0;1,0] xs 3 := by
+  (ha : PBIneq ![(1,0),(0,0)] xs 1)
+  (hb : PBIneq ![(1,0),(1,0)] xs 2)
+  : PBIneq ![(2,0),(1,0)] xs 3 := by
   apply Addition ha hb
   done
 

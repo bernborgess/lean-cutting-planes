@@ -12,17 +12,17 @@ open BigOperators FinVec
 -- ∑i (c * a i * l i) ≥ c*A
 theorem Multiplication
   {xs : Fin n → Fin 2}
-  {as : Matrix (Fin n) (Fin 2) ℕ} {A : ℕ} (ha : PBIneq as xs A)
+  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
   {c : ℕ} (hc0 : 0 < c)
   : PBIneq (c • as) xs (c * A) := by
-  unfold PBIneq PBSum at *
+  -- unfold PBIneq PBSum at *
 
   -- ∑i, (c * as) i * (xs i) ≥ c * A
-  simp [Pi.smul_apply]                              -- (c * as) i = c * (as i)
+  -- simp [Pi.smul_apply]                              -- (c * as) i = c * (as i)
   -- c * A ≤ ∑i, c * as i * (xs i)
 
 
-  simp [mul_assoc]                              -- (a * b) * c = a * (b * c)
+  -- simp [mul_assoc]                              -- (a * b) * c = a * (b * c)
   -- c * A ≤ ∑i, c * (as i * xs i)
 
   sorry
@@ -38,8 +38,8 @@ theorem Multiplication
   done
 
 example
-  (ha : PBIneq !![1,0] xs 3)
-  : PBIneq !![2,0] xs 6 := by
+  (ha : PBIneq ![(1,0)] xs 3)
+  : PBIneq ![(2,0)] xs 6 := by
   let h2z : 2 > 0 := Nat.zero_lt_succ 1
   apply Multiplication ha h2z
   done

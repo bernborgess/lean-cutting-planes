@@ -13,9 +13,9 @@ def ceildiv (c : ℕ) (a : ℕ) := (a+c-1) / c
 -- ∑i (ceil(a i / c) * l i) ≥ ceil(A / c)
 theorem Division
   {xs : Fin n → Fin 2}
-  {as : Matrix (Fin n) (Fin 2) ℕ} {A : ℕ} (ha : PBIneq as xs A)
+  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
   {c : ℕ} (hc0 : c > 0)
-  : PBIneq (as.map (ceildiv c)) xs (ceildiv c A) :=
+  : PBIneq (map (mapBoth $ ceildiv c) as) xs (ceildiv c A) :=
   sorry
 
 example
