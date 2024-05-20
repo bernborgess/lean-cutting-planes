@@ -33,8 +33,7 @@ theorem Addition
   {bs : Coeff n} {B : ℕ} (hb : PBIneq bs xs B)
   : AdditionProp xs as A bs B := by
   unfold AdditionProp PBIneq PBSum getSlack tighten at *
-  simp
-
+  simp at *
   /-
   A + B ≤
   (∑ x : Fin n,

@@ -15,26 +15,15 @@ theorem Multiplication
   {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
   {c : ℕ} (hc0 : 0 < c)
   : PBIneq (c • as) xs (c * A) := by
-  -- unfold PBIneq PBSum at *
-
-  -- ∑i, (c * as) i * (xs i) ≥ c * A
-  -- simp [Pi.smul_apply]                              -- (c * as) i = c * (as i)
-  -- c * A ≤ ∑i, c * as i * (xs i)
-
-
-  -- simp [mul_assoc]                              -- (a * b) * c = a * (b * c)
-  -- c * A ≤ ∑i, c * (as i * xs i)
-
+  unfold PBIneq PBSum at *
+  simp at *
+  /- ⊢ c * A ≤
+        ∑ x : Fin n,
+          if xs x = 1
+          then c * (as x).1
+          else c * (as x).2
+  -/
   sorry
-  -- rw [Finset.mul_sum Finset.univ (λ i ↦ as i * xs i) c |>.symm] -- ∑i, c * f i = c * ∑i, f i
-  -- c * A ≤ c * ∑i, as i * xs i
-
-  -- rw [←Int.ofNat_pos] at hc0 -- cast c to ℤ
-
-  -- apply mul_le_mul_iff_of_pos_left hc0 |>.mpr       -- (c * A ≤ c * B) ∧ (c > 0) → (A ≤ B)
-  -- A ≤ ∑i, as i * xs i
-
-  -- exact ha
   done
 
 example

@@ -31,22 +31,4 @@ example : PBIneq ![(3,0),(4,0)] ![0,1] 2 := by
 
 def mapBoth (f : α → β) (t : α × α) : β × β := Prod.map f f t
 
-variable {α β : Type}
-#check @Prod.map α β α β
-#check @mapBoth α β
-
--- def ceildiv (c : ℕ) (a : ℕ) := (a+c-1) / c
--- def ceilTup (c : ℕ) : ℕ × ℕ → ℕ × ℕ := mapBoth (ceildiv c)
---   -- (ceildiv c t.1,ceildiv c t.2)
--- #eval ceilTup 3 (3,4) = (1,2)
--- #eval ceilTup 2 (3,4) = (2,2)
--- #eval ceilTup 1 (3,4) = (3,4)
-
-def minTup (A : ℕ) (t : ℕ × ℕ) := mapBoth (min A) t
--- (min A t.1,min A t.2)
-#eval minTup 1 (1,5) = (1,1)
-#eval minTup 3 (1,5) = (1,3)
-#eval minTup 5 (1,5) = (1,5)
-
-
 end PseudoBoolean
