@@ -27,7 +27,7 @@ Run `mdbook test` to test all `lean` code blocks.
 ## Example
 
 We want to represent Pseudo-Boolean formulas to decide whether they are _satisfiable_. For instance,
-$$ \overline x_1 + 2x_2 + 3\overline x_3 + 4x_4 + 5\overline x_5 \ge 1 $$
+$$\overline x_1 + 2x_2 + 3\overline x_3 + 4x_4 + 5\overline x_5 \ge 1$$
 will be represented as
 
 ```lean
