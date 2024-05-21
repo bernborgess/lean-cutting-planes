@@ -76,6 +76,14 @@ example (A B C D : ℕ)
         rw [min_eq_right_of_lt h₃]
         exact h
 
+example (A : ℕ) (xs : Fin n → ℕ)
+  (h : A ≤ min A (∑i,xs i))
+  : A ≤ ∑i,min A (xs i) := by sorry
+
+example (A B C : ℕ) (i : Bool)
+  : min A (if i then B else C) = (if i then min A B else min A C) := by
+  exact apply_ite (min A) (i = true) B C
+  done
 
 -- Saturation
 -- ∑i (a i * l i) ≥ A
@@ -86,13 +94,21 @@ theorem Saturation
   {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
   : PBIneq (map (mapBoth (min A)) as) xs A := by
   unfold PBIneq PBSum FinVec.map mapBoth at *
-  simp at *
+  simp only [Fin.isValue, ge_iff_le, Prod_map, seq_eq] at *
+  apply le_min_self_of_le at ha
+
+  have h1 : min A (∑ x : Fin n, if xs x = 1 then (as x).1 else (as x).2) ≤ (∑ x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2)) := sorry
+
+  have h2 : A ≤ (∑ x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2)) := by
+    apply le_trans ha h1
+
+  have r1 : ∀x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2) = (if xs x = 1 then min A (as x).1 else min A (as x).2) := by exact fun x => apply_ite (min A) (xs x = 1) (as x).1 (as x).2
+
+  -- rw [r1] at h2
+
   /-
-  A ≤
-    ∑ x : Fin n,
-      if xs x = 1
-      then min A (as x).1
-      else min A (as x).2
+  h2 : A ≤ ∑ x : Fin n, min A (if xs x = 1 then       (as x).1 else       (as x).2)
+  ⊢    A ≤ ∑ x : Fin n,       (if xs x = 1 then min A (as x).1 else min A (as x).2)
   -/
   sorry
   done
