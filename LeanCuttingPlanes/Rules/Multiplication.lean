@@ -14,16 +14,15 @@ theorem Multiplication
   {xs : Fin n → Fin 2}
   {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
   {c : ℕ} (hc0 : 0 < c)
-  : PBIneq (c • as) xs (c * A) := by
+  : PBIneq (c • as) xs (c • A) := by
   unfold PBIneq PBSum at *
   simp at *
-  /- ⊢ c * A ≤
-        ∑ x : Fin n,
-          if xs x = 1
-          then c * (as x).1
-          else c * (as x).2
-  -/
-  sorry
+  have hh : c • A ≤ c • ∑ x : Fin n, if xs x = 1 then (as x).1 else (as x).2 := by
+    exact nsmul_le_nsmul_right ha c
+    done
+  rw [← Finset.sum_nsmul] at hh
+  simp at hh
+  assumption
   done
 
 example
