@@ -85,6 +85,43 @@ example (A B C : ℕ) (i : Bool)
   exact apply_ite (min A) (i = true) B C
   done
 
+-- set_option autoImplicit false
+
+#check apply_ite (min 3) true 3 4
+
+-- Zulip Question: how to rewrite inside BigOperators
+-- https://leanprover.zulipchat.com/#narrow/stream/113489-new-members/topic/.E2.9C.94.20Expanding.20a.20sum
+-- https://leanprover.zulipchat.com/#narrow/stream/113489-new-members/topic/patterns.20with.20coerced.20var
+-- https://leanprover.zulipchat.com/#narrow/stream/217875-Is-there-code-for-X.3F/topic/finset.20sum.20function.2Eextend
+-- https://leanprover.zulipchat.com/#narrow/stream/217875-Is-there-code-for-X.3F/topic/Finset.2Euniv.2Esum.20split
+-- https://leanprover.zulipchat.com/#narrow/stream/270676-lean4/topic/.E2.9C.94.20Can't.20rewrite.20seemingly.20indentical.20terms
+-- https://leanprover.zulipchat.com/#narrow/stream/287929-mathlib4/topic/Point.26Click.20library.20rewrite.20tactic
+example (A B : ℕ)
+  (xs : Fin n → ℕ)
+  (h : A = B)
+  (g : B ≤ ∑i,(min A (if xs i = 1 then xs i else 3)))
+  : B ≤ ∑i, (if xs i = 1 then min A (xs i) else min A 3) := by
+  have r : ∀ i : Fin n, (min A (if xs i = 1 then xs i else 3)) = ((if xs i = 1 then min A (xs i) else min A 3)) := by
+    intro i
+    exact apply_ite (min A) (xs i = 1) (xs i) 3
+    done
+  sorry
+  -- rw [r] at g
+  -- assumption
+  done
+
+example (A B : ℕ)
+  (xs : Fin n → ℕ)
+  (h : A = B)
+  (g : B ≤ ∑i,(min A (if xs i = 1 then xs i else 3)))
+  : B ≤ ∑i, (if xs i = 1 then min A (xs i) else min A 3) := by
+  have r : (λ i : Fin n => (min A (if xs i = 1 then xs i else 3)))
+         = (λ i : Fin n => (if xs i = 1 then min A (xs i) else min A 3)) := by sorry
+  rw [r] at g
+  assumption
+  done
+
+
 -- Saturation
 -- ∑i (a i * l i) ≥ A
 -- ⊢
@@ -102,9 +139,13 @@ theorem Saturation
   have h2 : A ≤ (∑ x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2)) := by
     apply le_trans ha h1
 
-  have r1 : ∀x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2) = (if xs x = 1 then min A (as x).1 else min A (as x).2) := by exact fun x => apply_ite (min A) (xs x = 1) (as x).1 (as x).2
+  have r1 {b : Bool} {x y : ℕ} : min A (if b then x else y) = (if b then min A x else min A y) := by exact apply_ite (min A) (b = true) x y
 
-  -- rw [r1] at h2
+  -- rw [apply_ite] at h2
+
+  -- h2 : A ≤ ∑ x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2)
+  -- h2 : A ≤ ∑ x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2)
+
 
   /-
   h2 : A ≤ ∑ x : Fin n, min A (if xs x = 1 then       (as x).1 else       (as x).2)
