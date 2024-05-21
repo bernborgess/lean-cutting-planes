@@ -23,10 +23,6 @@ lemma min_sum_le_sum_min (A B C : ℕ)
   simp
   by_cases h : A ≤ B + C
   . left
-    /-
-    h : A ≤ B + C
-    ⊢ A ≤ min A B + min A C
-    -/
     by_cases h₁ : A ≤ B
     . rw [min_eq_left h₁]
       exact Nat.le_add_right A (min A C)
@@ -38,7 +34,6 @@ lemma min_sum_le_sum_min (A B C : ℕ)
       . simp at h₂
         rw [min_eq_right_of_lt h₂]
         exact h
-    sorry
 
   . right
     rw [not_le,←Nat.succ_le,Nat.succ_eq_add_one] at h
@@ -58,6 +53,7 @@ lemma min_sum_le_sum_min (A B C : ℕ)
     rw [min_eq_right hba]
     done
 
+-- Pattern keeps going for each new term
 example (A B C D : ℕ)
   (h : A ≤ B + C + D)
   : A ≤ min A B + min A C + min A D := by
