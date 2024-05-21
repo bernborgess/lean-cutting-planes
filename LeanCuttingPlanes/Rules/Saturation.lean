@@ -3,6 +3,30 @@ import «LeanCuttingPlanes».Data.PBO
 namespace PseudoBoolean
 open FinVec Matrix BigOperators
 
+lemma le_min_self_of_le
+  {A B : ℕ}
+  (h : A ≤ B)
+  : A ≤ min A B := by
+  simp only [ge_iff_le, h, min_eq_left, le_refl]
+
+lemma min_elim
+  (A C : ℕ)
+  (h : C < A)
+  : min A C = C := by
+  exact min_eq_right_of_lt h
+  done
+
+lemma min_sum_le_sum_min (A B C : ℕ)
+  : min A (B + C) ≤ (min A B) + (min A C) := by
+  simp
+  by_cases h : A ≤ B + C
+  . sorry
+  simp at h
+  right
+  have hca : C < A := by sorry
+  rw [min_eq_right_of_lt hca]
+  sorry
+
 -- Saturation
 -- ∑i (a i * l i) ≥ A
 -- ⊢
