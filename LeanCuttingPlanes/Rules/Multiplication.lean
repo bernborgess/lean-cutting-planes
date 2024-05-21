@@ -16,13 +16,12 @@ theorem Multiplication
   {c : ℕ} (hc0 : 0 < c)
   : PBIneq (c • as) xs (c • A) := by
   unfold PBIneq PBSum at *
-  simp at *
-  have hh : c • A ≤ c • ∑ x : Fin n, if xs x = 1 then (as x).1 else (as x).2 := by
-    exact nsmul_le_nsmul_right ha c
-    done
-  rw [← Finset.sum_nsmul] at hh
-  simp at hh
-  assumption
+  simp only [Fin.isValue, ge_iff_le, nsmul_eq_smul, smul_eq_mul] at *
+  apply nsmul_le_nsmul_right at ha
+  have ha := ha c
+  rw [←Finset.sum_nsmul] at ha
+  simp only [smul_eq_mul, Fin.isValue, mul_ite] at ha
+  exact ha
   done
 
 example
