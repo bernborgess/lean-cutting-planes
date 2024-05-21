@@ -18,7 +18,7 @@ theorem Multiplication
   unfold PBIneq PBSum at *
   simp only [Fin.isValue, ge_iff_le, nsmul_eq_smul, smul_eq_mul] at *
   apply nsmul_le_nsmul_right at ha
-  have ha := ha c
+  specialize ha c
   rw [←Finset.sum_nsmul] at ha
   simp only [smul_eq_mul, Fin.isValue, mul_ite] at ha
   exact ha
