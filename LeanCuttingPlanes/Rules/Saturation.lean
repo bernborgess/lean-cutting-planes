@@ -16,16 +16,37 @@ lemma min_elim
   exact min_eq_right_of_lt h
   done
 
+-- https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Order/LinearOrder.html
+
 lemma min_sum_le_sum_min (A B C : ℕ)
   : min A (B + C) ≤ (min A B) + (min A C) := by
   simp
   by_cases h : A ≤ B + C
-  . sorry
-  simp at h
-  right
-  have hca : C < A := by sorry
-  rw [min_eq_right_of_lt hca]
-  sorry
+  . left
+    /-
+    h : A ≤ B + C
+    ⊢ A ≤ min A B + min A C
+    -/
+    sorry
+
+  . right
+    rw [not_le,←Nat.succ_le,Nat.succ_eq_add_one] at h
+
+    have hca : C ≤ A := by
+      apply le_of_add_le_left at h
+      apply le_of_add_le_right at h
+      exact h
+
+    rw [min_eq_right hca]
+
+    have hba : B ≤ A := by
+      apply le_of_add_le_left at h
+      apply le_of_add_le_left at h
+      exact h
+
+    rw [min_eq_right hba]
+    done
+
 
 -- Saturation
 -- ∑i (a i * l i) ≥ A
