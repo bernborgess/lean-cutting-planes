@@ -27,6 +27,17 @@ lemma min_sum_le_sum_min (A B C : ℕ)
     h : A ≤ B + C
     ⊢ A ≤ min A B + min A C
     -/
+    by_cases h₁ : A ≤ B
+    . rw [min_eq_left h₁]
+      exact Nat.le_add_right A (min A C)
+    . simp at h₁
+      rw [min_eq_right_of_lt h₁]
+      by_cases h₂ : A ≤ C
+      . rw [min_eq_left h₂]
+        exact Nat.le_add_left A B
+      . simp at h₂
+        rw [min_eq_right_of_lt h₂]
+        exact h
     sorry
 
   . right
@@ -46,6 +57,28 @@ lemma min_sum_le_sum_min (A B C : ℕ)
 
     rw [min_eq_right hba]
     done
+
+example (A B C D : ℕ)
+  (h : A ≤ B + C + D)
+  : A ≤ min A B + min A C + min A D := by
+  by_cases h₁ : A ≤ B
+  . rw [min_eq_left h₁]
+    rw [add_assoc]
+    exact Nat.le_add_right A (min A C + min A D)
+  . simp at h₁
+    rw [min_eq_right_of_lt h₁]
+    by_cases h₂ : A ≤ C
+    . rw [min_eq_left h₂]
+      rw [add_comm B A,add_assoc]
+      exact Nat.le_add_right A (B + min A D)
+    . simp at h₂
+      rw [min_eq_right_of_lt h₂]
+      by_cases h₃ : A ≤ D
+      . rw [min_eq_left h₃]
+        exact Nat.le_add_left A (B + C)
+      . simp at h₃
+        rw [min_eq_right_of_lt h₃]
+        exact h
 
 
 -- Saturation
