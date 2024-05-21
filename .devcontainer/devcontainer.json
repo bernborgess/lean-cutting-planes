@@ -1,5 +1,5 @@
 {
-    "name": "lean-cutting-planes",
+    "name": "capstone",
     "build": {
         "dockerfile": "Dockerfile"
     },
