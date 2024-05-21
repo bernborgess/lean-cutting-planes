@@ -4,7 +4,8 @@ open PseudoBoolean
 
 def pb : PBIneq ![(1,0),(2,0)] ![0,1] 1 := by
   reduce
-  simp
+  rw [Nat.le_eq]
+  apply Nat.one_le_ofNat
   done
 
 def derived
