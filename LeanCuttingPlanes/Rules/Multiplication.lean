@@ -13,7 +13,7 @@ open BigOperators FinVec
 theorem Multiplication
   {xs : Fin n → Fin 2}
   {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
-  {c : ℕ} (hc0 : 0 < c)
+  (c : ℕ)
   : PBIneq (c • as) xs (c • A) := by
   unfold PBIneq PBSum at *
   simp only [Fin.isValue, ge_iff_le, nsmul_eq_smul, smul_eq_mul] at *
@@ -27,8 +27,7 @@ theorem Multiplication
 example
   (ha : PBIneq ![(1,0)] xs 3)
   : PBIneq ![(2,0)] xs 6 := by
-  let h2z : 2 > 0 := Nat.zero_lt_succ 1
-  apply Multiplication ha h2z
+  apply Multiplication ha 2
   done
 
 end PseudoBoolean
