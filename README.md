@@ -24,6 +24,15 @@ You can read the [docs](https://bernborgess.github.io/lean-cutting-planes/) here
 
 Run `mdbook test` to test all `lean` code blocks.
 
+## Work Progress
+
+- [ ] Addition proof
+- [x] Multiplication proof
+- [ ] Saturation proof
+- [ ] Division proof
+- [ ] Test cases
+- [ ] Documentation
+
 ## Example
 
 We want to represent Pseudo-Boolean formulas to decide whether they are _satisfiable_. For instance,
