@@ -64,26 +64,9 @@ example (A B C D : ℕ)
 
 -- # Need to achieve this proof for BigOperators
 lemma min_sum_le_sum_min
-  (A n B : ℕ)
-  : min A (∑i:Fin n,B) ≤ ∑i:Fin n,min A B := by sorry
-
-lemma min_sum_le_sum_min_ite
   (A : ℕ)
-  (xs : Fin n → Fin 2)
-  (as : Fin n → ℕ × ℕ)
-  : min A (∑ x : Fin n, if xs x = 1 then (as x).1 else (as x).2)
-  ≤ (∑ x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2)) := by
-  -- apply min_sum_le_sum_min A n (B:=if xs _ = 1 then (as _).1 else (as _).2)
-  sorry
-  /-
-  tactic 'apply' failed, failed to unify
-    min A (∑ i : Fin n, if xs ?m.12973 = 1 then (as ?m.13003).1 else (as ?m.13008).2) ≤
-      ∑ i : Fin n, min A (if xs ?m.12973 = 1 then (as ?m.13003).1 else (as ?m.13008).2)
-  with
-    min A (∑ x : Fin n, if xs x = 1 then (as x).1 else (as x).2) ≤
-      ∑ x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2)
-  -/
-  done
+  (B : Fin n → ℕ)
+  : min A (∑i:Fin n,B i) ≤ ∑i:Fin n,min A (B i) := by sorry
 
 lemma le_min_self_of_le
   {A B : ℕ}
@@ -103,10 +86,11 @@ theorem Saturation
   simp only [Fin.isValue, ge_iff_le, Prod_map, seq_eq] at *
   apply le_min_self_of_le at ha
 
-  have h1 := by exact min_sum_le_sum_min_ite A xs as
-  -- min A (∑i, if _ then _ else _) ≤ ∑i, min A (if _ then _ else _)
+  have h1 := by
+    exact min_sum_le_sum_min A (B:=λi=> if xs i = 1 then(as i).1 else (as i).2)
 
   have h2 := by apply le_trans ha h1 -- A ≤ ∑i, min A (if _ then _ else _)
+
   simp_rw [apply_ite (min A) ((xs _ = 1)) ((as _).1) ((as _).2)] at h2
   exact h2
   done
