@@ -1,13 +1,21 @@
 import «LeanCuttingPlanes».Data.PBO
 
 namespace PseudoBoolean
-open FinVec Matrix BigOperators
+open FinVec Matrix BigOperators Finset
 
 lemma le_min_self_of_le
   {A B : ℕ}
   (h : A ≤ B)
   : A ≤ min A B := by
   simp only [h, min_eq_left, le_refl]
+
+lemma extract_x_sum (x : Fin n) (as : Fin n → ℕ)
+  : (∑i,as i) = (∑i with i≠x,as i) + as x := by
+  sorry
+  done
+
+--   (A ≤ ∑ i : Fin n, min A (as i))
+-- = (A ≤ ∑ i ∈ filter (fun i => i ≠ x) univ, min A (as i) + min A (as x))
 
 lemma le_sum_min_of_le_sum {n A : ℕ} {as : Fin n → ℕ}
   (h : A ≤ ∑i, as i)
@@ -19,22 +27,20 @@ lemma le_sum_min_of_le_sum {n A : ℕ} {as : Fin n → ℕ}
     exact h
 
   . -- Otherwise, ∃x, (as x) > A
-
-    -- Then: hxA : min A (as x) = A
+    simp only [not_forall, not_le] at ha
+    obtain ⟨x,hx⟩ := ha
+    have hxA : min A (as x) = A := by exact min_eq_left_of_lt hx
 
     -- Split goal from
     -- ⊢ A ≤ ∑i, min A (as i)
     -- to
     -- ⊢ A ≤ (∑ i ≠ x, min A (as i)) + min A (as x)
+    have r_sum_x : (A ≤ ∑i, min A (as i))
+                   = (A ≤ (∑i with i≠x, min A (as i)) + min A (as x))
+                   := by simp_rw [extract_x_sum x _]
 
-    -- rw [hxA]
+    rw [r_sum_x,hxA]
     -- ⊢ A ≤ (∑ i ≠ x, min A (as i)) + A
-
-    -- > Just for the demo
-    have oracle : (A ≤ ∑ i : Fin n, min A (as i)) = (A ≤ (∑i, min A (as i)) + A) := sorry
-    rw [oracle]
-    -- >
-
     exact Nat.le_add_left A _
 
 -- Saturation
