@@ -3,77 +3,39 @@ import «LeanCuttingPlanes».Data.PBO
 namespace PseudoBoolean
 open FinVec Matrix BigOperators
 
-/--
-# Convincing myself of the validity
- https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Order/LinearOrder.html
-lemma min_add_le_add_min (A B C : ℕ)
-  : min A (B + C) ≤ (min A B) + (min A C) := by
-  simp
-  by_cases h : A ≤ B + C
-  . left
-    by_cases h₁ : A ≤ B
-    . rw [min_eq_left h₁]
-      exact Nat.le_add_right A (min A C)
-    . simp at h₁
-      rw [min_eq_right_of_lt h₁]
-      by_cases h₂ : A ≤ C
-      . rw [min_eq_left h₂]
-        exact Nat.le_add_left A B
-      . simp at h₂
-        rw [min_eq_right_of_lt h₂]
-        exact h
-
-  . right
-    rw [not_le,←Nat.succ_le,Nat.succ_eq_add_one] at h
-
-    have hca : C ≤ A := by
-      apply le_of_add_le_left at h
-      apply le_of_add_le_right at h
-      exact h
-
-    rw [min_eq_right hca]
-
-    have hba : B ≤ A := by
-      apply le_of_add_le_left at h
-      apply le_of_add_le_left at h
-      exact h
-
-    rw [min_eq_right hba]
-    done
-
--- Pattern keeps going for each new term
-example (A B C D : ℕ)
-  (h : A ≤ B + C + D)
-  : A ≤ min A B + min A C + min A D := by
-  by_cases h₁ : A ≤ B
-  . rw [min_eq_left h₁]
-    rw [add_assoc]
-    exact Nat.le_add_right A (min A C + min A D)
-  . simp at h₁
-    rw [min_eq_right_of_lt h₁]
-    by_cases h₂ : A ≤ C
-    . rw [min_eq_left h₂]
-      rw [add_comm B A,add_assoc]
-      exact Nat.le_add_right A (B + min A D)
-    . simp at h₂
-      rw [min_eq_right_of_lt h₂]
-      by_cases h₃ : A ≤ D
-      . rw [min_eq_left h₃]
-        exact Nat.le_add_left A (B + C)
-      . simp at h₃
-        rw [min_eq_right_of_lt h₃]
-        exact h
--/
-
 lemma le_min_self_of_le
   {A B : ℕ}
   (h : A ≤ B)
   : A ≤ min A B := by
   simp only [h, min_eq_left, le_refl]
 
-lemma le_sum_min_of_le_sum {n A : ℕ} {B : Fin n → ℕ}
-  (h : A ≤ ∑i, B i)
-  : A ≤ ∑i, min A (B i) := sorry
+lemma le_sum_min_of_le_sum {n A : ℕ} {as : Fin n → ℕ}
+  (h : A ≤ ∑i, as i)
+  : A ≤ ∑i, min A (as i) := by
+  by_cases ha : ∀i, as i ≤ A
+  . -- Assume all elements of as are ≤ A
+    simp_rw [@Nat.min_eq_right A (as _) (ha _)]
+    -- rewrite min A (as i) to (as i)
+    exact h
+
+  . -- Otherwise, ∃x, (as x) > A
+
+    -- Then: hxA : min A (as x) = A
+
+    -- Split goal from
+    -- ⊢ A ≤ ∑i, min A (as i)
+    -- to
+    -- ⊢ A ≤ (∑ i ≠ x, min A (as i)) + min A (as x)
+
+    -- rw [hxA]
+    -- ⊢ A ≤ (∑ i ≠ x, min A (as i)) + A
+
+    -- > Just for the demo
+    have oracle : (A ≤ ∑ i : Fin n, min A (as i)) = (A ≤ (∑i, min A (as i)) + A) := sorry
+    rw [oracle]
+    -- >
+
+    exact Nat.le_add_left A _
 
 -- Saturation
 -- ∑i (a i * l i) ≥ A
