@@ -3,7 +3,9 @@ import «LeanCuttingPlanes».Data.PBO
 namespace PseudoBoolean
 open FinVec Matrix BigOperators
 
--- https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Order/LinearOrder.html
+/--
+# Convincing myself of the validity
+ https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Order/LinearOrder.html
 lemma min_add_le_add_min (A B C : ℕ)
   : min A (B + C) ≤ (min A B) + (min A C) := by
   simp
@@ -61,12 +63,12 @@ example (A B C D : ℕ)
       . simp at h₃
         rw [min_eq_right_of_lt h₃]
         exact h
+-/
 
--- # Need to achieve this proof for BigOperators
-lemma min_sum_le_sum_min
-  (A : ℕ)
-  (B : Fin n → ℕ)
-  : min A (∑i:Fin n,B i) ≤ ∑i:Fin n,min A (B i) := by sorry
+lemma min_sum_le_sum_min (A : ℕ) (B : Fin n → ℕ)
+  : min A (∑i,B i) ≤ ∑i, min A (B i) := by
+  sorry
+  done
 
 lemma le_min_self_of_le
   {A B : ℕ}
