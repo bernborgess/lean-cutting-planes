@@ -3,22 +3,8 @@ import «LeanCuttingPlanes».Data.PBO
 namespace PseudoBoolean
 open FinVec Matrix BigOperators
 
-lemma le_min_self_of_le
-  {A B : ℕ}
-  (h : A ≤ B)
-  : A ≤ min A B := by
-  simp only [ge_iff_le, h, min_eq_left, le_refl]
-
-lemma min_elim
-  (A C : ℕ)
-  (h : C < A)
-  : min A C = C := by
-  exact min_eq_right_of_lt h
-  done
-
 -- https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Order/LinearOrder.html
-
-lemma min_sum_le_sum_min (A B C : ℕ)
+lemma min_add_le_add_min (A B C : ℕ)
   : min A (B + C) ≤ (min A B) + (min A C) := by
   simp
   by_cases h : A ≤ B + C
@@ -76,51 +62,34 @@ example (A B C D : ℕ)
         rw [min_eq_right_of_lt h₃]
         exact h
 
-example (A : ℕ) (xs : Fin n → ℕ)
-  (h : A ≤ min A (∑i,xs i))
-  : A ≤ ∑i,min A (xs i) := by sorry
+-- # Need to achieve this proof for BigOperators
+lemma min_sum_le_sum_min
+  (A n B : ℕ)
+  : min A (∑i:Fin n,B) ≤ ∑i:Fin n,min A B := by sorry
 
-example (A B C : ℕ) (i : Bool)
-  : min A (if i then B else C) = (if i then min A B else min A C) := by
-  exact apply_ite (min A) (i = true) B C
-  done
-
--- set_option autoImplicit false
-
-#check apply_ite (min 3) true 3 4
-
--- Zulip Question: how to rewrite inside BigOperators
--- https://leanprover.zulipchat.com/#narrow/stream/113489-new-members/topic/.E2.9C.94.20Expanding.20a.20sum
--- https://leanprover.zulipchat.com/#narrow/stream/113489-new-members/topic/patterns.20with.20coerced.20var
--- https://leanprover.zulipchat.com/#narrow/stream/217875-Is-there-code-for-X.3F/topic/finset.20sum.20function.2Eextend
--- https://leanprover.zulipchat.com/#narrow/stream/217875-Is-there-code-for-X.3F/topic/Finset.2Euniv.2Esum.20split
--- https://leanprover.zulipchat.com/#narrow/stream/270676-lean4/topic/.E2.9C.94.20Can't.20rewrite.20seemingly.20indentical.20terms
--- https://leanprover.zulipchat.com/#narrow/stream/287929-mathlib4/topic/Point.26Click.20library.20rewrite.20tactic
-example (A B : ℕ)
-  (xs : Fin n → ℕ)
-  (h : A = B)
-  (g : B ≤ ∑i,(min A (if xs i = 1 then xs i else 3)))
-  : B ≤ ∑i, (if xs i = 1 then min A (xs i) else min A 3) := by
-  have r : ∀ i : Fin n, (min A (if xs i = 1 then xs i else 3)) = ((if xs i = 1 then min A (xs i) else min A 3)) := by
-    intro i
-    exact apply_ite (min A) (xs i = 1) (xs i) 3
-    done
+lemma min_sum_le_sum_min_ite
+  (A : ℕ)
+  (xs : Fin n → Fin 2)
+  (as : Fin n → ℕ × ℕ)
+  : min A (∑ x : Fin n, if xs x = 1 then (as x).1 else (as x).2)
+  ≤ (∑ x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2)) := by
+  -- apply min_sum_le_sum_min A n (B:=if xs _ = 1 then (as _).1 else (as _).2)
   sorry
-  -- rw [r] at g
-  -- assumption
+  /-
+  tactic 'apply' failed, failed to unify
+    min A (∑ i : Fin n, if xs ?m.12973 = 1 then (as ?m.13003).1 else (as ?m.13008).2) ≤
+      ∑ i : Fin n, min A (if xs ?m.12973 = 1 then (as ?m.13003).1 else (as ?m.13008).2)
+  with
+    min A (∑ x : Fin n, if xs x = 1 then (as x).1 else (as x).2) ≤
+      ∑ x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2)
+  -/
   done
 
-example (A B : ℕ)
-  (xs : Fin n → ℕ)
-  (h : A = B)
-  (g : B ≤ ∑i,(min A (if xs i = 1 then xs i else 3)))
-  : B ≤ ∑i, (if xs i = 1 then min A (xs i) else min A 3) := by
-  have r : (λ i : Fin n => (min A (if xs i = 1 then xs i else 3)))
-         = (λ i : Fin n => (if xs i = 1 then min A (xs i) else min A 3)) := by sorry
-  rw [r] at g
-  assumption
-  done
-
+lemma le_min_self_of_le
+  {A B : ℕ}
+  (h : A ≤ B)
+  : A ≤ min A B := by
+  simp only [h, min_eq_left, le_refl]
 
 -- Saturation
 -- ∑i (a i * l i) ≥ A
@@ -134,29 +103,17 @@ theorem Saturation
   simp only [Fin.isValue, ge_iff_le, Prod_map, seq_eq] at *
   apply le_min_self_of_le at ha
 
-  have h1 : min A (∑ x : Fin n, if xs x = 1 then (as x).1 else (as x).2) ≤ (∑ x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2)) := sorry
+  have h1 := by exact min_sum_le_sum_min_ite A xs as
+  -- min A (∑i, if _ then _ else _) ≤ ∑i, min A (if _ then _ else _)
 
-  have h2 : A ≤ (∑ x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2)) := by
-    apply le_trans ha h1
-
-  have r1 {b : Bool} {x y : ℕ} : min A (if b then x else y) = (if b then min A x else min A y) := by exact apply_ite (min A) (b = true) x y
-
-  -- rw [apply_ite] at h2
-
-  -- h2 : A ≤ ∑ x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2)
-  -- h2 : A ≤ ∑ x : Fin n, min A (if xs x = 1 then (as x).1 else (as x).2)
-
-
-  /-
-  h2 : A ≤ ∑ x : Fin n, min A (if xs x = 1 then       (as x).1 else       (as x).2)
-  ⊢    A ≤ ∑ x : Fin n,       (if xs x = 1 then min A (as x).1 else min A (as x).2)
-  -/
-  sorry
+  have h2 := by apply le_trans ha h1 -- A ≤ ∑i, min A (if _ then _ else _)
+  simp_rw [apply_ite (min A) ((xs _ = 1)) ((as _).1) ((as _).2)] at h2
+  exact h2
   done
 
 example
-  (ha : PBIneq ![3,4] xs 3)
-  : PBIneq ![3,3] xs 3 := by
+  (ha : PBIneq ![(3,0),(4,0)] xs 3)
+  : PBIneq ![(3,0),(3,0)] xs 3 := by
   apply Saturation ha
   done
 
