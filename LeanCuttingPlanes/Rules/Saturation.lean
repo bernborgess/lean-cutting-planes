@@ -65,16 +65,15 @@ example (A B C D : ℕ)
         exact h
 -/
 
-lemma min_sum_le_sum_min (A : ℕ) (B : Fin n → ℕ)
-  : min A (∑i,B i) ≤ ∑i, min A (B i) := by
-  sorry
-  done
-
 lemma le_min_self_of_le
   {A B : ℕ}
   (h : A ≤ B)
   : A ≤ min A B := by
   simp only [h, min_eq_left, le_refl]
+
+lemma le_sum_min_of_le_sum {n A : ℕ} {B : Fin n → ℕ}
+  (h : A ≤ ∑i, B i)
+  : A ≤ ∑i, min A (B i) := sorry
 
 -- Saturation
 -- ∑i (a i * l i) ≥ A
@@ -86,15 +85,9 @@ theorem Saturation
   : PBIneq (map (mapBoth (min A)) as) xs A := by
   unfold PBIneq PBSum FinVec.map mapBoth at *
   simp only [Fin.isValue, ge_iff_le, Prod_map, seq_eq] at *
-  apply le_min_self_of_le at ha
-
-  have h1 := by
-    exact min_sum_le_sum_min A (B:=λi=> if xs i = 1 then(as i).1 else (as i).2)
-
-  have h2 := by apply le_trans ha h1 -- A ≤ ∑i, min A (if _ then _ else _)
-
-  simp_rw [apply_ite (min A) ((xs _ = 1)) ((as _).1) ((as _).2)] at h2
-  exact h2
+  have h := le_sum_min_of_le_sum ha
+  simp_rw [apply_ite (min A) ((xs _ = 1)) ((as _).1) ((as _).2)] at h
+  exact h
   done
 
 example
