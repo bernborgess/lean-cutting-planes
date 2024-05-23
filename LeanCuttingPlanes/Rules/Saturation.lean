@@ -3,6 +3,13 @@ import «LeanCuttingPlanes».Data.PBO
 namespace PseudoBoolean
 open FinVec Matrix BigOperators Finset
 
+-- @collares
+lemma split_summation (n : ℕ) (as : Fin n → ℕ) (k : Fin n) :
+    (∑i with i≠k, as i) + as k = (∑i, as i) := by
+  have : (∑i with i=k, as i) = as k := by rw [Finset.sum_eq_single_of_mem] <;> simp
+  rw [← this, ← Finset.sum_filter_add_sum_filter_not Finset.univ (· ≠ k)]
+  simp only [ne_eq, Decidable.not_not]
+
 lemma le_sum_min_of_le_sum {n A : ℕ} {as : Fin n → ℕ}
   (h : A ≤ ∑i, as i)
   : A ≤ ∑i, min A (as i) := by
@@ -16,11 +23,9 @@ lemma le_sum_min_of_le_sum {n A : ℕ} {as : Fin n → ℕ}
     simp only [not_forall, not_le] at ha
     obtain ⟨k,hk⟩ := ha
 
-    have hask_le_sum : min A (as k) ≤ ∑i,min A (as i) := sorry
-
-    rw [Nat.sub_eq_iff_eq_add hask_le_sum |>.mp rfl]
+    rw [←split_summation]
     -- Split goal from  ⊢ A ≤  ∑i, min A (as i)
-    -- to               ⊢ A ≤ (∑i, min A (as i) - min A (as k)) + min A (as k)
+    -- to               ⊢ A ≤ (∑i with i ≠ k, min A (as i)) + min A (as k)
 
     -- min A (as k) = A
     rw [min_eq_left_of_lt hk]
