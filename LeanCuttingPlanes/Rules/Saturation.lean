@@ -1,31 +1,37 @@
 import «LeanCuttingPlanes».Data.PBO
 
 namespace PseudoBoolean
-open FinVec Matrix BigOperators
+open FinVec Matrix BigOperators Finset
 
-lemma le_min_self_of_le
-  {A B : ℕ}
-  (h : A ≤ B)
-  : A ≤ min A B := by
-  simp only [ge_iff_le, h, min_eq_left, le_refl]
+-- @collares
+lemma split_summation (n : ℕ) (as : Fin n → ℕ) (k : Fin n) :
+    (∑i with i≠k, as i) + as k = (∑i, as i) := by
+  have : (∑i with i=k, as i) = as k := by rw [Finset.sum_eq_single_of_mem] <;> simp
+  rw [← this, ← Finset.sum_filter_add_sum_filter_not Finset.univ (· ≠ k)]
+  simp only [ne_eq, Decidable.not_not]
 
-lemma min_elim
-  (A C : ℕ)
-  (h : C < A)
-  : min A C = C := by
-  exact min_eq_right_of_lt h
-  done
+lemma le_sum_min_of_le_sum {n A : ℕ} {as : Fin n → ℕ}
+  (h : A ≤ ∑i, as i)
+  : A ≤ ∑i, min A (as i) := by
+  by_cases ha : ∀i, as i ≤ A
+  . -- Assume all elements of as are ≤ A
+    simp_rw [@Nat.min_eq_right A (as _) (ha _)]
+    -- rewrite min A (as i) to (as i)
+    exact h
 
-lemma min_sum_le_sum_min (A B C : ℕ)
-  : min A (B + C) ≤ (min A B) + (min A C) := by
-  simp
-  by_cases h : A ≤ B + C
-  . sorry
-  simp at h
-  right
-  have hca : C < A := by sorry
-  rw [min_eq_right_of_lt hca]
-  sorry
+  . -- Otherwise, ∃k, (as k) > A
+    simp only [not_forall, not_le] at ha
+    obtain ⟨k,hk⟩ := ha
+
+    rw [←split_summation]
+    -- Split goal from  ⊢ A ≤  ∑i, min A (as i)
+    -- to               ⊢ A ≤ (∑i with i ≠ k, min A (as i)) + min A (as k)
+
+    -- min A (as k) = A
+    rw [min_eq_left_of_lt hk]
+
+    -- ⊢ A ≤ (∑i,min A (as i) - A) + A
+    exact Nat.le_add_left A _
 
 -- Saturation
 -- ∑i (a i * l i) ≥ A
@@ -36,20 +42,15 @@ theorem Saturation
   {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
   : PBIneq (map (mapBoth (min A)) as) xs A := by
   unfold PBIneq PBSum FinVec.map mapBoth at *
-  simp at *
-  /-
-  A ≤
-    ∑ x : Fin n,
-      if xs x = 1
-      then min A (as x).1
-      else min A (as x).2
-  -/
-  sorry
+  simp only [Fin.isValue, ge_iff_le, Prod_map, seq_eq] at *
+  have h := le_sum_min_of_le_sum ha
+  simp_rw [apply_ite (min A) ((xs _ = 1)) ((as _).1) ((as _).2)] at h
+  exact h
   done
 
 example
-  (ha : PBIneq ![3,4] xs 3)
-  : PBIneq ![3,3] xs 3 := by
+  (ha : PBIneq ![(3,0),(4,0)] xs 3)
+  : PBIneq ![(3,0),(3,0)] xs 3 := by
   apply Saturation ha
   done
 
