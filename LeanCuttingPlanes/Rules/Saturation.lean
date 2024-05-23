@@ -3,44 +3,6 @@ import «LeanCuttingPlanes».Data.PBO
 namespace PseudoBoolean
 open FinVec Matrix BigOperators Finset
 
-lemma le_min_self_of_le
-  {A B : ℕ}
-  (h : A ≤ B)
-  : A ≤ min A B := by
-  simp only [h, min_eq_left, le_refl]
-
-def mp : ℕ → Prop := λ i => i ≠ 3
-/-
-@[simp]
-theorem Finset.sum_cons{α : Type u_3} {β : Type u_4} {s : Finset α} {a : α} {f : α → β}
-[AddCommMonoid β] (h : a ∉ s) :
-  ((Finset.cons a s h).sum fun (x : α) => f x) = f a + s.sum fun (x : α) => f x
--/
-
-def myFinset : Finset ℕ := {0,1,2,3}
-def p : ℕ → Prop := λ i => i ≠ 1
-
-#check DecidablePred
-def hp : DecidablePred p := fun _ => sorry -- decidable_of_iff _ _
-
-#check @Finset.sum_apply_dite ℕ ℕ ℕ _ myFinset p hp
-/-
-theorem Finset.sum_apply_dite.{u_5, u_4, u_3} {α : Type u_3} {β : Type u_4} {γ : Type u_5} [AddCommMonoid β] {s : Finset α}
-  {p : α → Prop} {hp : DecidablePred p} [DecidablePred fun x => ¬p x] (f : (x : α) → p x → γ) (g : (x : α) → ¬p x → γ)
-  (h : γ → β) :
-  ∑ x ∈ s, h (if hx : p x then f x hx else g x hx) =
-    ∑ x ∈ (filter p s).attach, h (f ↑x ⋯) + ∑ x ∈ (filter (fun x => ¬p x) s).attach, h (g ↑x ⋯)
--/
-lemma extract_x_sum (x : Fin n) (as : Fin n → ℕ)
-  : (∑i,as i) = (∑i with i≠x,as i) + as x := by
-  rw [@sum_filter]
-
-  sorry
-  done
-
---   (A ≤ ∑ i : Fin n, min A (as i))
--- = (A ≤ ∑ i ∈ filter (fun i => i ≠ x) univ, min A (as i) + min A (as x))
-
 lemma le_sum_min_of_le_sum {n A : ℕ} {as : Fin n → ℕ}
   (h : A ≤ ∑i, as i)
   : A ≤ ∑i, min A (as i) := by
@@ -50,22 +12,20 @@ lemma le_sum_min_of_le_sum {n A : ℕ} {as : Fin n → ℕ}
     -- rewrite min A (as i) to (as i)
     exact h
 
-  . -- Otherwise, ∃x, (as x) > A
+  . -- Otherwise, ∃k, (as k) > A
     simp only [not_forall, not_le] at ha
-    obtain ⟨x,hx⟩ := ha
+    obtain ⟨k,hk⟩ := ha
 
-    have hxA : min A (as x) = A := by exact min_eq_left_of_lt hx
+    have hask_le_sum : min A (as k) ≤ ∑i,min A (as i) := sorry
 
-    -- Split goal from
-    -- ⊢ A ≤ ∑i, min A (as i)
-    -- to
-    -- ⊢ A ≤ (∑ i ≠ x, min A (as i)) + min A (as x)
-    have r_sum_x : (A ≤ ∑i, min A (as i))
-                   = (A ≤ (∑i with i≠x, min A (as i)) + min A (as x))
-                   := by simp_rw [extract_x_sum x _]
+    rw [Nat.sub_eq_iff_eq_add hask_le_sum |>.mp rfl]
+    -- Split goal from  ⊢ A ≤  ∑i, min A (as i)
+    -- to               ⊢ A ≤ (∑i, min A (as i) - min A (as k)) + min A (as k)
 
-    rw [r_sum_x,hxA]
-    -- ⊢ A ≤ (∑ i ≠ x, min A (as i)) + A
+    -- min A (as k) = A
+    rw [min_eq_left_of_lt hk]
+
+    -- ⊢ A ≤ (∑i,min A (as i) - A) + A
     exact Nat.le_add_left A _
 
 -- Saturation
