@@ -28,7 +28,7 @@ Run `mdbook test` to test all `lean` code blocks.
 
 - [ ] Addition proof
 - [x] Multiplication proof
-- [ ] Saturation proof
+- [x] Saturation proof
 - [ ] Division proof
 - [ ] Test cases
 - [ ] Documentation
