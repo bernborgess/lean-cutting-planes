@@ -1,4 +1,4 @@
-import «LeanCuttingPlanes».Data.PBO
+import «LeanCuttingPlanes».Basic
 
 namespace PseudoBoolean
 
