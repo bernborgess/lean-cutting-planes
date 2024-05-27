@@ -6,9 +6,13 @@ open FinVec BigOperators
 
 def ceildiv (c : ℕ) (a : ℕ) := a ⌈/⌉ c
 
-lemma ceildiv_le_ceildiv_left {a b : ℕ} (c : ℕ) (hab : a ≤ b)
+lemma ceildiv_le_ceildiv_right {a b : ℕ} (c : ℕ) (hab : a ≤ b)
   : a ⌈/⌉ c ≤ b ⌈/⌉ c := by
-  sorry
+  repeat rw [Nat.ceilDiv_eq_add_pred_div]
+  apply Nat.div_le_div_right
+  apply Nat.sub_le_sub_right
+  apply Nat.add_le_add_right
+  exact hab
   done
 
 lemma sum_ceildiv (as : Fin n → ℕ) (c : ℕ)
@@ -34,7 +38,7 @@ theorem Division
   : PBIneq (map (mapBoth (ceildiv c)) as) xs (ceildiv c A) := by
   unfold PBIneq PBSum ceildiv mapBoth at *
   simp only [Fin.isValue, ge_iff_le, gt_iff_lt, Prod_map, map_eq, Function.comp_apply] at *
-  apply ceildiv_le_ceildiv_left c at ha
+  apply ceildiv_le_ceildiv_right c at ha
   apply le_trans ha
   simp only [←ceildiv_ite]
   apply sum_ceildiv
