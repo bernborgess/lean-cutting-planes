@@ -17,6 +17,12 @@ lemma ceildiv_le_ceildiv_right {a b : ℕ} (c : ℕ) (hab : a ≤ b)
 
 lemma sum_ceildiv (as : Fin n → ℕ) (c : ℕ)
   : (∑i, as i) ⌈/⌉ c ≤ ∑i,(as i ⌈/⌉ c) := by
+  -- by_cases hnz : n = 0 -- TODO
+  simp_rw [Nat.ceilDiv_eq_add_pred_div]
+  /-
+  ⊢ (∑i,  as i + c - 1) / c
+  ≤ ∑ i,((as i + c - 1)/c)
+  -/
   sorry
   done
 
