@@ -18,7 +18,7 @@ lemma sum_ceildiv (as : Fin n → ℕ) (c : ℕ)
 
 lemma ceildiv_ite (P : Prop) [Decidable P] (a b c : ℕ)
   : (if P then b else c) ⌈/⌉ a = if P then (b ⌈/⌉ a) else (c ⌈/⌉ a) := by
-  sorry
+  split_ifs <;> rfl
   done
 
 -- Division
