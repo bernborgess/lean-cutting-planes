@@ -1,6 +1,10 @@
 import «LeanCuttingPlanes».Basic
-import Mathlib.Data.Nat.ModEq
 import Mathlib.Algebra.Order.Floor.Div
+import Mathlib.Data.Nat.Defs
+import Mathlib.Data.Nat.ModEq
+import Mathlib.Logic.Equiv.Fin
+-- Init.Data.DivMod.Lemmas
+-- Init.Data.Nat.Div
 
 namespace PseudoBoolean
 open FinVec BigOperators
@@ -21,23 +25,10 @@ lemma add_ceildiv (a b c : ℕ)
   : (a + b) ⌈/⌉ c ≤ (a ⌈/⌉ c) + (b ⌈/⌉ c) := by
   rw [←Nat.div_add_mod a c,←Nat.div_add_mod b c]
 
-  let ma := a % c
-  have rma : ma = a % c := by exact rfl
-  rw [←rma]
-
-  let da := a / c
-  have rda : da = a / c := by exact rfl
-  rw [←rda]
-
-  let mb := b % c
-  have rmb : mb = b % c := by exact rfl
-  rw [←rmb]
-
-  let db := b / c
-  have rdb : db = b / c := by exact rfl
-  rw [←rdb]
-
-  clear rda rdb rma rmb
+  set ma := a % c
+  set da := a / c
+  set mb := b % c
+  set db := b / c
 
   -- ⊢ (c * da + ma + (c * db + mb)) ⌈/⌉ c ≤ (c * da + ma) ⌈/⌉ c + (c * db + mb) ⌈/⌉ c
   -- ⊢ (c * (da + db) + ma + mb) ⌈/⌉ c ≤ (c * da + ma) ⌈/⌉ c + (c * db + mb) ⌈/⌉ c
