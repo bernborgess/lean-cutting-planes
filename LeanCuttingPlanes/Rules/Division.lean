@@ -1,4 +1,5 @@
 import «LeanCuttingPlanes».Basic
+import Mathlib.Data.Nat.ModEq
 import Mathlib.Algebra.Order.Floor.Div
 
 namespace PseudoBoolean
@@ -13,6 +14,59 @@ lemma ceildiv_le_ceildiv_right {a b : ℕ} (c : ℕ) (hab : a ≤ b)
   apply Nat.sub_le_sub_right
   apply Nat.add_le_add_right
   exact hab
+  done
+
+-- same argument
+lemma add_ceildiv (a b c : ℕ)
+  : (a + b) ⌈/⌉ c ≤ (a ⌈/⌉ c) + (b ⌈/⌉ c) := by
+  rw [←Nat.div_add_mod a c,←Nat.div_add_mod b c]
+
+  let ma := a % c
+  have rma : ma = a % c := by exact rfl
+  rw [←rma]
+
+  let da := a / c
+  have rda : da = a / c := by exact rfl
+  rw [←rda]
+
+  let mb := b % c
+  have rmb : mb = b % c := by exact rfl
+  rw [←rmb]
+
+  let db := b / c
+  have rdb : db = b / c := by exact rfl
+  rw [←rdb]
+
+  clear rda rdb rma rmb
+
+  -- ⊢ (c * da + ma + (c * db + mb)) ⌈/⌉ c ≤ (c * da + ma) ⌈/⌉ c + (c * db + mb) ⌈/⌉ c
+  -- ⊢ (c * (da + db) + ma + mb) ⌈/⌉ c ≤ (c * da + ma) ⌈/⌉ c + (c * db + mb) ⌈/⌉ c
+  -- lemma factor_out_ceildiv : (c * a + b) ⌈/⌉ c = a + b ⌈/⌉ c
+  -- ⊢ da + db + (ma + mb) ⌈/⌉ c ≤ da + ma ⌈/⌉ c + db + mb ⌈/⌉ c
+  -- ⊢ (ma + mb) ⌈/⌉ c ≤ ma ⌈/⌉ c + mb ⌈/⌉ c
+  have oracle : ((c * da + ma + (c * db + mb)) ⌈/⌉ c ≤ (c * da + ma) ⌈/⌉ c + (c * db + mb) ⌈/⌉ c) = ((ma + mb) ⌈/⌉ c ≤ ma ⌈/⌉ c + mb ⌈/⌉ c) := sorry
+  rw [oracle]; clear oracle
+
+  by_cases hma0 : ma = 0
+  . simp only [hma0, zero_add, zero_ceilDiv, le_refl]
+  by_cases hmb0 : mb = 0
+  . simp only [hmb0, add_zero, zero_ceilDiv, le_refl]
+
+  have hmac : 0 ≤ ma ∧ ma < c := sorry
+  have hmac1 : ma ⌈/⌉ c = 1 := sorry -- hma0, hmac
+
+  have hmbc : 0 ≤ mb ∧ mb < c := sorry
+  have hmbc1 : mb ⌈/⌉ c = 1 := sorry -- hmb0, hmbc
+
+  rw [hmac1,hmbc1]
+  simp only [Nat.reduceAdd, ge_iff_le]
+  -- ⊢ (ma + mb) ⌈/⌉ c ≤ 2
+  have hmamb2c : ma + mb < 2 * c := sorry -- hmac, hmbc
+
+  have oracle : ((ma + mb) ⌈/⌉ c ≤ 2) = (ma + mb ≤ 2 * c) := sorry
+  rw [oracle]; clear oracle
+
+  exact Nat.le_of_succ_le hmamb2c
   done
 
 lemma sum_ceildiv (as : Fin n → ℕ) (c : ℕ)
