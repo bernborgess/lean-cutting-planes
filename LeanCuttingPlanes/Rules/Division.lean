@@ -51,8 +51,8 @@ theorem Division
   done
 
 example
-  (ha : PBIneq ![3,4] xs 3)
-  : PBIneq ![2,2] xs 2 := by
+  (ha : PBIneq ![(3,0),(4,0)] xs 3)
+  : PBIneq ![(2,0),(2,0)] xs 2 := by
   apply Division ha 2
   done
 
