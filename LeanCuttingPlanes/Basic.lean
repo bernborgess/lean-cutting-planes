@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Bernardo Borges
 -/
 import Mathlib.Data.Fin.Tuple.Reflection
-import Mathlib.Data.Matrix.Notation
 
 /-! # Representation of a Linear Inequality
 

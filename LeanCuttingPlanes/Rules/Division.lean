@@ -1,10 +1,6 @@
 import «LeanCuttingPlanes».Basic
 import Mathlib.Algebra.Order.Floor.Div
-import Mathlib.Data.Nat.Defs
 import Mathlib.Data.Nat.ModEq
-import Mathlib.Logic.Equiv.Fin
--- Init.Data.DivMod.Lemmas
--- Init.Data.Nat.Div
 
 namespace PseudoBoolean
 open FinVec BigOperators
@@ -20,47 +16,30 @@ lemma ceildiv_le_ceildiv_right {a b : ℕ} (c : ℕ) (hab : a ≤ b)
   exact hab
   done
 
--- same argument
-lemma add_ceildiv (a b c : ℕ)
-  : (a + b) ⌈/⌉ c ≤ (a ⌈/⌉ c) + (b ⌈/⌉ c) := by
-  rw [←Nat.div_add_mod a c,←Nat.div_add_mod b c]
+lemma l1 (a b c : ℕ)
+  : a + b + c - 1 = (a + b - 1) + c := by
+  sorry
 
-  set ma := a % c
-  set da := a / c
-  set mb := b % c
-  set db := b / c
+lemma l2 (a c : ℕ)
+  : a + c - 1 = (a - 1) + c := by
+  sorry
 
-  -- ⊢ (c * da + ma + (c * db + mb)) ⌈/⌉ c ≤ (c * da + ma) ⌈/⌉ c + (c * db + mb) ⌈/⌉ c
-  -- ⊢ (c * (da + db) + ma + mb) ⌈/⌉ c ≤ (c * da + ma) ⌈/⌉ c + (c * db + mb) ⌈/⌉ c
-  -- lemma factor_out_ceildiv : (c * a + b) ⌈/⌉ c = a + b ⌈/⌉ c
-  -- ⊢ da + db + (ma + mb) ⌈/⌉ c ≤ da + ma ⌈/⌉ c + db + mb ⌈/⌉ c
-  -- ⊢ (ma + mb) ⌈/⌉ c ≤ ma ⌈/⌉ c + mb ⌈/⌉ c
-  have oracle : ((c * da + ma + (c * db + mb)) ⌈/⌉ c ≤ (c * da + ma) ⌈/⌉ c + (c * db + mb) ⌈/⌉ c) = ((ma + mb) ⌈/⌉ c ≤ ma ⌈/⌉ c + mb ⌈/⌉ c) := sorry
-  rw [oracle]; clear oracle
-
-  by_cases hma0 : ma = 0
-  . simp only [hma0, zero_add, zero_ceilDiv, le_refl]
-  by_cases hmb0 : mb = 0
-  . simp only [hmb0, add_zero, zero_ceilDiv, le_refl]
-
-  have hmac : 0 ≤ ma ∧ ma < c := sorry
-  have hmac1 : ma ⌈/⌉ c = 1 := sorry -- hma0, hmac
-
-  have hmbc : 0 ≤ mb ∧ mb < c := sorry
-  have hmbc1 : mb ⌈/⌉ c = 1 := sorry -- hmb0, hmbc
-
-  rw [hmac1,hmbc1]
-  simp only [Nat.reduceAdd, ge_iff_le]
-  -- ⊢ (ma + mb) ⌈/⌉ c ≤ 2
-  have hmamb2c : ma + mb < 2 * c := sorry -- hmac, hmbc
-
-  have oracle : ((ma + mb) ⌈/⌉ c ≤ 2) = (ma + mb ≤ 2 * c) := sorry
-  rw [oracle]; clear oracle
-
-  exact Nat.le_of_succ_le hmamb2c
+theorem Nat.add_ceildiv_le_add_ceildiv (a b c : ℕ)
+  : (a + b) ⌈/⌉ c ≤ (a ⌈/⌉ c) + (b ⌈/⌉ c) :=
+  if hc0 : c = 0 then by simp[hc0] else by
+  apply Nat.zero_lt_of_ne_zero at hc0
+  simp [Nat.instCeilDiv]
+  rw [l1,l2 a c,l2 b c]
+  have c_dvd_c : c ∣ c := Nat.dvd_refl c
+  have c_div_c : c / c = 1 := Nat.div_self hc0
+  repeat rw [Nat.add_div_of_dvd_left c_dvd_c,c_div_c]
+  rw [Nat.add_comm,Nat.add_comm ((a-1)/c), Nat.add_assoc]
+  apply Nat.add_le_add_left (k := 1)
+  -- ⊢ (a + b - 1) / c ≤ (a - 1) / c + ((b - 1) / c + 1)
+  sorry
   done
 
-lemma sum_ceildiv (as : Fin n → ℕ) (c : ℕ)
+lemma ceildiv_sum_le_sum_ceildiv (as : Fin n → ℕ) (c : ℕ)
   : (∑i, as i) ⌈/⌉ c ≤ ∑i,(as i ⌈/⌉ c) := by
   -- by_cases hnz : n = 0 -- TODO
   simp_rw [Nat.ceilDiv_eq_add_pred_div]
@@ -92,7 +71,7 @@ theorem Division
   apply ceildiv_le_ceildiv_right c at ha
   apply le_trans ha
   simp only [←ceildiv_ite]
-  apply sum_ceildiv
+  apply ceildiv_sum_le_sum_ceildiv
   done
 
 example
