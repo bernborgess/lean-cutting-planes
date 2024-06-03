@@ -16,27 +16,18 @@ lemma ceildiv_le_ceildiv_right {a b : ℕ} (c : ℕ) (hab : a ≤ b)
   exact hab
   done
 
-lemma l1 (a b c : ℕ)
-  : a + b + c - 1 = (a + b - 1) + c := by
-  sorry
-
-lemma l2 (a c : ℕ)
-  : a + c - 1 = (a - 1) + c := by
-  sorry
-
+-- @kbuzzard
 theorem Nat.add_ceildiv_le_add_ceildiv (a b c : ℕ)
-  : (a + b) ⌈/⌉ c ≤ (a ⌈/⌉ c) + (b ⌈/⌉ c) :=
-  if hc0 : c = 0 then by simp[hc0] else by
-  apply Nat.zero_lt_of_ne_zero at hc0
-  simp [Nat.instCeilDiv]
-  rw [l1,l2 a c,l2 b c]
-  have c_dvd_c : c ∣ c := Nat.dvd_refl c
-  have c_div_c : c / c = 1 := Nat.div_self hc0
-  repeat rw [Nat.add_div_of_dvd_left c_dvd_c,c_div_c]
-  rw [Nat.add_comm,Nat.add_comm ((a-1)/c), Nat.add_assoc]
-  apply Nat.add_le_add_left (k := 1)
-  -- ⊢ (a + b - 1) / c ≤ (a - 1) / c + ((b - 1) / c + 1)
-  sorry
+  : (a + b) ⌈/⌉ c ≤ (a ⌈/⌉ c) + (b ⌈/⌉ c) := by
+  -- deal with c=0 separately
+  obtain (rfl | hc) := Nat.eq_zero_or_pos c
+  · simp
+  -- 0 < c case
+  -- First use the "Galois connection"
+  rw [ceilDiv_le_iff_le_smul hc, smul_eq_mul]
+  rw [mul_add]
+  -- now use a standard fact
+  gcongr <;> exact le_smul_ceilDiv hc
   done
 
 lemma ceildiv_sum_le_sum_ceildiv (as : Fin n → ℕ) (c : ℕ)
