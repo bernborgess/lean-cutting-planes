@@ -1,9 +1,8 @@
 import «LeanCuttingPlanes».Basic
 import Mathlib.Algebra.Order.Floor.Div
-import Mathlib.Data.Nat.ModEq
 
 namespace PseudoBoolean
-open FinVec BigOperators
+open Finset FinVec BigOperators
 
 def ceildiv (c : ℕ) (a : ℕ) := a ⌈/⌉ c
 
@@ -30,16 +29,17 @@ theorem Nat.add_ceildiv_le_add_ceildiv (a b c : ℕ)
   gcongr <;> exact le_smul_ceilDiv hc
   done
 
-lemma ceildiv_sum_le_sum_ceildiv (as : Fin n → ℕ) (c : ℕ)
-  : (∑i, as i) ⌈/⌉ c ≤ ∑i,(as i ⌈/⌉ c) := by
-  -- by_cases hnz : n = 0 -- TODO
-  simp_rw [Nat.ceilDiv_eq_add_pred_div]
-  /-
-  ⊢ (∑i,  as i + c - 1) / c
-  ≤ ∑ i,((as i + c - 1)/c)
-  -/
-  sorry
-  done
+-- @Ruben-VandeVelde
+theorem Finset.ceildiv_le_ceildiv {α : Type*} (as : α → ℕ) (s : Finset α) (c : ℕ)
+  : (∑i in s, as i) ⌈/⌉ c ≤ ∑i in s,(as i ⌈/⌉ c) := by
+  classical
+  induction s using Finset.cons_induction_on with
+  | h₁ => simp
+  | @h₂ a s ha ih =>
+    rw [sum_cons, sum_cons]
+    have h := Nat.add_ceildiv_le_add_ceildiv (as a) (∑x ∈ s, as x) c
+    exact le_add_of_le_add_left h ih
+    done
 
 lemma ceildiv_ite (P : Prop) [Decidable P] (a b c : ℕ)
   : (if P then b else c) ⌈/⌉ a = if P then (b ⌈/⌉ a) else (c ⌈/⌉ a) := by
@@ -62,7 +62,7 @@ theorem Division
   apply ceildiv_le_ceildiv_right c at ha
   apply le_trans ha
   simp only [←ceildiv_ite]
-  apply ceildiv_sum_le_sum_ceildiv
+  apply Finset.ceildiv_le_ceildiv
   done
 
 example
