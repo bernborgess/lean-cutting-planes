@@ -4,6 +4,25 @@ namespace PseudoBoolean
 
 open BigOperators FinVec Matrix
 
+#check Fin.eq_one_of_neq_zero
+#check Nat.min_comm
+#check Nat.sub_add_min_cancel
+
+lemma reduce_terms (p n : ℕ) (x : Fin 2)
+  : p * x + n * (1 - x) = (p - n) * x + (n - p) * (1 - x) + min p n  := by
+  by_cases h : x = 0
+  . rw [h]
+    simp only [Fin.isValue, Fin.val_zero, mul_zero, tsub_zero, mul_one, zero_add]
+    rw [Nat.min_comm]
+    exact Nat.sub_add_min_cancel n p |>.symm
+
+  . -- x = 1
+    apply Fin.eq_one_of_neq_zero x at h
+    rw [h]
+    simp only [Fin.isValue, Fin.val_one, mul_one, ge_iff_le, le_refl, tsub_eq_zero_of_le]
+    simp only [mul_zero, add_zero, Nat.sub_add_min_cancel]
+
+
 def tighten (as : Coeff n) : Coeff n :=
   λ i : Fin n => let (p,n) := as i
     if p > n then (p - n,0) else (0,n - p)
