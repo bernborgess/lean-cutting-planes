@@ -38,6 +38,19 @@ lemma sum_ge_a_sub_sum (p n : Fin m → ℕ) (x : Fin m → Fin 2) (A : ℕ)
   exact Nat.sub_le_of_le_add h
   done
 
+lemma ite_eq_bmul (x y : ℕ) (b : Fin 2)
+  : (if b = 1 then x else y) = (x * b + y * (1 - b)) := by
+  by_cases h : b = 0
+  . rw [h]
+    rw [if_neg]
+    . simp only [Fin.isValue, Fin.val_zero, mul_zero, tsub_zero, mul_one, zero_add]
+    trivial
+  . -- b = 1
+    apply Fin.eq_one_of_neq_zero b at h
+    rw [h]
+    simp only [Fin.isValue, ↓reduceIte, Fin.val_one, mul_one, ge_iff_le, le_refl,
+      tsub_eq_zero_of_le, mul_zero, add_zero]
+
 def tighten (as : Coeff n) : Coeff n :=
   λ i : Fin n => let (p,n) := as i
     if p > n then (p - n,0) else (0,n - p)
