@@ -51,6 +51,28 @@ lemma ite_eq_bmul (x y : ℕ) (b : Fin 2)
     simp only [Fin.isValue, ↓reduceIte, Fin.val_one, mul_one, ge_iff_le, le_refl,
       tsub_eq_zero_of_le, mul_zero, add_zero]
 
+theorem ThePlan
+   {xs : Fin n → Fin 2}
+  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
+  {bs : Coeff n} {B : ℕ} (hb : PBIneq bs xs B)
+  -- : AdditionProp xs as A bs B := byi
+  : True := by
+  set K := A + B
+  set ks := as + bs
+  have hk : PBIneq ks xs K := sorry -- here is Addition Proof without reduction
+  simp [PBIneq,PBSum] at hk         -- K ≤ ∑ i : Fin n, if xs i = 1 then (ks i).1 else (ks i).2
+  simp_rw [ite_eq_bmul] at hk       -- K ≤ ∑ i : Fin n, ((ks i).1 * ↑(xs i) + (ks i).2 * (1 - ↑(xs i)))
+  set pos := λ i => ks i |>.1 with rpos
+  set neg := λ i => ks i |>.2 with rneg
+  -- simp_rw [rpos,rneg] at hk
+  -- simp_rw [reduce_terms] at hk   -- K ≤ ∑ i : Fin n, ((pos i - neg i) * ↑(xs x) + (neg i - pos i) * (1 - ↑(xs x)) + min (pos i) (neg i))
+  -- apply sum_split_min_term       -- K ≤ ∑ i : Fin n, ((pos i - neg i) * ↑(xs x) + (neg i - pos i) * (1 - ↑(xs x))) + ∑i,min (pos i) (neg i)
+  -- apply sub_ge_a_sub_sum         -- K - ∑i,min (pos i) (neg i) ≤ ∑ i : Fin n, ((pos i - neg i) * ↑(xs x) + (neg i - pos i) * (1 - ↑(xs x)))
+  --
+  sorry
+  done
+
+
 def tighten (as : Coeff n) : Coeff n :=
   λ i : Fin n => let (p,n) := as i
     if p > n then (p - n,0) else (0,n - p)
