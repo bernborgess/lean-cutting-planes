@@ -19,9 +19,24 @@ lemma reduce_terms (p n : ℕ) (x : Fin 2)
   . -- x = 1
     apply Fin.eq_one_of_neq_zero x at h
     rw [h]
-    simp only [Fin.isValue, Fin.val_one, mul_one, ge_iff_le, le_refl, tsub_eq_zero_of_le]
-    simp only [mul_zero, add_zero, Nat.sub_add_min_cancel]
+    simp only [Fin.isValue, Fin.val_one, mul_one, ge_iff_le, le_refl, tsub_eq_zero_of_le, mul_zero, add_zero]
+    exact Nat.sub_add_min_cancel p n |>.symm
 
+#check Finset.sum_add_distrib
+
+lemma sum_split_min_term (p n : Fin m → ℕ) (x : Fin m → Fin 2)
+  : (∑i,((p i - n i) * x i + (n i - p i) * (1 - x i)   +      min (p i) (n i)))
+  = (∑i,((p i - n i) * x i + (n i - p i) * (1 - x i))) + (∑i,(min (p i) (n i))) := by
+  exact Finset.sum_add_distrib
+  done
+
+#check Nat.sub_le_of_le_add
+
+lemma sum_ge_a_sub_sum (p n : Fin m → ℕ) (x : Fin m → Fin 2) (A : ℕ)
+  (h : ∑i,((p i - n i) * x i + (n i - p i) * (1 - x i)) + ∑i,(min (p i) (n i)) ≥ A)
+  :   (∑i,((p i - n i) * x i + (n i - p i) * (1 - x i))) ≥ A - ∑i,(min (p i) (n i)) := by
+  exact Nat.sub_le_of_le_add h
+  done
 
 def tighten (as : Coeff n) : Coeff n :=
   λ i : Fin n => let (p,n) := as i
