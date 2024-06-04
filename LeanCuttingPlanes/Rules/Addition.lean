@@ -91,4 +91,13 @@ example
   apply Addition ha hb
   done
 
+-- Reduction happens automatically
+example
+  (ha : PBIneq ![(3,0),(0,0),(1,0)] xs 1)
+  (hb : PBIneq ![(0,0),(2,0),(0,1)] xs 2)
+  : PBIneq ![(3,0),(2,0),(0,0)] xs 2 := by
+  apply Addition ha hb
+  done
+
+
 end PseudoBoolean
