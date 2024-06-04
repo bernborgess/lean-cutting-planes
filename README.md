@@ -29,7 +29,7 @@ Run `mdbook test` to test all `lean` code blocks.
 - [ ] Addition proof
 - [x] Multiplication proof
 - [x] Saturation proof
-- [ ] Division proof
+- [x] Division proof
 - [ ] Test cases
 - [ ] Documentation
 
@@ -66,11 +66,10 @@ example (c1 : PBIneq ![(1,0),(2,0),(1,0),(0,0)] xs 2)
         (c3 : PBIneq ![(0,0),(0,0),(0,0),(0,1)] xs 0)
   : PBIneq ![(1,0),(2,0),(2,0),(0,0)] xs 3
   := by
-  let h3z : 3 > 0 := Nat.zero_lt_succ 2
   let t1 : PBIneq ![(2,0),(4,0),(2,0),(0,0)] xs 4  := by apply Multiplication c1 2
   let t2 : PBIneq ![(3,0),(6,0),(6,0),(2,0)] xs 9  := by apply Addition t1 c2
   let t3 : PBIneq ![(0,0),(0,0),(0,0),(0,2)] xs 0  := by apply Multiplication c3 2
   let t4 : PBIneq ![(3,0),(6,0),(6,0),(0,0)] xs 7  := by apply Addition t2 t3
-  exact Division t4 h3z
+  exact Division t4 3
   done
 ```
