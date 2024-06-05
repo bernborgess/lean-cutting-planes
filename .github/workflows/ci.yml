@@ -13,5 +13,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      # uses lean standard action with all default input values
       - uses: leanprover/lean-action@v1-beta
+
+      - name: Set up cache
+        id: cache-setup
+        uses: actions/cache@v3
+        with:
+          path: /path/to/cache
+          key: ${{ runner.os }}-${{ github.sha }}-lake
+          restore-keys: |
+            ${{ runner.os }}-lake-
