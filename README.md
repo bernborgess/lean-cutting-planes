@@ -48,7 +48,7 @@ open PseudoBoolean
 
 variable {xs : Fin 5 → Fin 2}
 
-def my_pb : PBIneq ![(0,1),(2,0),(0,3),(4,0),(0,5)] xs 1 := sorry
+def my_pb : PBIneq ![(0,1),(2,0),(0,3),(4,0),(0,5)] xs 1 := ...
 ```
 
 This notation is under development and is subject to changes.
