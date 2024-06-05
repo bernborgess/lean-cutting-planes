@@ -26,7 +26,7 @@ Run `mdbook test` to test all `lean` code blocks.
 
 ## Work Progress
 
-- [ ] Addition proof
+- [x] Addition proof
 - [x] Multiplication proof
 - [x] Saturation proof
 - [x] Division proof
