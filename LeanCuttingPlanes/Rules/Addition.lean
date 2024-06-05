@@ -51,32 +51,19 @@ lemma ite_eq_bmul (x y : ℕ) (b : Fin 2)
     simp only [Fin.isValue, ↓reduceIte, Fin.val_one, mul_one, ge_iff_le, le_refl,
       tsub_eq_zero_of_le, mul_zero, add_zero]
 
-theorem ThePlan
-   {xs : Fin n → Fin 2}
-  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
-  {bs : Coeff n} {B : ℕ} (hb : PBIneq bs xs B)
-  -- : AdditionProp xs as A bs B := byi
-  : True := by
-  set K := A + B
-  set ks := as + bs
-  have hk : PBIneq ks xs K := sorry -- here is Addition Proof without reduction
-  simp [PBIneq,PBSum] at hk         -- K ≤ ∑ i : Fin n, if xs i = 1 then (ks i).1 else (ks i).2
-  simp_rw [ite_eq_bmul] at hk       -- K ≤ ∑ i : Fin n, ((ks i).1 * ↑(xs i) + (ks i).2 * (1 - ↑(xs i)))
-  set pos := λ i => ks i |>.1 with rpos
-  set neg := λ i => ks i |>.2 with rneg
-  -- simp_rw [rpos,rneg] at hk
-  -- simp_rw [reduce_terms] at hk   -- K ≤ ∑ i : Fin n, ((pos i - neg i) * ↑(xs x) + (neg i - pos i) * (1 - ↑(xs x)) + min (pos i) (neg i))
-  -- apply sum_split_min_term       -- K ≤ ∑ i : Fin n, ((pos i - neg i) * ↑(xs x) + (neg i - pos i) * (1 - ↑(xs x))) + ∑i,min (pos i) (neg i)
-  -- apply sub_ge_a_sub_sum         -- K - ∑i,min (pos i) (neg i) ≤ ∑ i : Fin n, ((pos i - neg i) * ↑(xs x) + (neg i - pos i) * (1 - ↑(xs x)))
-  --
-  sorry
-  done
-
 theorem Addition'
   (xs : Fin n → Fin 2)
   (as : Coeff n) (A : ℕ) (ha : PBIneq as xs A)
   (bs : Coeff n) (B : ℕ) (hb : PBIneq bs xs B)
   : PBIneq (as + bs) xs (A + B) := by
+  unfold PBIneq PBSum at *
+  simp only [Fin.isValue, ge_iff_le] at *
+  /-
+  ha : A ≤ ∑ x : Fin n, if xs x = 1 then (as x).1 else (as x).2
+  hb : B ≤ ∑ x : Fin n, if xs x = 1 then (bs x).1 else (bs x).2
+  ⊢ A + B
+  ≤ ∑i, if xs i = 1 then (as i).1 + (bs i).1 else (as i).2 + (bs i).2
+  -/
   sorry
   done
 
@@ -93,7 +80,27 @@ theorem Reduction
   (xs : Fin n → Fin 2)
   (ks : Coeff n) (K : ℕ) (ha : PBIneq ks xs K)
   : ReductionProp xs ks K := by
+  unfold ReductionProp PBIneq PBSum at *
+  simp only [Fin.isValue, ge_iff_le, tsub_le_iff_right] at *
+  /-
+  ha : K ≤ ∑ x : Fin n, if xs x = 1 then (ks x).1 else (ks x).2
+  ⊢ K ≤
+    (∑i,  if xs i = 1
+          then (ks x).1 - (ks x).2
+          else (ks x).2 - (ks x).1
+    )
+    + ∑i, min (ks i).1 (ks i).2
+  -/
   sorry
+  -- simp [PBIneq,PBSum] at hk         -- K ≤ ∑ i : Fin n, if xs i = 1 then (ks i).1 else (ks i).2
+  -- simp_rw [ite_eq_bmul] at hk       -- K ≤ ∑ i : Fin n, ((ks i).1 * ↑(xs i) + (ks i).2 * (1 - ↑(xs i)))
+  -- set pos := λ i => ks i |>.1 with rpos
+  -- set neg := λ i => ks i |>.2 with rneg
+  -- simp_rw [rpos,rneg] at hk
+  -- simp_rw [reduce_terms] at hk   -- K ≤ ∑ i : Fin n, ((pos i - neg i) * ↑(xs x) + (neg i - pos i) * (1 - ↑(xs x)) + min (pos i) (neg i))
+  -- apply sum_split_min_term       -- K ≤ ∑ i : Fin n, ((pos i - neg i) * ↑(xs x) + (neg i - pos i) * (1 - ↑(xs x))) + ∑i,min (pos i) (neg i)
+  -- apply sub_ge_a_sub_sum         -- K - ∑i,min (pos i) (neg i) ≤ ∑ i : Fin n, ((pos i - neg i) * ↑(xs x) + (neg i - pos i) * (1 - ↑(xs x)))
+  --
   done
 
 def AdditionProp
@@ -113,16 +120,8 @@ theorem Addition
   {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
   {bs : Coeff n} {B : ℕ} (hb : PBIneq bs xs B)
   : AdditionProp xs as A bs B := by
-  unfold AdditionProp ReductionProp PBIneq PBSum at *
-  simp only [Fin.isValue, ge_iff_le, Pi.add_apply, Prod.fst_add, Prod.snd_add, tsub_le_iff_right] at *
-  /-
-  ha : A ≤ ∑i, if xs i = 1 then (as i).1 else (as i).2
-  hb : B ≤ ∑i, if xs i = 1 then (bs i).1 else (bs i).2
-  ⊢ A + B ≤
-    (∑i, if xs i = 1 then (as i).1 + (bs i).1 - ((as i).2 + (bs i).2) else (as i).2 + (bs i).2 - ((as i).1 + (bs i).1))
-    + ∑i, min ((as i).1 + (bs i).1) ((as i).2 + (bs i).2)
- -/
-  sorry
+  have hk := Addition' xs as A ha bs B hb
+  exact Reduction xs (as + bs) (A + B) hk
   done
 
 example
