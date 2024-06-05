@@ -29,10 +29,6 @@ def ReductionProp
   let rs := λ i => (pos i - neg i,neg i - pos i)
   PBIneq rs xs (K - slack)
 
-#check Fin.eq_one_of_neq_zero
-#check Nat.min_comm
-#check Nat.sub_add_min_cancel
-
 lemma reduce_terms (p n : ℕ) (x : Fin 2)
   : p * x + n * (1 - x) = (p - n) * x + (n - p) * (1 - x) + min p n  := by
   by_cases h : x = 0
@@ -47,15 +43,11 @@ lemma reduce_terms (p n : ℕ) (x : Fin 2)
     simp only [Fin.isValue, Fin.val_one, mul_one, ge_iff_le, le_refl, tsub_eq_zero_of_le, mul_zero, add_zero]
     exact Nat.sub_add_min_cancel p n |>.symm
 
-#check Finset.sum_add_distrib
-
 lemma sum_split_min_term (p n : Fin m → ℕ) (x : Fin m → Fin 2)
   : (∑i,((p i - n i) * x i + (n i - p i) * (1 - x i)   +      min (p i) (n i)))
   = (∑i,((p i - n i) * x i + (n i - p i) * (1 - x i))) + (∑i,(min (p i) (n i))) := by
   exact Finset.sum_add_distrib
   done
-
-#check Nat.sub_le_of_le_add
 
 lemma sum_ge_a_sub_sum (p n : Fin m → ℕ) (x : Fin m → Fin 2) (A : ℕ)
   (h : ∑i,((p i - n i) * x i + (n i - p i) * (1 - x i)) + ∑i,(min (p i) (n i)) ≥ A)
