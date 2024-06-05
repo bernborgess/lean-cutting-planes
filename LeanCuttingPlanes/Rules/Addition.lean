@@ -4,6 +4,31 @@ namespace PseudoBoolean
 
 open BigOperators FinVec Matrix
 
+theorem Addition'
+  (xs : Fin n → Fin 2)
+  (as : Coeff n) (A : ℕ) (ha : PBIneq as xs A)
+  (bs : Coeff n) (B : ℕ) (hb : PBIneq bs xs B)
+  : PBIneq (as + bs) xs (A + B) := by
+  unfold PBIneq PBSum at *
+  simp only [Fin.isValue, ge_iff_le] at *
+  /-
+  ha : A ≤ ∑ x : Fin n, if xs x = 1 then (as x).1 else (as x).2
+  hb : B ≤ ∑ x : Fin n, if xs x = 1 then (bs x).1 else (bs x).2
+  ⊢ A + B
+  ≤ ∑i, if xs i = 1 then (as i).1 + (bs i).1 else (as i).2 + (bs i).2
+  -/
+  sorry
+  done
+
+def ReductionProp
+  (xs : Fin n → Fin 2) (ks : Coeff n) (K : ℕ)
+  : Prop :=
+  let pos := λ i => ks i |>.1
+  let neg := λ i => ks i |>.2
+  let slack := (∑i, min (pos i) (neg i))
+  let rs := λ i => (pos i - neg i,neg i - pos i)
+  PBIneq rs xs (K - slack)
+
 #check Fin.eq_one_of_neq_zero
 #check Nat.min_comm
 #check Nat.sub_add_min_cancel
@@ -50,31 +75,6 @@ lemma ite_eq_bmul (x y : ℕ) (b : Fin 2)
     rw [h]
     simp only [Fin.isValue, ↓reduceIte, Fin.val_one, mul_one, ge_iff_le, le_refl,
       tsub_eq_zero_of_le, mul_zero, add_zero]
-
-theorem Addition'
-  (xs : Fin n → Fin 2)
-  (as : Coeff n) (A : ℕ) (ha : PBIneq as xs A)
-  (bs : Coeff n) (B : ℕ) (hb : PBIneq bs xs B)
-  : PBIneq (as + bs) xs (A + B) := by
-  unfold PBIneq PBSum at *
-  simp only [Fin.isValue, ge_iff_le] at *
-  /-
-  ha : A ≤ ∑ x : Fin n, if xs x = 1 then (as x).1 else (as x).2
-  hb : B ≤ ∑ x : Fin n, if xs x = 1 then (bs x).1 else (bs x).2
-  ⊢ A + B
-  ≤ ∑i, if xs i = 1 then (as i).1 + (bs i).1 else (as i).2 + (bs i).2
-  -/
-  sorry
-  done
-
-def ReductionProp
-  (xs : Fin n → Fin 2) (ks : Coeff n) (K : ℕ)
-  : Prop :=
-  let pos := λ i => ks i |>.1
-  let neg := λ i => ks i |>.2
-  let slack := (∑i, min (pos i) (neg i))
-  let rs := λ i => (pos i - neg i,neg i - pos i)
-  PBIneq rs xs (K - slack)
 
 theorem Reduction
   (xs : Fin n → Fin 2)
