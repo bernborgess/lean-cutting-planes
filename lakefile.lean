@@ -8,6 +8,11 @@ require mathlib from git
 
 lean_lib «LeanCuttingPlanes» where
 
+@[test_runner]
+script tests do
+  return 0
+
+
 @[default_target]
 lean_exe «lean-cutting-planes» where
   root := `Main
