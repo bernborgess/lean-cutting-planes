@@ -25,6 +25,19 @@ def ReductionProp
   let rs := λ i => (pos i - neg i,neg i - pos i)
   PBIneq rs xs (K - slack)
 
+lemma ite_eq_bmul (x y : ℕ) (b : Fin 2)
+  : (if b = 1 then x else y) = (x * b + y * (1 - b)) := by
+  by_cases h : b = 0
+  . rw [h]
+    rw [if_neg]
+    . simp only [Fin.isValue, Fin.val_zero, mul_zero, tsub_zero, mul_one, zero_add]
+    trivial
+  . -- b = 1
+    apply Fin.eq_one_of_neq_zero b at h
+    rw [h]
+    simp only [Fin.isValue, ↓reduceIte, Fin.val_one, mul_one, ge_iff_le, le_refl,
+      tsub_eq_zero_of_le, mul_zero, add_zero]
+
 lemma reduce_terms (p n : ℕ) (x : Fin 2)
   : p * x + n * (1 - x) = (p - n) * x + (n - p) * (1 - x) + min p n  := by
   by_cases h : x = 0
@@ -39,56 +52,16 @@ lemma reduce_terms (p n : ℕ) (x : Fin 2)
     simp only [Fin.isValue, Fin.val_one, mul_one, ge_iff_le, le_refl, tsub_eq_zero_of_le, mul_zero, add_zero]
     exact Nat.sub_add_min_cancel p n |>.symm
 
-lemma sum_split_min_term (p n : Fin m → ℕ) (x : Fin m → Fin 2)
-  : (∑i,((p i - n i) * x i + (n i - p i) * (1 - x i)   +      min (p i) (n i)))
-  = (∑i,((p i - n i) * x i + (n i - p i) * (1 - x i))) + (∑i,(min (p i) (n i))) := by
-  exact Finset.sum_add_distrib
-  done
-
-lemma sum_ge_a_sub_sum (p n : Fin m → ℕ) (x : Fin m → Fin 2) (A : ℕ)
-  (h : ∑i,((p i - n i) * x i + (n i - p i) * (1 - x i)) + ∑i,(min (p i) (n i)) ≥ A)
-  :   (∑i,((p i - n i) * x i + (n i - p i) * (1 - x i))) ≥ A - ∑i,(min (p i) (n i)) := by
-  exact Nat.sub_le_of_le_add h
-  done
-
-lemma ite_eq_bmul (x y : ℕ) (b : Fin 2)
-  : (if b = 1 then x else y) = (x * b + y * (1 - b)) := by
-  by_cases h : b = 0
-  . rw [h]
-    rw [if_neg]
-    . simp only [Fin.isValue, Fin.val_zero, mul_zero, tsub_zero, mul_one, zero_add]
-    trivial
-  . -- b = 1
-    apply Fin.eq_one_of_neq_zero b at h
-    rw [h]
-    simp only [Fin.isValue, ↓reduceIte, Fin.val_one, mul_one, ge_iff_le, le_refl,
-      tsub_eq_zero_of_le, mul_zero, add_zero]
-
 theorem Reduction
   (xs : Fin n → Fin 2)
   (ks : Coeff n) (K : ℕ) (ha : PBIneq ks xs K)
   : ReductionProp xs ks K := by
   unfold ReductionProp PBIneq PBSum at *
   simp only [Fin.isValue, ge_iff_le, tsub_le_iff_right] at *
-  /-
-  ha : K ≤ ∑ x : Fin n, if xs x = 1 then (ks x).1 else (ks x).2
-  ⊢ K ≤
-    (∑i,  if xs i = 1
-          then (ks x).1 - (ks x).2
-          else (ks x).2 - (ks x).1
-    )
-    + ∑i, min (ks i).1 (ks i).2
-  -/
-  sorry
-  -- simp [PBIneq,PBSum] at hk         -- K ≤ ∑ i : Fin n, if xs i = 1 then (ks i).1 else (ks i).2
-  -- simp_rw [ite_eq_bmul] at hk       -- K ≤ ∑ i : Fin n, ((ks i).1 * ↑(xs i) + (ks i).2 * (1 - ↑(xs i)))
-  -- set pos := λ i => ks i |>.1 with rpos
-  -- set neg := λ i => ks i |>.2 with rneg
-  -- simp_rw [rpos,rneg] at hk
-  -- simp_rw [reduce_terms] at hk   -- K ≤ ∑ i : Fin n, ((pos i - neg i) * ↑(xs x) + (neg i - pos i) * (1 - ↑(xs x)) + min (pos i) (neg i))
-  -- apply sum_split_min_term       -- K ≤ ∑ i : Fin n, ((pos i - neg i) * ↑(xs x) + (neg i - pos i) * (1 - ↑(xs x))) + ∑i,min (pos i) (neg i)
-  -- apply sub_ge_a_sub_sum         -- K - ∑i,min (pos i) (neg i) ≤ ∑ i : Fin n, ((pos i - neg i) * ↑(xs x) + (neg i - pos i) * (1 - ↑(xs x)))
-  --
+  simp_rw [ite_eq_bmul] at *
+  rw [←Finset.sum_add_distrib]
+  simp_rw [←reduce_terms]
+  exact ha
   done
 
 def AdditionProp
