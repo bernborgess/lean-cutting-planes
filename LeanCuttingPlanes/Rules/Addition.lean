@@ -72,24 +72,36 @@ theorem ThePlan
   sorry
   done
 
+theorem Addition'
+  (xs : Fin n → Fin 2)
+  (as : Coeff n) (A : ℕ) (ha : PBIneq as xs A)
+  (bs : Coeff n) (B : ℕ) (hb : PBIneq bs xs B)
+  : PBIneq (as + bs) xs (A + B) := by
+  sorry
+  done
 
-def tighten (as : Coeff n) : Coeff n :=
-  λ i : Fin n => let (p,n) := as i
-    if p > n then (p - n,0) else (0,n - p)
+def ReductionProp
+  (xs : Fin n → Fin 2) (ks : Coeff n) (K : ℕ)
+  : Prop :=
+  let pos := λ i => ks i |>.1
+  let neg := λ i => ks i |>.2
+  let slack := (∑i, min (pos i) (neg i))
+  let rs := λ i => (pos i - neg i,neg i - pos i)
+  PBIneq rs xs (K - slack)
 
-def getSlack (as : Coeff n) : ℕ :=
-  ∑ i : Fin n, let (p,n) := as i
-    min p n
+theorem Reduction
+  (xs : Fin n → Fin 2)
+  (ks : Coeff n) (K : ℕ) (ha : PBIneq ks xs K)
+  : ReductionProp xs ks K := by
+  sorry
+  done
 
 def AdditionProp
   (xs : Fin n → Fin 2)
   (as : Coeff n) (A : ℕ)
   (bs : Coeff n) (B : ℕ)
   : Prop :=
-  let abs := as + bs
-  let ts := tighten abs
-  let slack := getSlack abs
-  PBIneq ts xs (A + B - slack)
+  ReductionProp xs (as + bs) (A + B)
 
 -- Addition
 -- ∑i (a i * l i) ≥ A
@@ -101,21 +113,15 @@ theorem Addition
   {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
   {bs : Coeff n} {B : ℕ} (hb : PBIneq bs xs B)
   : AdditionProp xs as A bs B := by
-  unfold AdditionProp PBIneq PBSum getSlack tighten at *
-  simp at *
+  unfold AdditionProp ReductionProp PBIneq PBSum at *
+  simp only [Fin.isValue, ge_iff_le, Pi.add_apply, Prod.fst_add, Prod.snd_add, tsub_le_iff_right] at *
   /-
-  A + B ≤
-  (∑ x : Fin n,
-      if xs x = 1 then
-        (Decidable.rec (fun h => (0, (as x).2 + (bs x).2 - ((as x).1 + (bs x).1)))
-            (fun h => ((as x).1 + (bs x).1 - ((as x).2 + (bs x).2), 0))
-            (((as x).2 + (bs x).2).decLt ((as x).1 + (bs x).1))).1
-      else
-        (Decidable.rec (fun h => (0, (as x).2 + (bs x).2 - ((as x).1 + (bs x).1)))
-            (fun h => ((as x).1 + (bs x).1 - ((as x).2 + (bs x).2), 0))
-            (((as x).2 + (bs x).2).decLt ((as x).1 + (bs x).1))).2) +
-    ∑ x : Fin n, min ((as x).1 + (bs x).1) ((as x).2 + (bs x).2)
-  -/
+  ha : A ≤ ∑i, if xs i = 1 then (as i).1 else (as i).2
+  hb : B ≤ ∑i, if xs i = 1 then (bs i).1 else (bs i).2
+  ⊢ A + B ≤
+    (∑i, if xs i = 1 then (as i).1 + (bs i).1 - ((as i).2 + (bs i).2) else (as i).2 + (bs i).2 - ((as i).1 + (bs i).1))
+    + ∑i, min ((as i).1 + (bs i).1) ((as i).2 + (bs i).2)
+ -/
   sorry
   done
 
