@@ -11,13 +11,9 @@ theorem Addition'
   : PBIneq (as + bs) xs (A + B) := by
   unfold PBIneq PBSum at *
   simp only [Fin.isValue, ge_iff_le] at *
-  /-
-  ha : A ≤ ∑ x : Fin n, if xs x = 1 then (as x).1 else (as x).2
-  hb : B ≤ ∑ x : Fin n, if xs x = 1 then (bs x).1 else (bs x).2
-  ⊢ A + B
-  ≤ ∑i, if xs i = 1 then (as i).1 + (bs i).1 else (as i).2 + (bs i).2
-  -/
-  sorry
+  simp_rw [←ite_add_ite]
+  rw [Finset.sum_add_distrib]
+  exact Nat.add_le_add ha hb
   done
 
 def ReductionProp
