@@ -40,7 +40,7 @@ A constraint can be divided by any \\( c \in \mathbb{N}^{+} \\), and the the cei
 
 Saturation Rule
 -----------------------------
-A constraint can be replace its coefficients by the minimum between them and the constant:
+A constraint can replace its coefficients by the minimum between them and the constant:
 \\[ \frac
     {\sum_i{a_i l_i} \ge A}
     {\sum_i{ \min(a_i,A)\cdot l_i} \ge A}
