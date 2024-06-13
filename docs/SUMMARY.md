@@ -5,3 +5,4 @@
 
 - [Introduction](./introduction.md)
 - [Pseudo Boolean Rules](./pseudo_boolean_rules.md)
+- [Worked Example](./worked_example.md)
