@@ -7,6 +7,9 @@ title = "Cutting Planes with Lean 4"
 
 [output.html]
 git-repository-url = "https://github.com/bernborgess/lean-cutting-planes"
+mathjax-support = true
 
 [output.html.playground.boring-prefixes]
 lean = "# "
+
+# mdbook serve -p 8000 -n 127.0.0.1
