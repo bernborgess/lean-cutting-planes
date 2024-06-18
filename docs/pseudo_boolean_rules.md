@@ -1,18 +1,15 @@
 Pseudo Boolean Rules
 ============
 
-Input Axioms
+Interaction
 -----------------------------
 
-As a starting point for the pseudo boolean reasoning we will get constraints from the user, which are subject to a normalization process
+As a starting point for the pseudo boolean reasoning we will get constraints from the user, which are subject to a normalization process. Then the rules can be applied to produce further inequalities
 
-Literal Axioms
------------------------------
+```lean
+-- code goes here
+```
 
-For any literal \\( l_i\\) we can create a constraint:
-\\[ \frac{}
-    {l_i \ge 0}
-\\]
 
 Addition Rule
 -----------------------------
@@ -22,6 +19,10 @@ Two constraints can be added together, adding the coefficients and the constants
     {\sum_i{(a_i + b_i) l_i} \ge (A+B)}
 \\]
 
+```lean
+-- code goes here
+```
+
 Multiplication Rule
 -----------------------------
 A constraint can be multiplied by any \\( c \in \mathbb{N}^{+} \\):
@@ -29,6 +30,10 @@ A constraint can be multiplied by any \\( c \in \mathbb{N}^{+} \\):
     {\sum_i{a_i l_i} \ge A}
     {\sum_i{c a_i l_i} \ge c A}
 \\]
+
+```lean
+-- code goes here
+```
 
 Division Rule
 -----------------------------
@@ -38,6 +43,10 @@ A constraint can be divided by any \\( c \in \mathbb{N}^{+} \\), and the the cei
     {\sum_i{ \lceil \frac{a_i}{c} \rceil l_i} \ge \lceil \frac{A}{c} \rceil}
 \\]
 
+```lean
+-- code goes here
+```
+
 Saturation Rule
 -----------------------------
 A constraint can replace its coefficients by the minimum between them and the constant:
@@ -45,5 +54,9 @@ A constraint can replace its coefficients by the minimum between them and the co
     {\sum_i{a_i l_i} \ge A}
     {\sum_i{ \min(a_i,A)\cdot l_i} \ge A}
 \\]
+
+```lean
+-- code goes here
+```
 
 All these rules can be seen in practice in the Worked Example
