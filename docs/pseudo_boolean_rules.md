@@ -8,6 +8,7 @@ As a starting point for the pseudo boolean reasoning we will get constraints fro
 
 ```lean
 -- code goes here
+def x := 3
 ```
 
 
