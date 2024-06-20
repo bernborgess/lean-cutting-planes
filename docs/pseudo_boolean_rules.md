@@ -7,7 +7,13 @@ Interaction
 As a starting point for the pseudo boolean reasoning we will get constraints from the user, which are subject to a normalization process. Then the rules can be applied to produce further inequalities
 
 ```lean
+def eval(x) : 3 := 3
 -- code goes here
+  (xs : Fin 4 → Fin 2)
+  (c1 : PBIneq ![(1,0),(2,0),(1,0),(0,0)] xs 2)
+  (c2 : PBIneq ![(1,0),(2,0),(4,0),(2,0)] xs 5)
+  (c3 : PBIneq ![(0,0),(0,0),(0,0),(0,1)] xs 0)
+ 
 ```
 
 

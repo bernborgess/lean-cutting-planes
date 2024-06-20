@@ -1,4 +1,6 @@
-/book
+# Ignore book files, except for Lean's highlight.js
+/book/*
+!/book/highlight.js
 
 /build
 /lakefile.olean
