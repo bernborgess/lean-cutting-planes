@@ -1,10 +1,12 @@
 Worked Example
 ============
 
+This example was taken from the talk "[A Unified Proof System for Discrete Combinatorial Problems](https://jakobnordstrom.se/docs/presentations/TalkVeriPB_Dagstuhl23.pdf#page=58)" at slide 58 by Jakob Nordström. 
+
 Input
 -----------------------------
 
-For this example, in constraints over variables \\(w,x,y,z\\) we will have three input axioms:
+For this example, with constraints over variables \\(w,x,y,z\\), we will have three input axioms:
 
 1. \\( w + 2x + y \ge 2 \\)
 1. \\( w + 2x + 4y + 2z \ge 5 \\)
@@ -47,7 +49,7 @@ Now we add this result to constraint 2:
 ```lean
   let t2 : PBIneq ![(3,0),(6,0),(6,0),(2,0)] xs 9  := by apply Addition t1 c2
 ```
-At this point we want to remove the variable \\(z\\), as it does not appear in our goal. Then we will introduce a \\(\overline{z} \ge 0\\) by the literal axiom and then multiply it by 2:
+At this point we want to remove the variable \\(z\\), as it does not appear in our goal. Then we will use c3 \\(\overline{z} \ge 0\\) then multiply it by 2:
 \\[ \frac
     {\overline{z} \ge 0}
     {2\overline{z} \ge 0}
