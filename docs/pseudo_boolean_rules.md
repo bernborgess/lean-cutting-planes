@@ -7,13 +7,9 @@ Interaction
 As a starting point for the pseudo boolean reasoning we will get constraints from the user, which are subject to a normalization process. Then the rules can be applied to produce further inequalities
 
 ```lean
-def eval(x) : 3 := 3
--- code goes here
-  (xs : Fin 4 → Fin 2)
-  (c1 : PBIneq ![(1,0),(2,0),(1,0),(0,0)] xs 2)
-  (c2 : PBIneq ![(1,0),(2,0),(4,0),(2,0)] xs 5)
-  (c3 : PBIneq ![(0,0),(0,0),(0,0),(0,1)] xs 0)
- 
+def xs : Fin 2 → Fin 2
+def c1 : PBIneq ![(1,0),(2,0)] xs 2
+def c2 : PBIneq ![(1,0),(2,0)] xs 5
 ```
 
 
@@ -26,7 +22,11 @@ Two constraints can be added together, adding the coefficients and the constants
 \\]
 
 ```lean
--- code goes here
+def xs : Fin 2 → Fin 2
+def c1 : PBIneq ![(1,0),(2,0)] xs 2
+def c2 : PBIneq ![(1,0),(2,0)] xs 5
+-----------------------------------
+def c3 : PBIneq ![(2,0),(4,0)] xs 7 := by apply Addition c1 c2
 ```
 
 Multiplication Rule
@@ -38,7 +38,10 @@ A constraint can be multiplied by any \\( c \in \mathbb{N}^{+} \\):
 \\]
 
 ```lean
--- code goes here
+def xs : Fin 2 → Fin 2
+def c1 : PBIneq ![(1,0),(2,0)] xs 2
+-----------------------------------
+def c2 : PBIneq ![(2,0),(4,0)] xs 4 := by apply Multiplication c1 2
 ```
 
 Division Rule
@@ -50,7 +53,10 @@ A constraint can be divided by any \\( c \in \mathbb{N}^{+} \\), and the the cei
 \\]
 
 ```lean
--- code goes here
+def xs : Fin 2 → Fin 2
+def c1 : PBIneq ![(3,0),(6,0)] xs 7
+-----------------------------------
+def c2 : PBIneq ![(1,0),(2,0)] xs 3 := by apply Division c1 3
 ```
 
 Saturation Rule
@@ -62,7 +68,10 @@ A constraint can replace its coefficients by the minimum between them and the co
 \\]
 
 ```lean
--- code goes here
+def xs : Fin 2 → Fin 2
+def c1 : PBIneq ![(3,0),(6,0)] xs 3
+-----------------------------------
+def c2 : PBIneq ![(3,0),(3,0)] xs 3 := by apply Saturation c1
 ```
 
-All these rules can be seen in practice in the Worked Example
+All these rules can be seen in practice in the [Worked Example](./worked_example.md)
