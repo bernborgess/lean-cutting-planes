@@ -1,3 +1,4 @@
+# Ignore book files, except for Lean's highlight.js
 /book
 
 /build
