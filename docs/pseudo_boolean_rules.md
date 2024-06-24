@@ -5,11 +5,25 @@ Interaction
 -----------------------------
 
 As a starting point for the pseudo boolean reasoning we will get constraints from the user, which are subject to a normalization process. Then the rules can be applied to produce further inequalities
+\\[
+    xs := [0,1]
+\\]
 
+\\[
+    as := [(1,0),(2,0)] \equiv x + 2y 
+\\]
+
+\\[
+    bs := [(0,3),(2,0)] \equiv 3 \overline{x} + 2y
+\\]
+
+\\[
+    {{c1 := \sum_i{as_i xs_i} \ge 2}\qquad {c2 := \sum_i{bs_i xs_i} \ge 5}}
+\\]
 ```lean
-def xs : Fin 2 → Fin 2
+def xs : Fin 2 → Fin 2 := ![0,1]
 def c1 : PBIneq ![(1,0),(2,0)] xs 2
-def c2 : PBIneq ![(1,0),(2,0)] xs 5
+def c2 : PBIneq ![(0,3),(2,0)] xs 5
 ```
 
 
@@ -22,11 +36,11 @@ Two constraints can be added together, adding the coefficients and the constants
 \\]
 
 ```lean
-def xs : Fin 2 → Fin 2
+def xs : Fin 2 → Fin 2 := ![0,1]
 def c1 : PBIneq ![(1,0),(2,0)] xs 2
-def c2 : PBIneq ![(1,0),(2,0)] xs 5
+def c2 : PBIneq ![(0,3),(2,0)] xs 5
 -----------------------------------
-def c3 : PBIneq ![(2,0),(4,0)] xs 7 := by apply Addition c1 c2
+def c3 : PBIneq ![(0,2),(4,0)] xs 6 := by apply Addition c1 c2
 ```
 
 Multiplication Rule
