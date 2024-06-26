@@ -25,7 +25,9 @@
 \maketitle
 
 \begin{abstract}
-    Este documento ?
+    Esta pesquisa envolve a definição e verificação da lógica pseudo-booleana de
+    Planos de Corte utilizando o provador de teoremas Lean 4
+
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -33,7 +35,26 @@
 \end{IEEEkeywords}
 
 \section{Introdução}
-Capítulo introdutório: caracterização do problema, motivação, objetivos, breve descrição da estrutura do trabalho.
+O problema da satisfabilidade booleana (SAT) é muito importante para a Ciência da Computação, sendo o
+primeiro demonstrado ser da class NP-Completo. Ele é o problema de decidir para dada expressão booleana, é
+possível escolher valores para as variáveis de forma que a expressão como um todo seja verdadeira.
+Este problema é extensivamente pesquisado na área de métodos formais\cite{SatLive} e existem inclusive competições para
+definir qual é o melhor solucionador do mundo \cite{SatComp}.
+
+Um formato comumente utilizado para representar essas expressões é a Forma Normal Conjuntiva (CNF), que
+consiste da conjunção de cláusulas, em que cada cláusula é a disjunção de variáveis ou negação de variáveis.
+% Formula CNF aqui
+Entretando, introduzimos uma outra representação para expressões, chamados Pseudo-Booleanos, funções estudadas
+desde os anos 1960 na área de pesquisa operacional.
+% Formula PB aqui
+Este formato é exponencialmente mais compacto que o CNF, o que motiva seu uso\cite{PBSolve}.
+
+% TODO: https://youtu.be/xoAov5RLcis?feature=shared&t=165
+
+
+O cálculo formal de Planos de Corte é uma técnica matemática utilizada na área de otimização,
+particularmente em Programação Linear que
+% Capítulo introdutório: caracterização do problema, motivação, objetivos, breve descrição da estrutura do trabalho.
 
 \section{Referencial Teórico}
 Capítulo referencial: identificação de trabalhos correlatos, referencial teórico.
@@ -48,12 +69,12 @@ aluno.
 \section*{Conclusões}
 Capítulo de fechamento: conclusões e relação de trabalhos futuros.
 
-\section*{Referencias Bibliográficas}
-
-Referências bibliográficas contidas no texto.
-
 \begin{thebibliography}{00}
-    \bibitem{b1} J. Nordström, ``A Unified Proof System for Discrete Combinatorial Problems'', November 2023.
+    \bibitem{SatLive}   ``Sat Live! keep up to date with research on the satisfiability problem'', access at http://www.satlive.org/
+    \bibitem{SatComp}   ``The International SAT Competition Web Page'', access at https://satcompetition.github.io/.
+    \bibitem{PBSolve}   J. Nordström, ``Pseudo-Boolean Solving and Optimization'', February 2021.
+    \bibitem{CutPlane}  J. Nordström, ``A Unified Proof System for Discrete Combinatorial Problems'', November 2023.
+
 \end{thebibliography}
 \vspace{12pt}
 \end{document}
