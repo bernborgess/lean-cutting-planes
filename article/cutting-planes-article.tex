@@ -35,32 +35,67 @@
 \end{IEEEkeywords}
 
 \section{Introdução}
+
+% TODO
+% O cálculo formal de Planos de Corte é uma técnica matemática utilizada na área de otimização,
+% particularmente em Programação Linear.  
+% Capítulo introdutório: caracterização do problema, motivação, objetivos, breve descrição da estrutura do trabalho.
+% * problema de utilizar pseudo booleanos para representacao eficiente de problemas SAT
+% * motivacao: Ter certeza que solucoes que utilizam os pseudo-booleans estao corretas
+% * objetivos: Usar metodos formais para validar a logica pseudo-booleana e provas que a utilizem
+% * estrutura do trabalho: biblioteca de codigo em Lean 4 que implementa as regras da logica pseudo-booleana e prova sua
+%   corretude. Alem disso, mostrar exemplos de uso dessa biblioteca com o "Toy Example" presente na apresentacao de Jakob.
+%   Criacao de uma documentacao em formato mdbook, que estara disponivel para pesquisadores e matematicos que desejem usar
+%   a biblioteca.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris luctus lacus eu varius fermentum. Nullam lacus urna, semper a euismod sed, hendrerit eu nisi. Donec nec risus turpis. Vestibulum placerat justo sit amet aliquam mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed vulputate vulputate maximus. Sed euismod turpis vitae libero consectetur gravida. Pellentesque eu nibh ipsum. Ut porta tortor vel pharetra euismod. Nulla quis nunc bibendum, condimentum sem a, tempus lectus.
+
+\section{Referencial Teórico}
+% Capítulo referencial: identificação de trabalhos correlatos, referencial teórico.
+
+\subsection{Satisfiabilidade}
 O problema da satisfabilidade booleana (SAT) é muito importante para a Ciência da Computação, sendo o
-primeiro demonstrado ser da class NP-Completo. Ele é o problema de decidir para dada expressão booleana, é
-possível escolher valores para as variáveis de forma que a expressão como um todo seja verdadeira.
+primeiro demonstrado ser da class NP-Completo. Ele é o problema de decidir para dada expressão booleana,
+se é possível escolher valores para as variáveis de forma que a expressão como um todo seja verdadeira.
 Este problema é extensivamente pesquisado na área de métodos formais\cite{SatLive} e existem inclusive competições para
 definir qual é o melhor solucionador do mundo \cite{SatComp}.
 
 Um formato comumente utilizado para representar essas expressões é a Forma Normal Conjuntiva (CNF), que
 consiste da conjunção de cláusulas, em que cada cláusula é a disjunção de variáveis ou negação de variáveis.
-% Formula CNF aqui
-Entretando, introduzimos uma outra representação para expressões, chamados Pseudo-Booleanos, funções estudadas
-desde os anos 1960 na área de pesquisa operacional.
-% Formula PB aqui
-Este formato é exponencialmente mais compacto que o CNF, o que motiva seu uso\cite{PBSolve}.
-
-% TODO: https://youtu.be/xoAov5RLcis?feature=shared&t=165
-
-
-O cálculo formal de Planos de Corte é uma técnica matemática utilizada na área de otimização,
-particularmente em Programação Linear que
-% Capítulo introdutório: caracterização do problema, motivação, objetivos, breve descrição da estrutura do trabalho.
-
-\section{Referencial Teórico}
-Capítulo referencial: identificação de trabalhos correlatos, referencial teórico.
+% Formula CNF
+\begin{equation}
+    C_1 \land C_2 \land \dots \land C_n
+\end{equation}
+onde,
+\begin{equation}
+    C_i = a_1^i \lor a_2^i \lor \dots \lor a_k^i
+\end{equation}
+e para cada $j$
+\begin{equation}
+    a_j^i \in \{ x_1,x_2,\dots,x_m,\neg x_1,\neg x_2,\dots, \neg x_m \}
+\end{equation}
 
 \subsection{Pseudo-Booleans}
-O que são PBs?
+Neste trabalho, introduzimos uma outra representação para expressões, chamados Pseudo-Booleanos, funções estudadas
+desde os anos 1960 na área de pesquisa operacional, em programação inteira. Este formato consiste de:
+% Formula PB
+\begin{equation}
+    \sum_i{a_i l_i} \ge A
+\end{equation}
+onde,
+\begin{equation}
+    \begin{gathered}
+        A, a_i \in \mathbb{N} \\
+        l_i \in \{ x_i, \overline x_i \}, \qquad x_i + \overline x_i = 1
+    \end{gathered}
+\end{equation}
+
+Este formato é exponencialmente mais compacto que o CNF, o que motiva seu uso\cite{PBSolve}.
+
+\subsection{Pseudo-Boolean Reasoning}
+A lógica formal de Cutting Planes introduz 2 axiomas e 4 regras de inferência, nomeadamente
+\textbf{Adição}, \textbf{Multiplicação}, \textbf{Divisão} e \textbf{Saturação},
+que permitem derivar novas inequações a partir de outras\cite{CutPlane}.
+
 
 \section{Contribuições}
 Capítulo de contribuição: descrição organizada das atividades conduzidas pelo
@@ -70,10 +105,10 @@ aluno.
 Capítulo de fechamento: conclusões e relação de trabalhos futuros.
 
 \begin{thebibliography}{00}
-    \bibitem{SatLive}   ``Sat Live! keep up to date with research on the satisfiability problem'', access at http://www.satlive.org/
-    \bibitem{SatComp}   ``The International SAT Competition Web Page'', access at https://satcompetition.github.io/.
-    \bibitem{PBSolve}   J. Nordström, ``Pseudo-Boolean Solving and Optimization'', February 2021.
-    \bibitem{CutPlane}  J. Nordström, ``A Unified Proof System for Discrete Combinatorial Problems'', November 2023.
+    \bibitem{SatLive} ``Sat Live! keep up to date with research on the satisfiability problem'', access at http://www.satlive.org/.
+    \bibitem{SatComp} ``The International SAT Competition Web Page'', access at https://satcompetition.github.io/.
+    \bibitem{PBSolve} J. Nordström, ``Pseudo-Boolean Solving and Optimization'', February 2021.
+    \bibitem{CutPlane}J. Nordström, ``A Unified Proof System for Discrete Combinatorial Problems'', November 2023.
 
 \end{thebibliography}
 \vspace{12pt}
