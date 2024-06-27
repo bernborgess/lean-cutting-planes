@@ -7,6 +7,7 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
+\usepackage{minted}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
@@ -152,5 +153,30 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris luctus lacus eu 
     \bibitem{PFR}           T. Tao, ``The Polynomial Freiman-Ruzsa Conjecture'', Novembro de 2023. Acesso em https://teorth.github.io/pfr/.
     \bibitem{mathlib4}      The mathlib Community. 2020. ``The lean mathematical library''. In CPP 2020. 367-381. https://doi.org/10.1145/3372885.3373824
 \end{thebibliography}
+
 \vspace{12pt}
+
+\newpage
+
+\section{Apêndice}
+
+\subsection{Definição de Pseudo-Boolean}
+
+\begin{minted}{lean4}
+
+open FinVec BigOperators
+
+-- TODO: Add support for unicode chars in LaTeX
+abbrev Coeff (n : .) := Fin n → (. . .)
+
+def PBSum (cs : Coeff n) (xs : Fin n → Fin 2) :=
+  . i, let (p,n) := cs i;
+    if xs i = 1 then p else n
+
+def PBIneq (cs : Coeff n) (xs : Fin n → Fin 2) (const : .) :=
+  PBSum cs xs . const
+
+\end{minted}
+
+
 \end{document}
