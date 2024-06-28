@@ -177,7 +177,27 @@ quando $x_1 = 0$ e $x_2 = 1$.
 
 % * Prova da Regra Multiplication
 \subsection{Prova da Regra Multiplicação}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris luctus lacus eu varius fermentum. Nullam lacus urna, semper a euismod sed, hendrerit eu nisi. Donec nec risus turpis. Vestibulum placerat justo sit amet aliquam mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed vulputate vulputate maximus. Sed euismod turpis vitae libero consectetur gravida. Pellentesque eu nibh ipsum. Ut porta tortor vel pharetra euismod. Nulla quis nunc bibendum, condimentum sem a, tempus lectus.
+A primeira regra a ser formalizada é a multiplicação, que diz que dada uma inequação pseudo-booleana, podemos obter
+outra inequação válida ao multiplicar os coeficientes por um escalar natural $c \in \mathbb{N}^+ $, ao mesmo tempo que multiplicamos
+a constante pelo mesmo valor.
+
+\begin{equation}
+    \frac
+    {\sum_i{a_i l_i} \ge A}
+    {\sum_i{c a_i l_i} \ge c A}
+\end{equation}
+
+O teorema \textit{Multiplication} implementa esse comportamento em Lean:
+\begin{minted}[fontsize=\small]{lean4}
+theorem Multiplication
+  {xs : Fin n → Fin 2}
+  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
+  (c : ℕ)
+  : PBIneq (c • as) xs (c • A)
+\end{minted}
+
+A prova completa se encontra no Apêndice A. Como a muliplicação por escalares já está definida na \textit{mathlib4} para
+os \textit{FinVec}s pelo teorema \texttt{Finset.sum\_nsmul} da biblioteca.
 
 % * Prova da Regra Saturation
 \subsection{Prova da Regra Saturação}
