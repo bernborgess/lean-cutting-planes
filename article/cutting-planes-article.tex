@@ -7,7 +7,8 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
-\usepackage{minted}
+% \usepackage{minted}
+
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
@@ -162,21 +163,22 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris luctus lacus eu 
 
 \subsection{Definição de Pseudo-Boolean}
 
-\begin{minted}{lean4}
+% \begin{minted}{lean4}
 
-open FinVec BigOperators
+% open FinVec BigOperators
 
--- TODO: Add support for unicode chars in LaTeX
-abbrev Coeff (n : .) := Fin n → (. . .)
+% -- TODO: Add support for unicode chars in LaTeX
+% abbrev Coeff (n : .) := Fin n → (. . .)
 
-def PBSum (cs : Coeff n) (xs : Fin n → Fin 2) :=
-  . i, let (p,n) := cs i;
-    if xs i = 1 then p else n
 
-def PBIneq (cs : Coeff n) (xs : Fin n → Fin 2) (const : .) :=
-  PBSum cs xs . const
+% def PBSum (cs : Coeff n) (xs : Fin n → Fin 2) :=
+%   . i, let (p,n) := cs i;
+%     if xs i = 1 then p else n
 
-\end{minted}
+% def PBIneq (cs : Coeff n) (xs : Fin n → Fin 2) (const : .) :=
+%   PBSum cs xs . const
+
+% \end{minted}
 
 
 \end{document}
