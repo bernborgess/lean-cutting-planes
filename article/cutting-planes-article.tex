@@ -138,7 +138,8 @@ de dois números naturais, o tipo $\mathbb{N}$ em Lean:
 abbrev Coeff (n : ℕ) := Fin n → (ℕ × ℕ)
 \end{minted}
 
-Esse par consiste do coeficiente de $x_i$ no primeiro elemento e o coeficiente de $\overline x_i$ no segundo elemento.
+Esse par consiste do coeficiente de $x_i$ no primeiro elemento e
+o coeficiente de $\overline x_i$ no segundo elemento.
 
 Com essa definição, definimos o \textit{PBSum}, que, com os coeficientes $cs$ e os valores 0-1 $xs$,
 utiliza o \textit{BigOperator} de somatório ($\sum$) para somar os elementos da lista iterando no índice $i$:
@@ -147,6 +148,31 @@ def PBSum (cs : Coeff n) (xs : Fin n → Fin 2) :=
   ∑ i, let (p,n) := cs i;
     if xs i = 1 then p else n
 \end{minted}
+
+E com esse somatório podemos agora criar o \textit{PBIneq} que é a verificação que o \textit{PBSum}
+é maior ou igual à constante $const$:
+\begin{minted}[fontsize=\small]{lean4}
+def PBIneq (cs : Coeff n) (xs : Fin n → Fin 2)
+    (const : ℕ) :=
+  PBSum cs xs ≥ const
+\end{minted}
+
+Para criar uma expressão desse tipo basta fornecer as listas de coeficientes, pseudo-booleanos e a constante,
+e em seguida provar que a propriedade vale:
+\begin{minted}[fontsize=\small]{lean4}
+example : PBIneq ![(1,0),(2,0)] ![0,1] 2 := by
+  -- Change goal to 1 * 0 + 2 * 1 ≥ 2
+  reduce               
+  -- Prove 1 * 0 + 2 * 1 ≥ 2
+  exact Nat.le_refl 2  
+  done
+\end{minted}
+
+O exemplo acima prova a expressão
+\begin{equation}
+    x_1 + 2 x_2 \ge 2
+\end{equation}
+quando $x_1 = 0$ e $x_2 = 1$.
 
 
 % * Prova da Regra Multiplication
