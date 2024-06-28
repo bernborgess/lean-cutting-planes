@@ -196,12 +196,54 @@ theorem Multiplication
   : PBIneq (c • as) xs (c • A)
 \end{minted}
 
+% TODO: Criar apêndice A com código completo
 A prova completa se encontra no Apêndice A. Como a muliplicação por escalares já está definida na \textit{mathlib4} para
 os \textit{FinVec}s pelo teorema \texttt{Finset.sum\_nsmul} da biblioteca.
 
 % * Prova da Regra Saturation
 \subsection{Prova da Regra Saturação}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris luctus lacus eu varius fermentum. Nullam lacus urna, semper a euismod sed, hendrerit eu nisi. Donec nec risus turpis. Vestibulum placerat justo sit amet aliquam mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed vulputate vulputate maximus. Sed euismod turpis vitae libero consectetur gravida. Pellentesque eu nibh ipsum. Ut porta tortor vel pharetra euismod. Nulla quis nunc bibendum, condimentum sem a, tempus lectus.
+A regra da Saturação permite substituir os coeficientes de uma inequação pelo \textit{mínimo} desse número com a constante $A$:
+\begin{equation}
+    \frac
+    {\sum_i{a_i l_i} \ge A}
+    {\sum_i{ \min(a_i,A)\cdot l_i} \ge A}
+\end{equation}
+
+O teorema \textit{Saturation} implementa esse comportamento ao aplicar \textit{map} na lista de coeficientes com a função
+\texttt{mapBoth (min A)}, que transforma ambos elementos do par no mínimo entre eles e a constante $A$:
+\begin{minted}[fontsize=\small]{lean4}
+theorem Saturation
+  {xs : Fin n → Fin 2}
+  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
+  : PBIneq (map (mapBoth (min A)) as) xs A
+\end{minted}
+
+% TODO: Criar apêndice B com código completo
+Este teorema (Apêndice B) envolveu mais passos, pois não havia o mesmo suporte nativo da \textit{mathlib4}.
+O lema que provamos, chamado \texttt{le\_sum\_min\_of\_le\_sum} é o caso mais simples, onde trabalhamos com uma
+lista de naturais e desejamos mostrar que a relação menor-ou-igual se mantém ao aplicar o mínimo de $A$:
+\begin{minted}[fontsize=\small]{lean4}
+lemma le_sum_min_of_le_sum {n A : ℕ}
+  {as : Fin n → ℕ}
+  (h : A ≤ ∑i, as i)
+  : A ≤ ∑i, min A (as i)
+\end{minted}
+
+Em alto nível, podemos provar isso por casos:
+\begin{enumerate}
+    \item Todos os elementos de $as$ são menores-ou-iguais a $A$.
+          Nesse caso $\min(A,as_i) = as_i$, para todo $i$, logo temos a mesma lista.
+          % os elementos,
+          Então a afirmação vale pela hipótese.
+    \item Caso contrário, existe ao menos um índice $k$ da lista $as$, onde $as_k > A$.
+          Podemos dividir o somatório em $\sum_{i\neq k}{\min(A,as_i) + \min(A,as_k)}$, separando esse índice em específico.
+          Como $as_k > A$, substituímos $\min(A,as_k)$ por $A$.
+          Como queremos mostrar que $A \le \sum_{i\neq k}{\min(A,as_i) + A}$,
+          terminamos a prova com o teorema \texttt{Nat.le\_add\_left A}, que diz
+          $A \le B + A$, para qualquer $B \in \mathbb{N}$.
+
+\end{enumerate}
+
 
 % * Prova da Regra Division
 \subsection{Prova da Regra Divisão}
