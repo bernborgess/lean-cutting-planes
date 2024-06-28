@@ -131,8 +131,10 @@ A mesma fórmula acima nesse formato é expressa por:
     x_1 + x_2 + \overline x_3 \ge 2
 \end{equation}
 
-A implementação em Lean 4 consiste de definir o tipo para coeficientes \textit{Coeff}, onde usamos a estrutura
-\textit{FinVec}, que permite termos uma lista com $n$ elementos, onde cada elemento da lista será um par
+Na implementação em Lean 4 utilizamos o tipo \texttt{Fin 2}, que só permite os valores $0$ ou $1$
+para os pseudo-booleanos.
+Para os coeficientes \texttt{Coeff}, usamos a estrutura \texttt{FinVec},
+que permite termos uma lista com $n$ elementos, onde cada elemento da lista será um par
 de dois números naturais, o tipo $\mathbb{N}$ em Lean:
 \begin{minted}[fontsize=\small]{lean4}
 abbrev Coeff (n : ℕ) := Fin n → (ℕ × ℕ)
@@ -294,7 +296,68 @@ Com isso concluímos a prova.
 
 % * Prova da Regra Addition
 \subsection{Prova da Regra Adição}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris luctus lacus eu varius fermentum. Nullam lacus urna, semper a euismod sed, hendrerit eu nisi. Donec nec risus turpis. Vestibulum placerat justo sit amet aliquam mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed vulputate vulputate maximus. Sed euismod turpis vitae libero consectetur gravida. Pellentesque eu nibh ipsum. Ut porta tortor vel pharetra euismod. Nulla quis nunc bibendum, condimentum sem a, tempus lectus.
+Adição foi a última prova demonstrada, e se tornou a mais difícil, pois, além de somar duas inequações,
+dois literais de polaridades opostas se aniquilam, o que chamamos aqui de \textit{Redução}:
+
+\begin{equation}
+    \frac
+    {{\sum_i{a_i l_i} \ge A}\qquad {\sum_i{b_i l_i} \ge B}}
+    {\sum_i{(a_i + b_i) l_i} \ge (A+B)}
+\end{equation}
+
+Primeiro implementamos uma regra \textit{Addition'}, que realiza a adição diretamente sem a redução:
+
+\begin{minted}[fontsize=\small]{lean4}
+theorem Addition'
+  (xs : Fin n → Fin 2)
+  (as : Coeff n) (A : ℕ) (ha : PBIneq as xs A)
+  (bs : Coeff n) (B : ℕ) (hb : PBIneq bs xs B)
+  : PBIneq (as + bs) xs (A + B)
+\end{minted}
+
+Os teoremas da \textit{mathlib4} deram bom suporte à prova, o que \texttt{Finset.sum\_add\_distrib} resolveu em um passo.
+
+Um lema usado para seguir adiante foi \texttt{ite\_eq\_bmul},
+que nos permite transitar da notação \texttt{if-then-else}
+para a multiplicação dos termos pseudo-booleanos:
+
+\begin{minted}[fontsize=\small]{lean4}
+lemma ite_eq_bmul (x y : ℕ) (b : Fin 2)
+  : (if b = 1 then x else y)
+  = (x * b + y * (1 - b))
+\end{minted}
+
+Em seguida, implementamos a regra \textit{Reduction}, que toma uma inequação e aniquila coeficientes
+onde ambos elementos do par são maiores que $0$.
+Quando isso acontece, essa diferença "\textit{slack}" deve ser subtraída da constante:
+
+\begin{minted}[fontsize=\small]{lean4}
+def ReductionProp (xs : Fin n → Fin 2)
+    (ks : Coeff n) (K : ℕ) : Prop :=
+  let pos := λ i => ks i |>.1
+  let neg := λ i => ks i |>.2
+  let slack := (∑i, min (pos i) (neg i))
+  let rs := λ i => (pos i - neg i,neg i - pos i)
+  PBIneq rs xs (K - slack)
+
+theorem Reduction
+  (xs : Fin n → Fin 2)
+  (ks : Coeff n) (K : ℕ) (ha : PBIneq ks xs K)
+  : ReductionProp xs ks K
+\end{minted}
+
+Com esses dois teoremas, definimos \textit{Addition} compondo-os:
+
+\begin{minted}[fontsize=\small]{lean4}
+theorem Addition
+  {xs : Fin n → Fin 2}
+  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
+  {bs : Coeff n} {B : ℕ} (hb : PBIneq bs xs B)
+  : ReductionProp xs (as + bs) (A + B) := by
+  have hk := Addition' xs as A ha bs B hb
+  exact Reduction xs (as + bs) (A + B) hk
+  done
+\end{minted}
 
 % * Implementação do Toy Example
 \subsection{Implementação do Exemplo}
@@ -320,27 +383,25 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris luctus lacus eu 
 \vspace{12pt}
 
 \newpage
-
-\section{Apêndice}
+\onecolumn
+\appendix
 
 \subsection{Definição de Pseudo-Boolean}
+\begin{minted}{lean4}
 
-% \begin{minted}{lean4}
+open FinVec BigOperators
 
-% open FinVec BigOperators
-
-% -- TODO: Add support for unicode chars in LaTeX
-% abbrev Coeff (n : .) := Fin n → (. . .)
+-- TODO: Add support for unicode chars in LaTeX
+abbrev Coeff (n : .) := Fin n → (. . .)
 
 
-% def PBSum (cs : Coeff n) (xs : Fin n → Fin 2) :=
-%   . i, let (p,n) := cs i;
-%     if xs i = 1 then p else n
+def PBSum (cs : Coeff n) (xs : Fin n → Fin 2) :=
+. i, let (p,n) := cs i;
+if xs i = 1 then p else n
 
-% def PBIneq (cs : Coeff n) (xs : Fin n → Fin 2) (const : .) :=
-%   PBSum cs xs . const
-
-% \end{minted}
+def PBIneq (cs : Coeff n) (xs : Fin n → Fin 2) (const : .) :=
+PBSum cs xs . const
+\end{minted}
 
 
 \end{document}
