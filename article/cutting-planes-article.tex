@@ -194,8 +194,7 @@ theorem Multiplication
   : PBIneq (c • as) xs (c • A)
 \end{minted}
 
-% TODO: Criar apêndice A com código completo
-A prova completa se encontra no Apêndice A. Como a muliplicação por escalares já está definida na \textit{mathlib4} para
+A prova completa se encontra no Apêndice B. Como a muliplicação por escalares já está definida na \textit{mathlib4} para
 os \textit{FinVec}s pelo teorema \texttt{Finset.sum\_nsmul} da biblioteca.
 
 % * Prova da Regra Saturation
@@ -216,8 +215,7 @@ theorem Saturation
   : PBIneq (map (mapBoth (min A)) as) xs A
 \end{minted}
 
-% TODO: Criar apêndice B com código completo
-Este teorema (Apêndice B) envolveu mais passos, pois não havia o mesmo suporte nativo da \textit{mathlib4}.
+Este teorema (Apêndice C) envolveu mais passos, pois não havia o mesmo suporte nativo da \textit{mathlib4}.
 O lema que provamos, chamado \texttt{le\_sum\_min\_of\_le\_sum} é o caso mais simples, onde trabalhamos com uma
 lista de naturais e desejamos mostrar que a relação menor-ou-igual se mantém ao aplicar o mínimo de $A$:
 \begin{minted}[fontsize=\small]{lean4}
@@ -386,21 +384,339 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris luctus lacus eu 
 \onecolumn
 \appendix
 
-\subsection{Definição de Pseudo-Boolean}
+\subsection{Definição de Inequações Pseudo-Booleanas}
 \begin{minted}{lean4}
+import Mathlib.Data.Fin.Tuple.Reflection
+
+namespace PseudoBoolean
 
 open FinVec BigOperators
 
--- TODO: Add support for unicode chars in LaTeX
-abbrev Coeff (n : .) := Fin n → (. . .)
-
+abbrev Coeff (n : ℕ) := Fin n → (ℕ × ℕ)
 
 def PBSum (cs : Coeff n) (xs : Fin n → Fin 2) :=
-. i, let (p,n) := cs i;
-if xs i = 1 then p else n
+  ∑ i, let (p,n) := cs i;
+    if xs i = 1 then p else n
 
-def PBIneq (cs : Coeff n) (xs : Fin n → Fin 2) (const : .) :=
-PBSum cs xs . const
+def PBIneq (cs : Coeff n) (xs : Fin n → Fin 2) (const : ℕ) :=
+  PBSum cs xs ≥ const
+
+example : PBIneq ![(1,0)] ![1] 1 := by
+  reduce                -- Expand the goal to 1 * 1 ≥ 1
+  exact Nat.le_refl 1   -- Prove that 1 * 1 ≥ 1
+  done
+
+example : PBIneq ![(1,0),(2,0)] ![0,1] 2 := by
+  reduce                -- Change goal to 1 * 0 + 2 * 1 ≥ 2
+  exact Nat.le_refl 2   -- Prove 1 * 0 + 2 * 1 ≥ 2
+  done
+
+example : PBIneq ![(3,0),(4,0)] ![0,1] 2 := by
+  reduce
+  simp
+  done
+
+def mapBoth (f : α → β) (t : α × α) : β × β := Prod.map f f t
+
+end PseudoBoolean
+\end{minted}
+\newpage
+
+\subsection{Prova da Regra Multiplicação}
+\begin{minted}{lean4}
+import <<LeanCuttingPlanes>>.Basic
+
+namespace PseudoBoolean
+
+open BigOperators FinVec
+
+theorem Multiplication
+  {xs : Fin n → Fin 2}
+  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
+  (c : ℕ)
+  : PBIneq (c • as) xs (c • A) := by
+  unfold PBIneq PBSum at *
+  simp only [Fin.isValue, ge_iff_le, nsmul_eq_smul, smul_eq_mul] at *
+  apply nsmul_le_nsmul_right at ha
+  specialize ha c
+  rw [←Finset.sum_nsmul] at ha
+  simp only [smul_eq_mul, Fin.isValue, mul_ite] at ha
+  exact ha
+  done
+
+example
+  (ha : PBIneq ![(1,0)] xs 3)
+  : PBIneq ![(2,0)] xs 6 := by
+  apply Multiplication ha 2
+  done
+
+end PseudoBoolean
+\end{minted}
+\newpage
+
+\subsection{Prova da Regra Saturação}
+\begin{minted}{lean4}
+import <<LeanCuttingPlanes>>.Basic
+
+namespace PseudoBoolean
+open FinVec Matrix BigOperators Finset
+
+-- @collares
+lemma split_summation (n : ℕ) (as : Fin n → ℕ) (k : Fin n) :
+    (∑i with i≠k, as i) + as k = (∑i, as i) := by
+  have : (∑i with i=k, as i) = as k := by rw [Finset.sum_eq_single_of_mem] <;> simp
+  rw [← this, ← Finset.sum_filter_add_sum_filter_not Finset.univ (· ≠ k)]
+  simp only [ne_eq, Decidable.not_not]
+
+lemma le_sum_min_of_le_sum {n A : ℕ} {as : Fin n → ℕ}
+  (h : A ≤ ∑i, as i)
+  : A ≤ ∑i, min A (as i) := by
+  by_cases ha : ∀i, as i ≤ A
+  . -- Assume all elements of as are ≤ A
+    simp_rw [@Nat.min_eq_right A (as _) (ha _)]
+    -- rewrite min A (as i) to (as i)
+    exact h
+
+  . -- Otherwise, ∃k, (as k) > A
+    simp only [not_forall, not_le] at ha
+    obtain ⟨k,hk⟩ := ha
+
+    rw [←split_summation]
+    -- Split goal from  ⊢ A ≤  ∑i, min A (as i)
+    -- to               ⊢ A ≤ (∑i with i ≠ k, min A (as i)) + min A (as k)
+
+    -- min A (as k) = A
+    rw [min_eq_left_of_lt hk]
+
+    -- ⊢ A ≤ (∑i,min A (as i) - A) + A
+    exact Nat.le_add_left A _
+
+theorem Saturation
+  {xs : Fin n → Fin 2}
+  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
+  : PBIneq (map (mapBoth (min A)) as) xs A := by
+  unfold PBIneq PBSum FinVec.map mapBoth at *
+  simp only [Fin.isValue, ge_iff_le, Prod_map, seq_eq] at *
+  have h := le_sum_min_of_le_sum ha
+  simp_rw [apply_ite (min A) ((xs _ = 1)) ((as _).1) ((as _).2)] at h
+  exact h
+  done
+
+example
+  (ha : PBIneq ![(3,0),(4,0)] xs 3)
+  : PBIneq ![(3,0),(3,0)] xs 3 := by
+  apply Saturation ha
+  done
+
+end PseudoBoolean
+\end{minted}
+\newpage
+
+\subsection{Prova da Regra Divisão}
+\begin{minted}{lean4}
+import <<LeanCuttingPlanes>>.Basic
+import Mathlib.Algebra.Order.Floor.Div
+
+namespace PseudoBoolean
+open Finset FinVec BigOperators
+
+def ceildiv (c : ℕ) (a : ℕ) := a ⌈/⌉ c
+
+lemma ceildiv_le_ceildiv_right {a b : ℕ} (c : ℕ) (hab : a ≤ b)
+  : a ⌈/⌉ c ≤ b ⌈/⌉ c := by
+  repeat rw [Nat.ceilDiv_eq_add_pred_div]
+  apply Nat.div_le_div_right
+  apply Nat.sub_le_sub_right
+  apply Nat.add_le_add_right
+  exact hab
+  done
+
+-- @kbuzzard
+theorem Nat.add_ceildiv_le_add_ceildiv (a b c : ℕ)
+  : (a + b) ⌈/⌉ c ≤ (a ⌈/⌉ c) + (b ⌈/⌉ c) := by
+  -- deal with c=0 separately
+  obtain (rfl | hc) := Nat.eq_zero_or_pos c
+  · simp
+  -- 0 < c case
+  -- First use the "Galois connection"
+  rw [ceilDiv_le_iff_le_smul hc, smul_eq_mul]
+  rw [mul_add]
+  -- now use a standard fact
+  gcongr <;> exact le_smul_ceilDiv hc
+  done
+
+-- @Ruben-VandeVelde
+theorem Finset.ceildiv_le_ceildiv {α : Type*} (as : α → ℕ) (s : Finset α) (c : ℕ)
+  : (∑i in s, as i) ⌈/⌉ c ≤ ∑i in s,(as i ⌈/⌉ c) := by
+  classical
+  induction s using Finset.cons_induction_on with
+  | h₁ => simp
+  | @h₂ a s ha ih =>
+    rw [sum_cons, sum_cons]
+    have h := Nat.add_ceildiv_le_add_ceildiv (as a) (∑x ∈ s, as x) c
+    exact le_add_of_le_add_left h ih
+    done
+
+lemma ceildiv_ite (P : Prop) [Decidable P] (a b c : ℕ)
+  : (if P then b else c) ⌈/⌉ a = if P then (b ⌈/⌉ a) else (c ⌈/⌉ a) := by
+  split_ifs <;> rfl
+  done
+
+
+
+
+
+
+
+theorem Division
+  {xs : Fin n → Fin 2}
+  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
+  (c : ℕ)
+  : PBIneq (map (mapBoth (ceildiv c)) as) xs (ceildiv c A) := by
+  unfold PBIneq PBSum ceildiv mapBoth at *
+  simp only [Fin.isValue, ge_iff_le, gt_iff_lt,
+             Prod_map, map_eq, Function.comp_apply] at *
+  apply ceildiv_le_ceildiv_right c at ha
+  apply le_trans ha
+  simp only [←ceildiv_ite]
+  apply Finset.ceildiv_le_ceildiv
+  done
+
+example
+  (ha : PBIneq ![(3,0),(4,0)] xs 3)
+  : PBIneq ![(2,0),(2,0)] xs 2 := by
+  apply Division ha 2
+  done
+
+end PseudoBoolean
+
+\end{minted}
+\newpage
+
+\subsection{Prova da Regra Adição}
+\begin{minted}{lean4}
+import <<LeanCuttingPlanes>>.Basic
+
+namespace PseudoBoolean
+
+open BigOperators FinVec Matrix
+
+theorem Addition'
+  (xs : Fin n → Fin 2)
+  (as : Coeff n) (A : ℕ) (ha : PBIneq as xs A)
+  (bs : Coeff n) (B : ℕ) (hb : PBIneq bs xs B)
+  : PBIneq (as + bs) xs (A + B) := by
+  unfold PBIneq PBSum at *
+  simp only [Fin.isValue, ge_iff_le] at *
+  simp_rw [←ite_add_ite]
+  rw [Finset.sum_add_distrib]
+  exact Nat.add_le_add ha hb
+  done
+
+def ReductionProp
+  (xs : Fin n → Fin 2) (ks : Coeff n) (K : ℕ)
+  : Prop :=
+  let pos := λ i => ks i |>.1
+  let neg := λ i => ks i |>.2
+  let slack := (∑i, min (pos i) (neg i))
+  let rs := λ i => (pos i - neg i,neg i - pos i)
+  PBIneq rs xs (K - slack)
+
+lemma ite_eq_bmul (x y : ℕ) (b : Fin 2)
+  : (if b = 1 then x else y) = (x * b + y * (1 - b)) := by
+  by_cases h : b = 0
+  . rw [h]
+    rw [if_neg]
+    . simp only [Fin.isValue, Fin.val_zero, mul_zero, tsub_zero, mul_one, zero_add]
+    trivial
+  . -- b = 1
+    apply Fin.eq_one_of_neq_zero b at h
+    rw [h]
+    simp only [Fin.isValue, ↓reduceIte, Fin.val_one, mul_one, ge_iff_le, le_refl,
+      tsub_eq_zero_of_le, mul_zero, add_zero]
+
+lemma reduce_terms (p n : ℕ) (x : Fin 2)
+  : p * x + n * (1 - x) = (p - n) * x + (n - p) * (1 - x) + min p n  := by
+  by_cases h : x = 0
+  . rw [h]
+    simp only [Fin.isValue, Fin.val_zero, mul_zero, tsub_zero, mul_one, zero_add]
+    rw [Nat.min_comm]
+    exact Nat.sub_add_min_cancel n p |>.symm
+
+  . -- x = 1
+    apply Fin.eq_one_of_neq_zero x at h
+    rw [h]
+    simp only [Fin.isValue, Fin.val_one, mul_one, ge_iff_le,
+                le_refl, tsub_eq_zero_of_le, mul_zero, add_zero]
+    exact Nat.sub_add_min_cancel p n |>.symm
+
+theorem Reduction
+  (xs : Fin n → Fin 2)
+  (ks : Coeff n) (K : ℕ) (ha : PBIneq ks xs K)
+  : ReductionProp xs ks K := by
+  unfold ReductionProp PBIneq PBSum at *
+  simp only [Fin.isValue, ge_iff_le, tsub_le_iff_right] at *
+  simp_rw [ite_eq_bmul] at *
+  rw [←Finset.sum_add_distrib]
+  simp_rw [←reduce_terms]
+  exact ha
+  done
+
+def AdditionProp
+  (xs : Fin n → Fin 2)
+  (as : Coeff n) (A : ℕ)
+  (bs : Coeff n) (B : ℕ)
+  : Prop :=
+  ReductionProp xs (as + bs) (A + B)
+
+theorem Addition
+  {xs : Fin n → Fin 2}
+  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
+  {bs : Coeff n} {B : ℕ} (hb : PBIneq bs xs B)
+  : AdditionProp xs as A bs B := by
+  have hk := Addition' xs as A ha bs B hb
+  exact Reduction xs (as + bs) (A + B) hk
+  done
+
+example
+  (ha : PBIneq ![(1,0),(0,0)] xs 1)
+  (hb : PBIneq ![(1,0),(1,0)] xs 2)
+  : PBIneq ![(2,0),(1,0)] xs 3 := by
+  apply Addition ha hb
+  done
+
+-- Reduction happens automatically
+example
+  (ha : PBIneq ![(3,0),(0,0),(1,0)] xs 1)
+  (hb : PBIneq ![(0,0),(2,0),(0,1)] xs 2)
+  : PBIneq ![(3,0),(2,0),(0,0)] xs 2 := by
+  apply Addition ha hb
+  done
+
+end PseudoBoolean
+
+\end{minted}
+\newpage
+
+\subsection{Implementação do Exemplo}
+\begin{minted}{lean4}
+import <<LeanCuttingPlanes>>
+
+open PseudoBoolean
+
+example
+  (xs : Fin 4 → Fin 2)
+  (c1 : PBIneq ![(1,0),(2,0),(1,0),(0,0)] xs 2)
+  (c2 : PBIneq ![(1,0),(2,0),(4,0),(2,0)] xs 5)
+  (c3 : PBIneq ![(0,0),(0,0),(0,0),(0,1)] xs 0)
+  : PBIneq ![(1,0),(2,0),(2,0),(0,0)] xs 3
+  := by
+  let t1 : PBIneq ![(2,0),(4,0),(2,0),(0,0)] xs 4  := by apply Multiplication c1 2
+  let t2 : PBIneq ![(3,0),(6,0),(6,0),(2,0)] xs 9  := by apply Addition t1 c2
+  let t3 : PBIneq ![(0,0),(0,0),(0,0),(0,2)] xs 0  := by apply Multiplication c3 2
+  let t4 : PBIneq ![(3,0),(6,0),(6,0),(0,0)] xs 7  := by apply Addition t2 t3
+  exact Division t4 3
+  done
 \end{minted}
 
 
