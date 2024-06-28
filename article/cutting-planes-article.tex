@@ -168,11 +168,7 @@ example : PBIneq ![(1,0),(2,0)] ![0,1] 2 := by
   done
 \end{minted}
 
-O exemplo acima prova a expressão
-\begin{equation}
-    x_1 + 2 x_2 \ge 2
-\end{equation}
-quando $x_1 = 0$ e $x_2 = 1$.
+O exemplo acima prova a expressão $x_1 + 2 x_2 \ge 2$, quando $x_1 = 0$ e $x_2 = 1$.
 
 
 % * Prova da Regra Multiplication
@@ -247,7 +243,54 @@ Em alto nível, podemos provar isso por casos:
 
 % * Prova da Regra Division
 \subsection{Prova da Regra Divisão}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris luctus lacus eu varius fermentum. Nullam lacus urna, semper a euismod sed, hendrerit eu nisi. Donec nec risus turpis. Vestibulum placerat justo sit amet aliquam mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed vulputate vulputate maximus. Sed euismod turpis vitae libero consectetur gravida. Pellentesque eu nibh ipsum. Ut porta tortor vel pharetra euismod. Nulla quis nunc bibendum, condimentum sem a, tempus lectus.
+A regra Divisão nos permite fazer o caminho inverso da Multiplicação, dividindo por um escalar $c \in \mathbb{N}^+$, com a diferença que divisões não exatas serão arrendondadas
+para cima:
+\begin{equation}
+    \frac
+    {\sum_i{a_i l_i} \ge A}
+    {\sum_i{ \lceil \frac{a_i}{c} \rceil l_i} \ge \lceil \frac{A}{c} \rceil}
+\end{equation}
+
+O teorema \textit{Division} implementa esse comportamento ao aplicar \textit{map} na lista de coeficientes com a função
+\texttt{mapBoth (ceildiv c)}, que divide ambos elementos do par por $c$, arredondando para cima:
+\begin{minted}[fontsize=\small]{lean4}
+theorem Division
+  {xs : Fin n → Fin 2}
+  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
+  (c : ℕ)
+  : PBIneq (map (mapBoth (ceildiv c)) as)
+    xs (ceildiv c A)
+\end{minted}
+
+Essa prova foi mais complexa, pois precisamos mostrar o comportamento para a lista toda,
+não sendo suficiente apenas mostrar para algum elemento em particular, como no caso da Saturação.
+Dispondo de ajuda pelo \textit{Zulip do Lean}, chegamos em dois lemas que permitem provar a propriedade.
+
+Mostramos primeiramente que, para dois elementos em isolados, a divisão com teto da soma é menor-ou-igual à soma das divisões com teto:
+\begin{minted}[fontsize=\small]{lean4}
+theorem Nat.add_ceildiv_le_add_ceildiv
+    (a b c : ℕ)
+  : (a + b) ⌈/⌉ c ≤ (a ⌈/⌉ c) + (b ⌈/⌉ c) 
+\end{minted}
+
+Com esse teorema, agora podemos criar uma prova por indução que vai valer para listas de qualquer tamanho:
+\begin{minted}[fontsize=\small]{lean4}
+theorem Finset.ceildiv_le_ceildiv {α : Type*}
+    (as : α → ℕ) (s : Finset α) (c : ℕ)
+  : (∑i in s, as i) ⌈/⌉ c ≤ ∑i in s,(as i ⌈/⌉ c)
+\end{minted}
+
+O último detalhe que tivemos que provar é que podemos distribuir o \textit{ceildiv} sobre a expressão \texttt{if-then-else}:
+\begin{minted}[fontsize=\small]{lean4}
+lemma ceildiv_ite (P : Prop) [Decidable P]
+    (a b c : ℕ)
+  : (if P then b else c) ⌈/⌉ a
+  = if P then (b ⌈/⌉ a) else (c ⌈/⌉ a)
+\end{minted}
+
+Com isso concluímos a prova.
+
+
 
 % * Prova da Regra Addition
 \subsection{Prova da Regra Adição}
