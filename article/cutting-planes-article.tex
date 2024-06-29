@@ -51,7 +51,13 @@
 %   corretude. Alem disso, mostrar exemplos de uso dessa biblioteca com o "Toy Example" presente na apresentacao de Jakob.
 %   Criacao de uma documentacao em formato mdbook, que estara disponivel para pesquisadores e matematicos que desejem usar
 %   a biblioteca.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris luctus lacus eu varius fermentum. Nullam lacus urna, semper a euismod sed, hendrerit eu nisi. Donec nec risus turpis. Vestibulum placerat justo sit amet aliquam mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed vulputate vulputate maximus. Sed euismod turpis vitae libero consectetur gravida. Pellentesque eu nibh ipsum. Ut porta tortor vel pharetra euismod. Nulla quis nunc bibendum, condimentum sem a, tempus lectus.
+O cálculo formal de Planos de Corte é uma técnica matemática utilizada na área de otimização,
+particularmente em Programação Linear.
+Nesse trabalho, procuramos trazer essa lógica para os resultados formalizados em \texttt{Lean 4},
+seguindo a tendência crescente no mundo da matemática e atendendo a necessidade de confiança
+nos resultados de solucionadores. Além da formalização, procuramos aqui disponibilizar estes
+resultados para a comunidade em geral, para que mais integrações entre projetos possam ser possíveis
+no futuro.
 
 \section{Referencial Teórico}
 % Capítulo referencial: identificação de trabalhos correlatos, referencial teórico.
@@ -277,7 +283,8 @@ Com esse teorema, agora podemos criar uma prova por indução que vai valer para
 \begin{minted}[fontsize=\small]{lean4}
 theorem Finset.ceildiv_le_ceildiv {α : Type*}
     (as : α → ℕ) (s : Finset α) (c : ℕ)
-  : (∑i in s, as i) ⌈/⌉ c ≤ ∑i in s,(as i ⌈/⌉ c)
+  : (∑i in s, as i) ⌈/⌉ c
+  ≤ ∑i in s,(as i ⌈/⌉ c)
 \end{minted}
 
 O último detalhe que tivemos que provar é que podemos distribuir o \textit{ceildiv} sobre a expressão \texttt{if-then-else}:
@@ -359,11 +366,29 @@ theorem Addition
 
 % * Implementação do Toy Example
 \subsection{Implementação do Exemplo}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris luctus lacus eu varius fermentum. Nullam lacus urna, semper a euismod sed, hendrerit eu nisi. Donec nec risus turpis. Vestibulum placerat justo sit amet aliquam mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed vulputate vulputate maximus. Sed euismod turpis vitae libero consectetur gravida. Pellentesque eu nibh ipsum. Ut porta tortor vel pharetra euismod. Nulla quis nunc bibendum, condimentum sem a, tempus lectus.
+Com todas as regras necessárias, prosseguimos para um exemplo retirado da apresentação
+(Apêncide F). Aqui podemos ver como usar as regras, com auxílio da tática \texttt{apply}.
+O leitor fica convidado a visitar o repositório público em \texttt{github.com/bernborgess/lean-cutting-planes}
+e tentar por conta própria.
+
 
 \section*{Conclusões}
 % Capítulo de fechamento: conclusões e relação de trabalhos futuros.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris luctus lacus eu varius fermentum. Nullam lacus urna, semper a euismod sed, hendrerit eu nisi. Donec nec risus turpis. Vestibulum placerat justo sit amet aliquam mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed vulputate vulputate maximus. Sed euismod turpis vitae libero consectetur gravida. Pellentesque eu nibh ipsum. Ut porta tortor vel pharetra euismod. Nulla quis nunc bibendum, condimentum sem a, tempus lectus.
+Nós demonstramos a lógica de planos de corte como método correto para trabalhar com pseudo-booleanos.
+Com nossa biblioteca \texttt{lean-cutting-planes} agora podemos utilizar o sistema de tipos de Lean
+para validar com confiança passos dessa lógica. Com a documentação convidamos novos pesquisadores e
+matemáticos a usar os resultados em verificadores.
+
+
+% 6. Conclusion
+% We have demonstrated Euclidean geometry as an attractive
+% target for autoformalization. With our SMT-based symbolic
+% engine, it is feasible to (1) automatically evaluate autofor-
+% malized theorems statements and (2) have the model auto-
+% formalize only explicit proof steps, leaving diagrammatic
+% reasoning implicit. We have constructed the LeanEuclid
+% benchmark to facilitate future research on autoformalizing
+% Euclidean geometry.
 
 \begin{thebibliography}{00}
     \bibitem{SatLive}       D. Le Berre, ``Sat Live! keep up to date with research on the satisfiability problem'', Acesso em http://www.satlive.org/.
@@ -377,8 +402,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris luctus lacus eu 
     \bibitem{PFR}           T. Tao, ``The Polynomial Freiman-Ruzsa Conjecture'', Novembro de 2023. Acesso em https://teorth.github.io/pfr/.
     \bibitem{mathlib4}      The mathlib Community. 2020. ``The lean mathematical library''. In CPP 2020. 367-381. https://doi.org/10.1145/3372885.3373824
 \end{thebibliography}
-
-\vspace{12pt}
 
 \newpage
 \onecolumn
