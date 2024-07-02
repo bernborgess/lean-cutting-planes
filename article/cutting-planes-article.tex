@@ -16,7 +16,7 @@
 \begin{document}
 
 \title{Modelando e verificando o cálculo formal de Planos de Corte com Lean 4\\
-{\footnotesize Projeto Orientadado em Computação I - Pesquisa Científica}
+{\footnotesize Projeto Orientado em Computação I - Pesquisa Científica}
 }
 
 \author{\IEEEauthorblockN{Bernardo Borges}
@@ -50,8 +50,8 @@ no futuro.
 \section{Referencial Teórico}
 % Capítulo referencial: identificação de trabalhos correlatos, referencial teórico.
 
-\subsection{Satisfiabilidade}
-O problema da satisfabilidade booleana (SAT) é muito importante para a Ciência da Computação, sendo o
+\subsection{Satisfatibilidade}
+O problema da satisfatibilidade booliana (SAT) é muito importante para a Ciência da Computação, sendo o
 primeiro demonstrado ser NP-Completo. Ele é o problema de decidir para dada expressão booleana
 se é possível escolher valores para as variáveis de forma que a expressão como um todo seja verdadeira.
 Este problema é extensivamente pesquisado na área de métodos formais\cite{SatLive} e existem inclusive competições para
@@ -135,7 +135,7 @@ Lean é uma linguagem de tipos dependentes, ou seja, é possível definir tipos 
 Um caso útil é o tipo \texttt{Fin n}, que contém os números naturais até \texttt{n}.
 Para modelar os Pseudo-Booleanos utilizamos o tipo \texttt{Fin 2}, que contém os valores $0$ e $1$.
 
-Para os coeficientes \texttt{Coeff}, utilisamos a estrutura \texttt{FinVec},
+Para os coeficientes \texttt{Coeff}, utilizamos a estrutura \texttt{FinVec},
 que permite definir uma lista com exatamente \texttt{n} elementos,
 expressa por uma função que toma um \texttt{Fin n} e retorna o elemento,
 em que cada um será um par de dois números naturais, o tipo $\mathbb{N}$ em Lean:
@@ -203,7 +203,7 @@ Podemos usar o fato \texttt{nsmul\_le\_nsmul\_right} que, se $a \le b$, então $
     c \cdot \sum_i{a_i l_i} \ge c \cdot A
 \end{equation}
 
-Como a muliplicação por escalares já está definida na \textit{mathlib4} para
+Como a multiplicação por escalares já está definida na \textit{mathlib4} para
 os \texttt{FinVec}s pelo teorema \texttt{Finset.sum\_nsmul} da biblioteca,
 que diz:
 \begin{equation}
@@ -384,7 +384,7 @@ theorem Addition
 \newpage
 \subsection{Implementação do Exemplo}
 Com todas as regras necessárias, prosseguimos para um exemplo retirado da apresentação
-(Apêncide F). Aqui podemos ver como usar as regras, com auxílio da tática \texttt{apply}.
+(Apêndice F). Aqui podemos ver como usar as regras, com auxílio da tática \texttt{apply}.
 
 \includegraphics[scale=0.17]{_minted-cutting-planes-article/toy_example.png}
 
@@ -399,16 +399,6 @@ Com nossa biblioteca \texttt{lean-cutting-planes} agora podemos utilizar o siste
 para validar com confiança passos dessa lógica. Com a documentação convidamos novos pesquisadores e
 matemáticos a usar os resultados em verificadores.
 
-
-% 6. Conclusion
-% We have demonstrated Euclidean geometry as an attractive
-% target for autoformalization. With our SMT-based symbolic
-% engine, it is feasible to (1) automatically evaluate autofor-
-% malized theorems statements and (2) have the model auto-
-% formalize only explicit proof steps, leaving diagrammatic
-% reasoning implicit. We have constructed the LeanEuclid
-% benchmark to facilitate future research on autoformalizing
-% Euclidean geometry.
 
 \begin{thebibliography}{00}
     \bibitem{SatLive}       D. Le Berre, ``Sat Live! keep up to date with research on the satisfiability problem'', Acesso em http://www.satlive.org/.
