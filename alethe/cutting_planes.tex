@@ -1,14 +1,44 @@
 \begin{RuleDescription}{cp_addition}
-    \begin{AletheX}
-        $i$. & \ctxsep & $\varphi$ & \currule \\
-    \end{AletheX}
-    TODO where $\varphi$ corresponds up to the orientation of equalities
-    to a formula asserted in the input problem, or $\varphi$ is a local assumption
-    in a subproof.
-    \ruleparagraph{Remark.}
-    This rule can not be used by the
-    \inlineAlethe{(step }\dots\inlineAlethe{)} command. Instead it corresponds to the dedicated
-    \inlineAlethe{(assume }\dots\inlineAlethe{)} command.
+    A step of the \currule{} rule represents a step in the cutting planes reasoning, that works on
+    Pseudo-Boolean Constraints, that are 0-1 integer linear inequalities.
+
+    A pseudo boolean inequality is a term of the form
+    \[
+        \sum_i{a_i l_i} \ge A
+    \]
+    where we have:
+    \begin{itemize}
+        \item constant $A \in \mathbb{N}$
+        \item coefficients $ a_i \in \mathbb{N}$
+        \item literals $ l_i: x_i\ \text{or}\ \overline{x_i}\ (\text{where } x_i + \overline{x_i} = 1)$
+        \item variables $ x_i $ take values $ 0 = false $ or $ 1 = true$
+    \end{itemize}
+
+    In alethe such formula will be defined as:
+
+    \centerline{\inlineAlethe{(>= (+ <TERMS> 0) <A>)}}
+    \hfill
+
+    where \inlineAlethe{<TERMS>} is a list of either:
+    \begin{enumerate}
+        \item \inlineAlethe{(* <a_i> <x_i>)} in a plain literal $a_i x_i$.
+        \item \inlineAlethe{(* (- 1 <a_i>) <x_i>)} in a negated literal $a_i \overline x_i$
+    \end{enumerate}
+
+    and \inlineAlethe{<A>} is the natural constant $A$. \\
+
+    Using this format, two constraints can be added together, adding the coefficients and the
+    constants. Another behaviour is that $x_i$ and $\overline x_i$ that may appear together
+    cancel each other:
+
+    \begin{AletheXS}
+        $j$. & ${\sum_i{a_i l_i} \ge A}$ & ${\sum_i{b_i l_i} \ge B}$ \\
+        \spsep
+        $k$. & $\Gamma$ & \ctxsep  & ${\sum_i{(a_i + b_i) l_i} \ge (A+B)}$ & \currule{} \\
+    \end{AletheXS}
+
+    \textit{TODO: make the above line fit the "rule" format appropriately}
+
 \end{RuleDescription}
 
 
@@ -16,13 +46,7 @@
     \begin{AletheX}
         $i$. & \ctxsep & $\varphi$ & \currule \\
     \end{AletheX}
-    TODO where $\varphi$ corresponds up to the orientation of equalities
-    to a formula asserted in the input problem, or $\varphi$ is a local assumption
-    in a subproof.
-    \ruleparagraph{Remark.}
-    This rule can not be used by the
-    \inlineAlethe{(step }\dots\inlineAlethe{)} command. Instead it corresponds to the dedicated
-    \inlineAlethe{(assume }\dots\inlineAlethe{)} command.
+    TODO
 \end{RuleDescription}
 
 
@@ -30,13 +54,7 @@
     \begin{AletheX}
         $i$. & \ctxsep & $\varphi$ & \currule \\
     \end{AletheX}
-    TODO where $\varphi$ corresponds up to the orientation of equalities
-    to a formula asserted in the input problem, or $\varphi$ is a local assumption
-    in a subproof.
-    \ruleparagraph{Remark.}
-    This rule can not be used by the
-    \inlineAlethe{(step }\dots\inlineAlethe{)} command. Instead it corresponds to the dedicated
-    \inlineAlethe{(assume }\dots\inlineAlethe{)} command.
+    TODO
 \end{RuleDescription}
 
 
@@ -44,13 +62,7 @@
     \begin{AletheX}
         $i$. & \ctxsep & $\varphi$ & \currule \\
     \end{AletheX}
-    TODO where $\varphi$ corresponds up to the orientation of equalities
-    to a formula asserted in the input problem, or $\varphi$ is a local assumption
-    in a subproof.
-    \ruleparagraph{Remark.}
-    This rule can not be used by the
-    \inlineAlethe{(step }\dots\inlineAlethe{)} command. Instead it corresponds to the dedicated
-    \inlineAlethe{(assume }\dots\inlineAlethe{)} command.
+    TODO
 \end{RuleDescription}
 
 
