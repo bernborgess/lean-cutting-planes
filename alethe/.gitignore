@@ -1,0 +1,14 @@
+*.tar.gz
+bib.bib
+changelog.tex
+doc.aux
+doc.tex
+highlight.py
+Makefile
+publications.bib
+rule_index_style.ist
+rule_list.tex
+shell.nix
+Title.jpg
+version.sh
+.vscode
