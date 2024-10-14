@@ -25,44 +25,52 @@
         \item \inlineAlethe{(* (- 1 <a_i>) <x_i>)} in a negated literal $a_i \overline x_i$
     \end{enumerate}
 
-    and \inlineAlethe{<A>} is the natural constant $A$. \\
+    and \inlineAlethe{<A>} is the natural constant $A$.
 
     Using this format, two constraints can be added together, adding the coefficients and the
     constants. Another behaviour is that $x_i$ and $\overline x_i$ that may appear together
     cancel each other:
 
-    \begin{AletheXS}
-        $j$. & ${\sum_i{a_i l_i} \ge A}$ & ${\sum_i{b_i l_i} \ge B}$ \\
-        \spsep
-        $k$. & $\Gamma$ & \ctxsep  & ${\sum_i{(a_i + b_i) l_i} \ge (A+B)}$ & \currule{} \\
-    \end{AletheXS}
-
-    \textit{TODO: make the above line fit the "rule" format appropriately}
+    \begin{AletheS}
+        $i_1$. & \ctxsep & \, & ${\sum_i{a_i l_i} \ge A}$  \\
+        $i_2$. & \ctxsep  & \, & ${\sum_i{b_i l_i} \ge B}$ \\
+        $j$. & \ctxsep  & \, & ${\sum_i{(a_i + b_i) l_i} \ge (A+B)}$  & (\currule\; $i_1$, $i_2$)
+    \end{AletheS}
 
 \end{RuleDescription}
 
 
 \begin{RuleDescription}{cp_multiplication}
-    \begin{AletheX}
-        $i$. & \ctxsep & $\varphi$ & \currule \\
-    \end{AletheX}
-    TODO
+    A constraint can be multiplied by any $c \in \mathbb{N}^+$:
+
+    \begin{AletheS}
+        $i$. & \ctxsep & \, & ${\sum_i{a_i l_i} \ge A}$  \\
+        $j$. & \ctxsep  & \, & ${\sum_i{c a_i l_i} \ge c A}$  & (\currule\; $i$)\,[$c$]
+    \end{AletheS}
+
 \end{RuleDescription}
 
 
 \begin{RuleDescription}{cp_divison}
-    \begin{AletheX}
-        $i$. & \ctxsep & $\varphi$ & \currule \\
-    \end{AletheX}
-    TODO
+    A constraint can be divided by any $c \in \mathbb{N}^+$,
+    and the the ceiling of this division in applied:
+
+    \begin{AletheS}
+        $i$. & \ctxsep & \, & ${\sum_i{a_i l_i} \ge A}$  \\
+        $j$. & \ctxsep  & \, & ${\sum_i{ \lceil \frac{a_i}{c} \rceil l_i} \ge \lceil \frac{A}{c} \rceil}$  & (\currule\; $i$)\,[$c$]
+    \end{AletheS}
+
 \end{RuleDescription}
 
 
 \begin{RuleDescription}{cp_saturation}
-    \begin{AletheX}
-        $i$. & \ctxsep & $\varphi$ & \currule \\
-    \end{AletheX}
-    TODO
+    A constraint can replace its coefficients by the minimum between them and the constant:
+
+    \begin{AletheS}
+        $i$. & \ctxsep & \, & ${\sum_i{a_i l_i} \ge A}$  \\
+        $j$. & \ctxsep  & \, & ${\sum_i{ \min(a_i,A)\cdot l_i} \ge A}$  & (\currule\; $i$)
+    \end{AletheS}
+
 \end{RuleDescription}
 
 
