@@ -39,6 +39,91 @@
 
 \end{RuleDescription}
 
+\newpage
+
+\begin{RuleDescription}{cp_addition2}
+    A step of the \currule{} rule represents the addition of two pseudo-Boolean
+    constraints using cutting planes reasoning. Pseudo-Boolean constraints are
+    0-1 integer linear inequalities of the form:
+    \[
+        \sum_i a_i \times l_i \geq A
+    \]
+    where $A \in \mathbb{N}$ is a constant, $a_i \in \mathbb{N}$ are coefficients,
+    and $l_i$ are literals of the form $x_i$ or $\overline{x_i}$ (where $x_i + \overline{x_i} = 1$),
+    with $x_i$ taking pseudo-boolean values $0$ (false) or $1$ (true).
+
+    The \proofRule{cp_addition2} rule allows two pseudo-Boolean constraints to be
+    added together, combining their coefficients and constants. Literals $x_i$ and
+    $\overline{x_i}$ that appear together cancel each other.
+
+    Formally, given two constraints:
+    \[
+        \sum_i a_i \times l_i \geq A \quad \text{and} \quad \sum_i b_i \times l_i \geq B,
+    \]
+    the result of applying the \currule{} rule is:
+    \[
+        \sum_i (a_i + b_i) \times l_i \geq (A + B).
+    \]
+
+    A {\currule} step in the proof has the form:
+
+    \begin{AletheS}
+        $i_1$. & \ctxsep & \, & ${\sum_i{a_i l_i} \ge A}$  \\
+        $i_2$. & \ctxsep  & \, & ${\sum_i{b_i l_i} \ge B}$ \\
+        $j$. & \ctxsep  & \, & ${\sum_i{(a_i + b_i) l_i} \ge (A+B)}$  & (\currule\; $i_1$, $i_2$)
+    \end{AletheS}
+
+    To verify a \proofRule{cp_addition2} step, one must check that the two given
+    pseudo-Boolean constraints are valid and that their combination satisfies
+    the addition rule.
+
+\end{RuleDescription}
+
+\begin{RuleExample}
+    A simple \proofRule{cp_addition2} step might look like this:
+
+    \begin{AletheVerb}
+        (assume c1 (>= (+ (* 1 x1) 0) 1))
+        (assume c2 (>= (+ (* 1 x2) 0) 1))
+        (step t1 (cl (>= (+ (* 1 x1) (* 1 x2) 0) 2))
+        :rule cp_addition :premises (c1 c2))
+    \end{AletheVerb}
+
+    In this example, we are adding two constraints.
+    \[
+        x_1 \geq 1 \quad \text{and} \quad x_2 \geq 1.
+    \]
+    After applying the \proofRule{cp_addition2} rule,
+    the combined constraint is:
+    \[
+        x_1 + x_2 \geq 1
+    \]
+    After simplification, this results in a contradiction.
+\end{RuleExample}
+
+\begin{RuleExample}
+    This \proofRule{cp_addition2} example has negated literals that cancel each other:
+
+    \begin{AletheVerb}
+        (assume c1 (>= (+ (* 2 x1) (* 3 x2) 0) 2))
+        (assume c2 (>= (+ (* 1 (- 1 x1)) (* 3 (- 1 x2)) 0) 4))
+        (step t1 (cl (>= (+ (* 1 x1) 0) 2))
+        :rule cp_addition :premises (c1 c2))
+    \end{AletheVerb}
+
+    In this example, we are adding two constraints.
+    \[
+        2 x_1 + 3 x_2 \geq 2 \quad \text{and} \quad \overline{x_1} + 3 \overline{x_2} \geq 4.
+    \]
+    After applying the \proofRule{cp_addition2} rule,
+    the combined constraint is:
+    \[
+        x_1 \geq 2
+    \]
+    After simplification, this results in a contradiction.
+\end{RuleExample}
+
+
 
 \begin{RuleDescription}{cp_multiplication}
     A constraint can be multiplied by any $c \in \mathbb{N}^+$:
