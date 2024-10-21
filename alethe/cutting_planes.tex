@@ -1,60 +1,28 @@
 \begin{RuleDescription}{cp_addition}
-    A step of the \currule{} rule represents a step in the cutting planes reasoning, that works on
-    Pseudo-Boolean Constraints, that are 0-1 integer linear inequalities.
-
-    A pseudo boolean inequality is a term of the form
-    \[
-        \sum_i{a_i l_i} \ge A
-    \]
-    where we have:
-    \begin{itemize}
-        \item constant $A \in \mathbb{N}$
-        \item coefficients $ a_i \in \mathbb{N}$
-        \item literals $ l_i: x_i\ \text{or}\ \overline{x_i}\ (\text{where } x_i + \overline{x_i} = 1)$
-        \item variables $ x_i $ take values $ 0 = false $ or $ 1 = true$
-    \end{itemize}
-
-    In alethe such formula will be defined as:
-
-    \centerline{\inlineAlethe{(>= (+ <TERMS> 0) <A>)}}
-    \hfill
-
-    where \inlineAlethe{<TERMS>} is a list of either:
-    \begin{enumerate}
-        \item \inlineAlethe{(* <a_i> <x_i>)} in a plain literal $a_i x_i$.
-        \item \inlineAlethe{(* (- 1 <a_i>) <x_i>)} in a negated literal $a_i \overline x_i$
-    \end{enumerate}
-
-    and \inlineAlethe{<A>} is the natural constant $A$.
-
-    Using this format, two constraints can be added together, adding the coefficients and the
-    constants. Another behaviour is that $x_i$ and $\overline x_i$ that may appear together
-    cancel each other:
-
-    \begin{AletheS}
-        $i_1$. & \ctxsep & \, & ${\sum_i{a_i l_i} \ge A}$  \\
-        $i_2$. & \ctxsep  & \, & ${\sum_i{b_i l_i} \ge B}$ \\
-        $j$. & \ctxsep  & \, & ${\sum_i{(a_i + b_i) l_i} \ge (A+B)}$  & (\currule\; $i_1$, $i_2$)
-    \end{AletheS}
-
-\end{RuleDescription}
-
-\newpage
-
-\begin{RuleDescription}{cp_addition2}
     A step of the \currule{} rule represents the addition of two pseudo-Boolean
     constraints using cutting planes reasoning. Pseudo-Boolean constraints are
     0-1 integer linear inequalities of the form:
     \[
         \sum_i a_i \times l_i \geq A
     \]
-    where $A \in \mathbb{N}$ is a constant, $a_i \in \mathbb{N}$ are coefficients,
-    and $l_i$ are literals of the form $x_i$ or $\overline{x_i}$ (where $x_i + \overline{x_i} = 1$),
-    with $x_i$ taking pseudo-boolean values $0$ (false) or $1$ (true).
+    where $A$ is called \textbf{constant}, $a_i$ are \textbf{coefficients},
+    and $l_i$ are \textbf{literals}, that are either:
+    \begin{itemize}
+        \item \textbf{plain} literal, a term \inlineAlethe{x};
+        \item \textbf{negated} literal, a term of the form \inlineAlethe{(- 1 x)}
+    \end{itemize}
 
-    The \proofRule{cp_addition2} rule allows two pseudo-Boolean constraints to be
-    added together, combining their coefficients and constants. Literals $x_i$ and
-    $\overline{x_i}$ that appear together cancel each other.
+    where the \inlineAlethe{x} value is a pseudo-boolean variable,
+    i.e. it will resolve to values \inlineAlethe{0} (false) or \inlineAlethe{1} (true).
+    All these values are of sort \inlineAlethe{Int}.
+
+    To form a summation we use a list of added terms of form,
+    \inlineAlethe{(+ <T1> <T2> ... 0)} and each term is
+    \inlineAlethe{(* a_i <L1>)}, with a coefficient and a literal.\\
+
+    The \currule{} rule allows two pseudo-Boolean constraints to be
+    added together, combining their coefficients and constants. Negated and plain literals
+    over the same variable cancel each other.
 
     Formally, given two constraints:
     \[
@@ -73,14 +41,14 @@
         $j$. & \ctxsep  & \, & ${\sum_i{(a_i + b_i) l_i} \ge (A+B)}$  & (\currule\; $i_1$, $i_2$)
     \end{AletheS}
 
-    To verify a \proofRule{cp_addition2} step, one must check that the two given
+    To verify a \currule{} step, one must check that the two given
     pseudo-Boolean constraints are valid and that their combination satisfies
     the addition rule.
 
 \end{RuleDescription}
 
 \begin{RuleExample}
-    A simple \proofRule{cp_addition2} step might look like this:
+    A simple \proofRule{cp_addition} step might look like this:
 
     \begin{AletheVerb}
         (assume c1 (>= (+ (* 1 x1) 0) 1))
@@ -93,7 +61,7 @@
     \[
         x_1 \geq 1 \quad \text{and} \quad x_2 \geq 1.
     \]
-    After applying the \proofRule{cp_addition2} rule,
+    After applying the \proofRule{cp_addition} rule,
     the combined constraint is:
     \[
         x_1 + x_2 \geq 1
@@ -101,7 +69,7 @@
 \end{RuleExample}
 
 \begin{RuleExample}
-    This \proofRule{cp_addition2} example has negated literals that cancel each other:
+    This \proofRule{cp_addition} example has negated literals that cancel each other:
 
     \begin{AletheVerb}
         (assume c1 (>= (+ (* 2 x1) (* 3 x2) 0) 2))
@@ -114,7 +82,7 @@
     \[
         2 x_1 + 3 x_2 \geq 2 \quad \text{and} \quad \overline{x_1} + 3 \overline{x_2} \geq 4.
     \]
-    After applying the \proofRule{cp_addition2} rule,
+    After applying the \proofRule{cp_addition} rule,
     the combined constraint is:
     \[
         x_1 \geq 2
