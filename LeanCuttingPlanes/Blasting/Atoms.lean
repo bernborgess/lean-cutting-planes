@@ -35,3 +35,25 @@ def f2 : Fin 3 := 2
 #check 2 ^ f2.val
 
 #eval ![1,2,3] - ![2,3,4]
+
+
+namespace PB
+open BigOperators FinVec
+
+abbrev Vec (α : Type) (n : ℕ) := Fin n → α
+abbrev BitVec (k : ℕ) := Fin k → Fin 2
+
+def NotProp (a : BitVec k) := (∃r: BitVec k, ∀i, r i + a i = 1)
+def EqualProp {x y : BitVec k} := (∑i, ((2 : Nat) ^ i.val) * (x i - y i)) = 0
+def AndProp {a : Vec (BitVec k) n} := ∃r:BitVec k, ∀i, (∀j, a j i - r i ≥ 0) ∧ (r i - (∑j,a j i) ≥ 1 - n)
+
+theorem Not (a : BitVec k) : NotProp a := sorry
+
+theorem Equal (x y : BitVec k) : (∑i, ((2 : Nat) ^ i.val) * (x i - y i)) = 0 := sorry
+
+theorem And (a : Vec (BitVec k) n) : ∃r:BitVec k, ∀i, (∀j, a j i - r i ≥ 0) ∧ (r i - (∑j,a j i) ≥ 1 - n) := sorry
+
+end PB
+
+def non_contradiction_principle (p : PB.BitVec k) : Prop
+  := sorry
