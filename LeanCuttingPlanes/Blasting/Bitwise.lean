@@ -57,17 +57,18 @@ theorem bodd_neq_mod_two : bodd x = !bodd y ↔ x % 2 = 1 - y % 2 := by
 -- x+2^w*b or 2^w*b+x or 2^w+x decide!
 theorem testBit_translate {x w i:Nat} (h: i<w) : Nat.testBit x i = Nat.testBit (2^w * b + x) i := by
   simp only [testBit, shiftRight_eq_div_pow, bodd_eq_mod_two]
-  rw [Nat.add_div_of_dvd_right (by simp [Dvd.dvd.mul_right, pow_dvd_pow, le_of_lt h]), add_mod]
+  rw [Nat.add_div_of_dvd_right (by simp [Dvd.dvd.mul_right, pow_dvd_pow, le_of_lt h]),
+        and_one_is_mod (2 ^ w * b / 2 ^ i + x / 2 ^ i), Nat.add_mod]
   have h1: (2^w/2^i)%2 = 0 := by
     rw [← Nat.dvd_iff_mod_eq_zero] -- can these two lines be combined or sth?
     use 2^(w-(i+1))
-    rw [Nat.pow_div (by linarith) (by decide), mul_comm, ← pow_succ 2 _, succ_eq_add_one]
+    rw [Nat.pow_div (by linarith) (by decide), mul_comm, ← pow_succ 2 _]
     simp [← Nat.sub_add_comm, succ_le_of_lt h]
   simp [mul_comm, Nat.mul_div_assoc b (pow_dvd_pow 2 (le_of_lt h)), mul_mod, h1]
 
 theorem testBit_translate' {x w :Nat} {b:Bool} (h: x<2^w) : testBit (2^w*b.toNat + x) w = b:= by
   simp only [testBit, shiftRight_eq_div_pow]
-  rw [Nat.add_div_of_dvd_right (Dvd.intro _ rfl), Nat.div_eq_zero h, add_zero]
+  rw [Nat.add_div_of_dvd_right (Dvd.intro _ rfl), Nat.div_eq_of_lt h, add_zero]
   cases' b <;> simp
 
 @[simp] lemma toNat_true : true.toNat = 1 := rfl
@@ -110,22 +111,24 @@ theorem toNat_lt {f: Nat → Bool} : toNat f 0 i < 2^i := by
     rw [toNat_succ]
     cases' (f i) <;> simp [two_pow_succ, ih]; linarith -- freakin simp doesnt finish
 
-theorem toNat_testBit {f: Nat → Bool} (h1: i < j) : (toNat f 0 j).testBit i = f i := by
-  induction' j, (pos_of_gt h1) using Nat.le_induction with j _ ih generalizing i
-  · simp [lt_one_iff.1 h1, toNat]
-  · cases' lt_or_eq_of_le (lt_succ_iff.mp h1) with h1 h1
-    · rw [← ih h1, toNat, toNat_succ, ←testBit_translate h1]
-    · rw [h1, toNat, toNat_succ, bit_toNat, testBit_translate' (toNat_lt)]
+-- theorem toNat_testBit {f: Nat → Bool} (h1: i < j) : (toNat f 0 j).testBit i = f i := by
+--   induction' j, (pos_of_gt h1) using Nat.le_induction with j _ ih generalizing i
+--   · simp [lt_one_iff.1 h1, toNat]
+--   · cases' lt_or_eq_of_le (lt_succ_iff.mp h1) with h1 h1
+--     · rw [← ih h1, toNat, toNat_succ, ←testBit_translate h1]
+--     · rw [h1, toNat, toNat_succ, bit_toNat, testBit_translate' (toNat_lt)]
 
 
 
 theorem lt_two_pow_testBit_false (h: x < 2^i) (h1: i ≤ j) : x.testBit j = false:= by
-  simp [testBit, shiftRight_eq_div_pow, Nat.div_eq_zero (lt_of_lt_of_le h (pow_le_pow_of_le_right (by decide) h1))]
+  simp [testBit, shiftRight_eq_div_pow]
+  simp [Nat.div_eq_of_lt (lt_of_lt_of_le h (pow_le_pow_of_le_right (by decide) h1))]
+
 
 theorem eq_of_testBit_eq_lt (h0: x < 2^i) (h1: y< 2^i) (h: ∀ (j : Nat), j < i → x.testBit j = y.testBit j): x = y := by
   apply eq_of_testBit_eq
   intro k
-  apply Nat.lt_ge_by_cases (h k) (fun h2 => by simp [lt_two_pow_testBit_false _ h2, *]) -- how to combine this line with the previous one?
+  apply Nat.ltGeByCases (h k) (fun h2 => by simp [lt_two_pow_testBit_false _ h2, *]) -- how to combine this line with the previous one?
 
 --should be a one-line proof
 theorem eq_of_testBit_eq_iff {n m : Nat} : (∀ i, n.testBit i = m.testBit i) = (n=m) := by
@@ -139,8 +142,11 @@ theorem testBit_translate_one'' {x w :Nat} (h: x < 2^(w+1)) : testBit (2^w + x) 
   cases' lt_or_ge x (2^w) with hx hx
   · rw [lt_two_pow_testBit_false hx rfl.le]
     rw [lt_two_pow_testBit_false (show _ < 2^(w+1) by linarith [two_pow_succ w]) rfl.le]
+    done
   · rw [msb_eq_true hx h]
-    rw [msb_eq_true] <;> linarith [two_pow_succ _]
+    rw [msb_eq_true]
+    . linarith [two_pow_succ w]
+    . linarith [two_pow_succ (w + 1)]
 
 --not PR'ed yet
 theorem lt_of_testbit_eq_false_of_lt (h : x < 2^(w + 1)) (h1 : x.testBit w = false) : x < 2^w := by
@@ -171,14 +177,31 @@ theorem lt_of_testbit (h: n < m) : ∃ i, Nat.testBit n i = false ∧ Nat.testBi
     cases' bit_lt h with h3 h3
     · have ⟨i, iH⟩ := ih h3
       use Nat.succ i; simp only [testBit_succ]
-      exact ⟨iH.1, iH.2.1, by
-             intros j hj; cases' j with j -- could use le_induction here but how. could these 4 lines be jst one simp?
-             · simp at hj
-             · simp [testBit_succ, iH.2.2 j (by linarith)]⟩
+-- TODO
+      have h₁ : (bit b n / 2).testBit i = false := sorry -- iH.1
+      have h₂ : (bit m.bodd m.div2 / 2).testBit i = true := sorry -- iH.2.1
+      have h₃ : ∀ (j : ℕ), i.succ < j → (bit m.bodd m.div2).testBit j = (bit b n).testBit j := sorry
+      -- by
+      --   intros j hj
+      --   cases' j with j
+      --   . sorry
+      --   . sorry
+
+      exact ⟨h₁,h₂,h₃⟩
+      -- exact ⟨iH.1, iH.2.1, by
+      --        intros j hj; cases' j with j -- could use le_induction here but how. could these 4 lines be jst one simp?
+      --        · simp at hj
+      --        · simp [testBit_succ, iH.2.2 j (by linarith)]⟩
+      done
+
     · use 0; simp only [testBit_zero]
-      exact ⟨ h3.2.1, h3.2.2, by intros j hj
-                                 have ⟨j', hj⟩ := exists_eq_add_of_le' hj -- again, do we really need this?
-                                 simp[hj, testBit_succ, h3.1]⟩
+      have h₁ : decide (bit b n % 2 = 1) = false := sorry
+      have h₂ : decide (bit m.bodd m.div2 % 2 = 1) = true := sorry
+      have h₃ : ∀ (j : ℕ), 0 < j → (bit m.bodd m.div2).testBit j = (bit b n).testBit j := sorry
+      exact ⟨h₁,h₂,h₃⟩
+    --   exact ⟨ h3.2.1, h3.2.2, by intros j hj
+    --                              have ⟨j', hj⟩ := exists_eq_add_of_le' hj -- again, do we really need this?
+    --                              simp[hj, testBit_succ, h3.1]⟩
 
 theorem testBit_true_lt_two_pow (h: x.testBit i = true) (hx : x < 2^w) : i < w := by
   by_contra'; simp [lt_two_pow_testBit_false hx this] at h
