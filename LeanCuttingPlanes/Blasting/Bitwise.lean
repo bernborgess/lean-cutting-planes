@@ -259,41 +259,42 @@ def bitwise_neg (x i : Nat) : Nat := bitwise_add (bitwise_not x i) 1 i
 
 lemma two_pow_succ_minus_one : 2^(i+1) - 1 = bit true (2^i-1) := by
   simp only [bit_val, cond]
-  zify [two_pow_pos]
-  rw [pow_succ'']; ring --sth can be removed here
+  zify [Nat.two_pow_pos]
+  rw [pow_succ]
+  ring
 
 lemma testBit_two_pow_minus_one (h0 : 0 < i) (h: j < i): testBit (2^i -1) j = true:= by
   induction' i, h0 using Nat.le_induction with i _ ih generalizing j
   · simp [lt_one_iff.1 h]
   · rw [two_pow_succ_minus_one]
     cases' j with j
-    · rw[testBit_zero]
-    · rw[testBit_succ, ih (by linarith)]
+    · rw[testBit_bit_zero]
+    · rw[testBit_bit_succ, ih (by linarith)]
 
 lemma bitwise_carry_not_eq_false (h: j ≤ i) : bitwise_carry (toNat (fun j => !testBit x j) 0 i) x j = false := by
   induction' j with j ih
   · simp [bitwise_carry]
-  · simp [bitwise_carry, ih (le_of_succ_le h), toNat_testBit (show j < i by linarith)]
+  · simp [bitwise_carry, ih (le_of_succ_le h), toNat_testBit' (show j < i by linarith)]
 
 --I tried shortening this proof by formalizing the lemma above. the last index is annoying.
 theorem bitwise_not_eq_neg_sub_one (h0: x <  2^i) : bitwise_not x i  + x  = 2 ^ i - 1 := by
   simp only [bitwise_not]
-  apply eq_of_testBit_eq_lt ((two_pow_succ i).symm ▸ add_lt_add (toNat_lt) h0) (lt_trans (sub_lt (two_pow_pos _) (by decide)) (by simp [pow_lt_pow_succ]))
-  intros j hj; cases' (lt_succ_iff_lt_or_eq.mp hj) with hj hj
-  · rw [testBit_add, testBit_two_pow_minus_one (pos_of_gt hj) hj, toNat_testBit hj]
+  apply eq_of_testBit_eq_lt ((two_pow_succ i).symm ▸ add_lt_add (toNat_lt) h0) (lt_trans (sub_lt (Nat.two_pow_pos _) (by decide)) (by simp [Nat.pow_lt_pow_succ]))
+  intros j hj; cases' (Nat.lt_succ_iff_lt_or_eq.mp hj) with hj hj
+  · rw [testBit_add, testBit_two_pow_minus_one (pos_of_gt hj) hj, toNat_testBit' hj]
     simp [bitwise_carry_not_eq_false (le_of_lt hj)]
   · rw [testBit_add, lt_two_pow_testBit_false h0 (by linarith), lt_two_pow_testBit_false (toNat_lt) (by linarith)]
-    rw [lt_two_pow_testBit_false (sub_lt (two_pow_pos i) (by simp)) (by simp [hj]), hj]
+    rw [lt_two_pow_testBit_false (sub_lt (Nat.two_pow_pos i) (by simp)) (by simp [hj]), hj]
     simp [bitwise_carry, toNat_testBit, bitwise_carry_not_eq_false]
 
 theorem bitwise_neg_eq_neg (h: x < 2^i) : bitwise_neg x i  = (2 ^ i - x) % 2 ^ i := by
   simp only [bitwise_neg, bitwise_add_eq_add]; congr
   have := bitwise_not_eq_neg_sub_one h
-  zify [le_of_lt h, (one_le_of_lt (two_pow_pos i))] at * ; linarith
+  zify [le_of_lt h, (one_le_of_lt (Nat.two_pow_pos i))] at * ; linarith
 
 theorem toNat_self (hx : x < 2^w) : (toNat (fun i => x.testBit i) 0 w) = x := by
   apply eq_of_testBit_eq_lt (toNat_lt) hx
-  exact fun j hj => by rw [toNat_testBit hj]
+  exact fun j hj => by rw [toNat_testBit' hj]
 
 /-! ### Multiplication -/
 
@@ -319,9 +320,6 @@ def bitwise_mul.carry (x y : Nat) : Nat → Nat → Bool
     else
       false
 end
-termination_by
-  bitwise_mul.res x y i j   => i + j + 1
-  bitwise_mul.carry _ _ i j => i + j
 
 open bitwise_mul
 
@@ -344,7 +342,9 @@ theorem res_scale_two_pow_new (h: i < w ∨ j< w) : bitwise_mul.res x (2^w+y) i 
   induction' k using Nat.strongInductionOn with k ih generalizing i j
   cases' k with k
   · replace hk := eq_zero_of_add_eq_zero (Eq.symm hk)
-    simp [hk, bitwise_mul.res, bitwise_mul.carry, bitwise_mul.sh]
+    simp only [hk, bitwise_mul.res.eq_1, sh, le_refl, tsub_eq_zero_of_le,
+                Bool.decide_and, Bool.decide_coe, ite_true,
+                carry.eq_1, and_true]
     rw [← testBit_translate_one (by cases' h <;> linarith)]
   · cases' i with i <;> cases' j with j
     rotate_left 3
@@ -352,9 +352,20 @@ theorem res_scale_two_pow_new (h: i < w ∨ j< w) : bitwise_mul.res x (2^w+y) i 
       by_cases hij: j + 1< succ i
       · have H: j < w ∧ succ j < w := by apply And.intro <;> cases' h <;> linarith
         have H3: j < i ∧ j+1 ≤ i ∧ j+1 ≤ succ i := ⟨by linarith, by linarith, by linarith⟩
-        simp [bitwise_mul.res, bitwise_mul.carry, hij, H3, bitwise_mul.sh, ih k _ (Or.inr H.2) H2.2, ih k _ (Or.inr H.1) H2.1]
-        simp [ih (k-1) (by simp_arith) (by right; linarith) (show k-1 = i+j by aesop)]
-        simp [← testBit_translate_one, H.2]
+
+        simp only [res.eq_3, lt_succ_self, ih k _ (Or.inr H.1) H2.1, sh, H3, ge_iff_le, succ_sub_succ_eq_sub,
+          Bool.decide_and, Bool.decide_coe, ite_true, carry.eq_3, ih k _ (Or.inr H.2) H2.2, Bool.xor_assoc]
+        -- simp [bitwise_mul.res, bitwise_mul.carry, hij, H3, bitwise_mul.sh, ih k _ (Or.inr H.2) H2.2, ih k _ (Or.inr H.1) H2.1]
+
+        -- simp [ih (k-1) (by simp_arith) (by right; linarith) (show k-1 = i+j by aesop)]
+        simp only [ge_iff_le, ih (k - 1) (by simp_arith ) (by right; linarith) (show k - 1 = i + j by aesop)]
+
+        -- simp [← testBit_translate_one, H.2]
+
+        simp only [ge_iff_le, H.2, testBit_translate_one, and_self]
+
+        done
+
       · have H3 : ¬ j < i  ∧ ¬ j+1 ≤ i := ⟨by linarith, by linarith⟩
         have hi3: ¬ j+1 ≤ succ i ∨ succ i = j+1 := by push_neg at *; exact lt_or_eq_of_le hij
         have H: succ i < w ∧ i< w := by apply And.intro <;> cases' h <;> linarith
