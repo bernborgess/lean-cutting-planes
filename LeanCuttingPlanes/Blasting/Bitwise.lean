@@ -373,11 +373,22 @@ theorem res_scale_two_pow_new (h: i < w ∨ j< w) : bitwise_mul.res x (2^w+y) i 
 theorem scale_two_pow_bit_new (h: y< 2^w): ((bitwise_mul.res x (2^w+y) w w) = ((bitwise_mul.res x y w w) ^^ (x.testBit 0))) ∧  (bitwise_mul.carry x (2^w+y) w w= bitwise_mul.carry x y w w) := by
   cases' w with w
   · cases' h3 : y.testBit 0
-    <;> simp [bitwise_mul.res, bitwise_mul.carry, bitwise_mul.sh, testBit_add, bitwise_carry, h3]
-  · simp [bitwise_mul.res, bitwise_mul.carry, bitwise_mul.sh, res_scale_two_pow_new (Or.inr (lt_succ_self w)), testBit_translate_one' h, lt_two_pow_testBit_false h (show w+1 ≤ w+1 by simp)]
+    . simp only [zero_eq, _root_.pow_zero, res.eq_1, sh, le_refl, tsub_eq_zero_of_le, testBit_add, h3,
+          Bool.xor_false, bitwise_carry, and_true, Bool.decide_coe, ite_true, and_false, decide_False, ite_self,
+          carry.eq_1, and_self]
+      simp only [testBit_zero, decide_eq_true_eq, mod_succ, decide_True, and_true, Bool.false_bne]
+    . simp only [ _root_.pow_zero, and_false, and_self, and_true, bitwise_carry, Bool.decide_coe,
+        Bool.not_eq_true', Bool.xor_false, Bool.xor_self, Bool.xor_true, carry.eq_1, decide_False,
+        h3, ite_self, ite_true, le_refl, res.eq_1, sh, testBit_add, tsub_eq_zero_of_le, zero_eq ]
+      simp only [testBit_zero, decide_eq_true_eq, mod_succ, decide_True, Bool.true_eq_false,
+        and_false, decide_False]
+  · simp only [ add_le_iff_nonpos_right, and_false, and_self, and_true, Bool.and_false, Bool.decide_coe,
+        Bool.false_or, Bool.xor_false, carry.eq_3, decide_False, ge_iff_le, ite_false, ite_self,
+        ite_true, le_add_iff_nonneg_right, le_refl, lt_self_iff_false, lt_two_pow_testBit_false h (show w + 1 ≤ w + 1 by simp),
+        res_scale_two_pow_new (Or.inr (lt_succ_self w)), res.eq_3, sh, testBit_translate_one' h, tsub_eq_zero_of_le]
 
 theorem res_n_eq_res_w (h: w ≤ n ): bitwise_mul.res x y w n = bitwise_mul.res x y w w:= by
-  have ⟨k, hk⟩ := exists_eq_add_of_le h; clear h
+  have ⟨k, hk⟩ := Nat.exists_eq_add_of_le h; clear h
   cases' w with w
   · simp [bitwise_mul_res_zero]
   · induction' k with k ih generalizing n
@@ -392,7 +403,8 @@ theorem carry_n_eq_false (h: w < n ) (h0: y < 2^(w+1) ): bitwise_mul.carry x y m
   · simp [bitwise_mul.carry]
   · induction' m with m ih
     · simp [bitwise_mul_carry_zero]
-    · simp [bitwise_mul.carry, ih, bitwise_mul.sh, lt_two_pow_testBit_false h0 (show w+1 ≤ succ n by linarith)]
+    · simp only [carry.eq_3, sh, ge_iff_le, lt_two_pow_testBit_false h0 (show w + 1 ≤ succ n by linarith),
+        and_false, decide_False, ite_self, Bool.and_false, Bool.xor_false, ih, Bool.or_self]
 
 theorem res_n_eq_res_w' (h: w ≤ n) (h1: w ≤ i) (h0: y< 2^(w+1)): bitwise_mul.res x y i n = bitwise_mul.res x y i w := by
   cases' lt_or_eq_of_le h with h2 h2; clear h
@@ -402,11 +414,14 @@ theorem res_n_eq_res_w' (h: w ≤ n) (h1: w ≤ i) (h0: y< 2^(w+1)): bitwise_mul
     · simp [hk1, bitwise_mul.res, bitwise_mul_res_zero, this]
     · induction' k with k ih generalizing n
       · simp at hk2
-      · simp [hk1, add_succ, bitwise_mul.res, bitwise_mul.sh, bitwise_mul.carry]
-        have H:= lt_two_pow_testBit_false h0 (show w+1 ≤ succ (w+k) by linarith)
-        simp [H, res_n_eq_res_w, carry_n_eq_false (show w < succ (w+k) by linarith) h0]
+      ·
+        simp only [hk1, add_succ, res.eq_3, sh, add_zero, ge_iff_le, succ_sub_succ_eq_sub, Bool.decide_and,
+          Bool.decide_coe, carry.eq_3, Bool.xor_assoc]
+        have H : testBit y (succ (w + k)) = false := lt_two_pow_testBit_false h0 (show w+1 ≤ succ (w+k) by linarith)
+        simp only [ge_iff_le, H, Bool.and_false, ite_self, Bool.xor_false,
+          carry_n_eq_false (show w < succ (w + k) by linarith) h0, Bool.or_self, Bool.xor_self]
         cases' k with k
-        · simp
+        · simp only [succ_eq_add_one, add_zero]
         · simp [ih (show w < w+succ k by linarith) rfl (succ_pos k) H]
   · simp [h2]
 
@@ -419,7 +434,7 @@ theorem res_n_eq_res_w'' (x: Nat) (h: i < n) (h1: k ≤ m) (h0: y < 2^(i+1)): bi
 theorem mul_two_pow (h: j < i): testBit (x*2^i) j = false := by
   simp only [testBit, shiftRight_eq_div_pow]
   have: x * 2 ^ i / 2 ^ j = 2 ^ (i-j)*x := by
-    rw [Nat.div_eq_iff_eq_mul_right (two_pow_pos j) (dvd_mul_of_dvd_right (pow_dvd_pow 2 (le_of_lt h)) x), ← mul_assoc, ← pow_add]
+    rw [Nat.div_eq_iff_eq_mul_right (Nat.two_pow_pos j) (dvd_mul_of_dvd_right (pow_dvd_pow 2 (le_of_lt h)) x), ← mul_assoc, ← pow_add]
     rw [add_sub_of_le (le_of_lt h), mul_comm]
   have H: x * 2 ^ i / 2 ^ j % 2 = 0 := by
     rw [this, mod_eq_zero_of_dvd ((show 2^(succ 0) = 2 by simp) ▸ dvd_mul_of_dvd_left (pow_dvd_pow 2 (succ_le_iff.mpr (tsub_pos_of_lt h))) x)]
@@ -427,17 +442,17 @@ theorem mul_two_pow (h: j < i): testBit (x*2^i) j = false := by
 
 theorem mul_two_pow_gen (h: i ≤ n) : testBit (x*2^i) n = testBit x (n-i) := by
   simp only [testBit, shiftRight_eq_div_pow]
-  nth_rewrite 1 [← Nat.sub_add_cancel h, pow_add, Nat.mul_div_mul_right _ _ (two_pow_pos i)]; rfl
+  nth_rewrite 1 [← Nat.sub_add_cancel h, pow_add, Nat.mul_div_mul_right _ _ (Nat.two_pow_pos i)]; rfl
 
 
-theorem helper_of_main (h0: 0<i) (H2: j < 2*n) (h2: i ≤ n) (hij: j < i): bitwise_carry (x * 2 ^ i) (x * (y % 2 ^ i)) j = false := by
+theorem helper_of_main (_h0: 0<i) (H2: j < 2*n) (h2: i ≤ n) (hij: j < i): bitwise_carry (x * 2 ^ i) (x * (y % 2 ^ i)) j = false := by
   induction' j with j hj
   · simp [bitwise_carry]
   · simp [bitwise_carry, hj (by linarith) (by linarith), mul_two_pow (show j < i by linarith)]
 
 
 theorem helper_of_main1 (h0: 0<i) (H2: j < 2*n) (h2: i ≤ n) (h: ∀ k < 2*n, bitwise_mul.res x ( y % 2 ^ i) k n = testBit ( x * (y % 2 ^ i)) k ) (h1: i ≤ j): bitwise_carry (x * 2 ^ i) (x * (y % 2 ^ i)) j = bitwise_mul.carry x (2 ^ i + y % 2 ^ i) j i := by
-  have H: (y % (2^i)) < 2^i :=by simp [two_pow_pos, mod_lt]
+  have H: (y % (2^i)) < 2^i :=by simp [Nat.two_pow_pos, mod_lt]
   have ⟨i', hi'⟩ : ∃i', i =succ i' := by use pred i; simp [Nat.succ_pred_eq_of_pos h0]
   rw [hi'] at h1 H h h2 h0 ⊢
   induction' j with j hj
