@@ -352,27 +352,22 @@ theorem res_scale_two_pow_new (h: i < w ∨ j< w) : bitwise_mul.res x (2^w+y) i 
       by_cases hij: j + 1< succ i
       · have H: j < w ∧ succ j < w := by apply And.intro <;> cases' h <;> linarith
         have H3: j < i ∧ j+1 ≤ i ∧ j+1 ≤ succ i := ⟨by linarith, by linarith, by linarith⟩
-
         simp only [res.eq_3, lt_succ_self, ih k _ (Or.inr H.1) H2.1, sh, H3, ge_iff_le, succ_sub_succ_eq_sub,
           Bool.decide_and, Bool.decide_coe, ite_true, carry.eq_3, ih k _ (Or.inr H.2) H2.2, Bool.xor_assoc]
-        -- simp [bitwise_mul.res, bitwise_mul.carry, hij, H3, bitwise_mul.sh, ih k _ (Or.inr H.2) H2.2, ih k _ (Or.inr H.1) H2.1]
-
-        -- simp [ih (k-1) (by simp_arith) (by right; linarith) (show k-1 = i+j by aesop)]
         simp only [ge_iff_le, ih (k - 1) (by simp_arith ) (by right; linarith) (show k - 1 = i + j by aesop)]
-
-        -- simp [← testBit_translate_one, H.2]
-
-        simp only [ge_iff_le, H.2, testBit_translate_one, and_self]
-
-        done
-
+        simp only [ge_iff_le, H.2, ← testBit_translate_one, and_self]
       · have H3 : ¬ j < i  ∧ ¬ j+1 ≤ i := ⟨by linarith, by linarith⟩
         have hi3: ¬ j+1 ≤ succ i ∨ succ i = j+1 := by push_neg at *; exact lt_or_eq_of_le hij
         have H: succ i < w ∧ i< w := by apply And.intro <;> cases' h <;> linarith
         cases'  hi3 with hi3 hi3
-        <;> simp [bitwise_mul.res, bitwise_mul.carry,  hi3, H3, bitwise_mul.sh]
-        · simp [ih k _ (Or.inl H.2) H2.2, ih k _ (Or.inl H.1) H2.1]
-        · simp [← testBit_translate_one (hi3 ▸ H.1), ih k _ (Or.inl (hi3 ▸ H.1)) (hi3 ▸ H2.1)]
+        · simp [bitwise_mul.res, bitwise_mul.carry,  hi3, H3, bitwise_mul.sh]
+          simp [ih k _ (Or.inl H.2) H2.2, ih k _ (Or.inl H.1) H2.1]
+        · rw [←Nat.succ_eq_add_one i,hi3]
+          simp only [res.eq_3, sh, le_refl, tsub_eq_zero_of_le, Bool.decide_and, Bool.decide_coe, ite_true,
+            carry.eq_3, lt_self_iff_false, add_le_iff_nonpos_right, ge_iff_le, le_add_iff_nonneg_right, ite_false,
+            Bool.and_false, Bool.xor_false, Bool.false_or, and_true]
+          simp only [lt_succ_self, ih k _ (Or.inl (hi3 ▸ H.1)) (hi3 ▸ H2.1), ← testBit_translate_one (hi3 ▸ H.1)]
+          done
     all_goals {simp [hk, bitwise_mul.res, bitwise_mul.carry, bitwise_mul.sh, ← testBit_translate_one (show 0 < w by cases' h <;> linarith)]}
 
 theorem scale_two_pow_bit_new (h: y< 2^w): ((bitwise_mul.res x (2^w+y) w w) = ((bitwise_mul.res x y w w) ^^ (x.testBit 0))) ∧  (bitwise_mul.carry x (2^w+y) w w= bitwise_mul.carry x y w w) := by
