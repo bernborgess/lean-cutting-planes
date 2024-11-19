@@ -4,6 +4,7 @@ import Mathlib.Data.Bool.Basic
 import Mathlib.Data.Int.ModEq
 import Mathlib.Tactic.IntervalCases
 import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.Ring
 
 
 infix:30 " ^^ " => xor
@@ -111,13 +112,12 @@ theorem toNat_lt {f: Nat → Bool} : toNat f 0 i < 2^i := by
     rw [toNat_succ]
     cases' (f i) <;> simp [two_pow_succ, ih]; linarith -- freakin simp doesnt finish
 
--- theorem toNat_testBit {f: Nat → Bool} (h1: i < j) : (toNat f 0 j).testBit i = f i := by
---   induction' j, (pos_of_gt h1) using Nat.le_induction with j _ ih generalizing i
---   · simp [lt_one_iff.1 h1, toNat]
---   · cases' lt_or_eq_of_le (lt_succ_iff.mp h1) with h1 h1
---     · rw [← ih h1, toNat, toNat_succ, ←testBit_translate h1]
---     · rw [h1, toNat, toNat_succ, bit_toNat, testBit_translate' (toNat_lt)]
-
+theorem toNat_testBit' {f: Nat → Bool} (h1: i < j) : (toNat f 0 j).testBit i = f i := by
+  induction' j, (pos_of_gt h1) using Nat.le_induction with j _ ih generalizing i
+  · simp [lt_one_iff.1 h1, toNat]
+  · cases' lt_or_eq_of_le (Nat.lt_succ_iff.mp h1) with h1 h1
+    · rw [← ih h1, toNat, toNat_succ, ←testBit_translate h1]
+    · rw [h1, toNat, toNat_succ, bit_toNat, testBit_translate' (toNat_lt)]
 
 
 theorem lt_two_pow_testBit_false (h: x < 2^i) (h1: i ≤ j) : x.testBit j = false:= by
@@ -246,9 +246,9 @@ theorem bitwise_add_eq_add (x y : Nat) : bitwise_add x y i = (x + y) % 2 ^ i := 
 #eval bitwise_add 10 9 5
 
 theorem testBit_add {x y i: Nat} : (x + y).testBit i = ((x.testBit i ^^ y.testBit i) ^^ bitwise_carry x y i):= by
-  have := lt_of_lt_of_le (lt_trans (lt_two_pow (x + y)) (pow_lt_pow_succ (by decide) (x + y))) (pow_le_pow_of_le_right (show 0 < 2 by decide) (@le_add_self _ _ _ i))
+  have this := lt_of_lt_of_le (lt_trans (lt_two_pow (x + y)) (Nat.pow_lt_pow_succ (by decide))) (pow_le_pow_of_le_right (show 0 < 2 by decide) (@le_add_self _ _ _ i))
   rw [← Nat.mod_eq_of_lt this, ← add_assoc, ← bitwise_add_eq_add x y]
-  simp [toNat_testBit (show i < i + (x + y) + 1 by linarith)]
+  simp [toNat_testBit' (show i < i + (x + y) + 1 by linarith)]
 
 
 /-! ### Negation -/
