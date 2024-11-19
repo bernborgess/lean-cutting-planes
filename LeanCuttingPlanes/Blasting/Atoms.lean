@@ -1,4 +1,20 @@
+import Init.Data.BitVec.Basic
 import Mathlib.Data.Fin.Tuple.Reflection
+
+#check BitVec.or
+
+open BitVec
+#eval 0b1010#4 ||| 0b0110#4 = 0b1110#4
+
+def zero := 0b0000#4
+def one  := 0b0001#4
+
+#eval zero.or one
+#eval zero.ult one
+#eval zero.ule one
+#eval zero.slt one
+#eval zero.extractLsb 3 0
+
 
 open FinVec BigOperators
 
