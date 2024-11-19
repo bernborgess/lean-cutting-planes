@@ -204,11 +204,16 @@ theorem bitwise_ult_of_ult (hy: y< 2^w) (h1: x < y) : bitwise_ult x y w := by
   have ⟨i, hi1, hi2, hi3⟩ := lt_of_testbit h1
   suffices goal: ∀ j, i+1 ≤ j → bitwise_ult x y j from goal w (testBit_true_lt_two_pow hi2 hy)
   apply le_induction
-  · cases' i <;> simp [bitwise_ult, bitwise_ult.go, hi1, hi2]
+  · cases' i
+    . simp [bitwise_ult, bitwise_ult.go, hi1, hi2]
+    . simp only [bitwise_ult, bitwise_ult.go, hi1, not_false_eq_true,
+                  hi2, and_self, not_true, true_and, true_or]
   · intros j hj ih
-    have ⟨j', hj'⟩ := exists_eq_add_of_le' (le_of_add_le_right hj) -- why?
-    simp only [bitwise_ult, bitwise_ult.go, hj', succ_sub_one j'] at ih ⊢ -- could make a lemma that descends on bitwise_ult or just make the inductive hyp on bitwise_ult.go
-    simp [ih, hi3 (j'+1) (by linarith)]
+    have ⟨j', hj'⟩ := Nat.exists_eq_add_of_le (le_of_add_le_right hj)
+    rw [Nat.add_comm] at hj'
+    simp only [bitwise_ult, bitwise_ult.go, hj', succ_sub_one j'] at ih ⊢
+    simp only [add_eq, add_zero, Bool.not_eq_true, hi3 (j' + 1) (by linarith),
+               not_and, Bool.not_eq_false, imp_self, ih, and_self, or_true]
 
 
 /-! ### Addition -/
