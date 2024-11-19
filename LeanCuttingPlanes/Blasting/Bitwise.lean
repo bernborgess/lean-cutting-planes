@@ -195,8 +195,10 @@ theorem lt_of_testbit (h: n < m) : ∃ i, Nat.testBit n i = false ∧ Nat.testBi
       exact ⟨h3.2.1, h3.2.2, h⟩
 
 theorem testBit_true_lt_two_pow (h: x.testBit i = true) (hx : x < 2^w) : i < w := by
-  by_contra'; simp [lt_two_pow_testBit_false hx this] at h
-  -- could jst use mt (modus tollens?) but it trips on push_neg
+  by_contra hc
+  rw [Nat.lt_two_pow_testBit_false hx (_)] at h
+  . contradiction
+  . exact Nat.le_of_not_lt hc
 
 theorem bitwise_ult_of_ult (hy: y< 2^w) (h1: x < y) : bitwise_ult x y w := by
   have ⟨i, hi1, hi2, hi3⟩ := lt_of_testbit h1
