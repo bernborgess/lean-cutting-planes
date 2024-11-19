@@ -176,32 +176,23 @@ theorem lt_of_testbit (h: n < m) : ∃ i, Nat.testBit n i = false ∧ Nat.testBi
   · rw [← bit_decomp m] at h ⊢
     cases' bit_lt h with h3 h3
     · have ⟨i, iH⟩ := ih h3
-      use Nat.succ i; simp only [testBit_succ]
--- TODO
-      have h₁ : (bit b n / 2).testBit i = false := sorry -- iH.1
-      have h₂ : (bit m.bodd m.div2 / 2).testBit i = true := sorry -- iH.2.1
-      have h₃ : ∀ (j : ℕ), i.succ < j → (bit m.bodd m.div2).testBit j = (bit b n).testBit j := sorry
-      -- by
-      --   intros j hj
-      --   cases' j with j
-      --   . sorry
-      --   . sorry
-
-      exact ⟨h₁,h₂,h₃⟩
-      -- exact ⟨iH.1, iH.2.1, by
-      --        intros j hj; cases' j with j -- could use le_induction here but how. could these 4 lines be jst one simp?
-      --        · simp at hj
-      --        · simp [testBit_succ, iH.2.2 j (by linarith)]⟩
-      done
-
-    · use 0; simp only [testBit_zero]
-      have h₁ : decide (bit b n % 2 = 1) = false := sorry
-      have h₂ : decide (bit m.bodd m.div2 % 2 = 1) = true := sorry
-      have h₃ : ∀ (j : ℕ), 0 < j → (bit m.bodd m.div2).testBit j = (bit b n).testBit j := sorry
-      exact ⟨h₁,h₂,h₃⟩
-    --   exact ⟨ h3.2.1, h3.2.2, by intros j hj
-    --                              have ⟨j', hj⟩ := exists_eq_add_of_le' hj -- again, do we really need this?
-    --                              simp[hj, testBit_succ, h3.1]⟩
+      use Nat.succ i;
+      simp only [testBit_bit_succ]
+      have h : ∀ (j : ℕ), i.succ < j → (bit m.bodd m.div2).testBit j = (bit b n).testBit j := by
+        intros j hj
+        cases' j with j
+        . simp at hj
+        . simp only [testBit_bit_succ, iH.2.2 j (by linarith)]
+      exact ⟨iH.1,iH.2.1,h⟩
+    · use 0
+      simp only [testBit_bit_zero]
+      have h : ∀ (j : ℕ), 0 < j → (bit m.bodd m.div2).testBit j = (bit b n).testBit j := by
+        intros j hj
+        have ⟨j', hj⟩ := Nat.exists_eq_add_of_le hj
+        rw [Nat.add_comm] at hj
+        rw [hj,testBit_bit_succ, h3.1, testBit_bit_succ]
+        done
+      exact ⟨h3.2.1, h3.2.2, h⟩
 
 theorem testBit_true_lt_two_pow (h: x.testBit i = true) (hx : x < 2^w) : i < w := by
   by_contra'; simp [lt_two_pow_testBit_false hx this] at h
