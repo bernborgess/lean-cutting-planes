@@ -127,4 +127,27 @@
     \]
 \end{RuleDescription}
 
+\begin{RuleDescription}{bv_pbblast_step_bvand}
+    The `bvand' operation over BitVectors with n bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\mathrm{bvand}\ x\ y) ≈ A$ & (\currule) \\
+    \end{AletheX}
+    The term ``$A$'' is
+    \begin{align*}
+        (\lsymb{bbT}\; & ((\lsymb{bitOf}_{0}\ x) \,\lsymb{and}\,(\lsymb{bitOf}_{0}\ y))       \\
+                       & ((\lsymb{bitOf}_{1}\ x) \,\lsymb{and}\,(\lsymb{bitOf}_{1}\ y))       \\
+                       & \ldots                                                               \\
+                       & ((\lsymb{bitOf}_{n-1}\ x) \,\lsymb{and}\, (\lsymb{bitOf}_{n-1}\ y)))
+    \end{align*}
+    and for $0 \leq i < n$, taking $r := (\mathrm{bvand}\ x\ y) $
+    \[
+        \begin{array}{lcl}
+            x_i + y_i + \overline{r_i}            & \ge & 1 \\
+            r_i + \overline{x_i} + \overline{y_i} & \ge & 1 \\
+        \end{array}
+    \]
+
+\end{RuleDescription}
+
 \newpage
