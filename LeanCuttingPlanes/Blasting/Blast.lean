@@ -1,7 +1,6 @@
 import LeanCuttingPlanes.Basic
 
-open BitVec
-
+open BitVec Std.Tactic.BVDecide.Reflect.BitVec
 #check BitVec.and
 #check BitVec.getLsbD
 
@@ -18,11 +17,10 @@ def bbVar (x : BitVec w) : x = bbT (λi↦x[i]) := by
   | succ s hi =>
       unfold bbT
       simp only [Fin.natCast_eq_last, Fin.getElem_fin, Fin.val_last, Fin.coe_eq_castSucc, Fin.coe_castSucc]
-      -- let t : BitVec s := bbT (λ i : Fin s ↦ x[↑i])
-      -- have idk := hi t
-      -- simp [hi]
-      -- rw [t]
-      -- set t := (Matrix.vecTail fun i => x[↑i])
+      -- s : ℕ
+      -- hi : ∀ (x : BitVec s), x = bbT fun i => x[i]
+      -- x : BitVec (s + 1)
+      -- ⊢ x = cons x[s] (bbT fun i => x[↑i])
       sorry
 
 def bbVar0 (x : BitVec 0) : x = bbT ![] := by
@@ -40,44 +38,22 @@ def bbVar2 (x : BitVec 2) : x = bbT ![x[0],x[1]] := by
   rw [←r]
   exact bbVar x
 
-def bbVar3 (x : BitVec 3) : x = bbT ![x[0],x[1],x[2]] := by
-  have r : (λ i => x[i]) = ![x[0],x[1],x[2]] := List.ofFn_inj.mp rfl
-  rw [←r]
-  exact bbVar x
+#check congrArg
 
 -- This blasts the assertion to propositional variables
 theorem bitblast_and_eq (x y : BitVec 2)
-  : x.and y = 0b10#2 := by
+  : x &&& y = 10#2 := by
   have i1 := bbVar2 x
-  -- ...
+  have i2 := bbVar2 y
+  have i3 : x&&&y = (bbT ![x[0],x[1]]) &&& (bbT ![y[0],y[1]]) := and_congr 2 (bbT ![x[0], x[1]]) (bbT ![y[0], y[1]]) x y i1 i2
+  have i4 : bbT ![x[0],x[1]] &&& bbT ![y[0],y[1]] = bbT ![(x[0] ∧ y[0]),(x[1] ∧ y[1])] := sorry--bbAnd
+  have i5 : x&&&y = bbT ![(x[0] ∧ y[0]),(x[1] ∧ y[1])] := Eq.trans i3 i4
+  have i6 : 10#2 = bbT ![false,true] := rfl
+  have i7 : (x&&&y = 10#2) = (bbT ![(x[0] ∧ y[0]),(x[1] ∧ y[1])] = bbT ![false,true]) := congrFun (congrArg Eq i5) 10#2
+  have i8 : (bbT ![(x[0] ∧ y[0]),(x[1] ∧ y[1])] = bbT ![false,true]) = ((x[0]∧y[0])=false) ∧ ((x[1]∧y[1])=true) := by sorry --bbEq
+  have i9 : (x&&&y=10#2)=(((x[0]∧y[0])=false)∧((x[1]∧y[1])=true)) := by sorry
+  rw [i9.mpr]
+  simp only [Bool.false_eq_true, eq_iff_iff, iff_false, not_and, Bool.not_eq_true, iff_true]
 
-  -- apply List.ofFn_inj.mp at idk
-  -- rw [List.ofFn_inj.mp rfl] at idk
-
-  -- have idk2 : (fun i : Fin 2 => x[i]) = ![x[0],x[1]] := by exact List.ofFn_inj.mp rfl
-  -- rw [idk2] at idk
-  -- simp only [Nat.succ_eq_add_one, Nat.reduceAdd] at idk
-
-
-  -- have ⟨fv1,i1⟩ := bbVar x
-  -- have ⟨fv2,i2⟩ := bbVar y
-  -- have idk : fv1 = ![x[1],x[0]] := sorry
-
-  -- rw [idk] at i1
-
-
-
-  -- set x₀ := x.getLsbD 0
-  -- set x₁ := x.getLsbD 1
-  -- have h : x = bbT ![x₁,x₀] := by sorry
-
-
-
-  -- let x₀ := x.getLsb 0
-  -- let x₁ := x.getLsb 1
-
-
-
-
-
+  -- ⊢ (x[0] = true → y[0] = false) ∧ x[1] = true ∧ y[1] = true
   sorry
