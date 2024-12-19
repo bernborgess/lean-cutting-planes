@@ -1,4 +1,4 @@
-import «LeanCuttingPlanes».Basic
+import LeanCuttingPlanes.Basic
 import Mathlib.Algebra.Order.Floor.Div
 
 namespace PseudoBoolean
@@ -13,7 +13,6 @@ lemma ceildiv_le_ceildiv_right {a b : ℕ} (c : ℕ) (hab : a ≤ b)
   apply Nat.sub_le_sub_right
   apply Nat.add_le_add_right
   exact hab
-  done
 
 -- @kbuzzard
 theorem Nat.add_ceildiv_le_add_ceildiv (a b c : ℕ)
@@ -27,7 +26,6 @@ theorem Nat.add_ceildiv_le_add_ceildiv (a b c : ℕ)
   rw [mul_add]
   -- now use a standard fact
   gcongr <;> exact le_smul_ceilDiv hc
-  done
 
 -- @Ruben-VandeVelde
 theorem Finset.ceildiv_le_ceildiv {α : Type*} (as : α → ℕ) (s : Finset α) (c : ℕ)
@@ -39,12 +37,10 @@ theorem Finset.ceildiv_le_ceildiv {α : Type*} (as : α → ℕ) (s : Finset α)
     rw [sum_cons, sum_cons]
     have h := Nat.add_ceildiv_le_add_ceildiv (as a) (∑x ∈ s, as x) c
     exact le_add_of_le_add_left h ih
-    done
 
 lemma ceildiv_ite (P : Prop) [Decidable P] (a b c : ℕ)
   : (if P then b else c) ⌈/⌉ a = if P then (b ⌈/⌉ a) else (c ⌈/⌉ a) := by
   split_ifs <;> rfl
-  done
 
 -- Division
 -- ∑i (a i * l i) ≥ A
@@ -58,17 +54,15 @@ theorem Division
   (c : ℕ)
   : PBIneq (map (mapBoth (ceildiv c)) as) xs (ceildiv c A) := by
   unfold PBIneq PBSum ceildiv mapBoth at *
-  simp only [Fin.isValue, ge_iff_le, gt_iff_lt, Prod_map, map_eq, Function.comp_apply] at *
+  simp only [Fin.isValue, ge_iff_le, gt_iff_lt, Prod.map_apply, map_eq, Function.comp_apply] at *
   apply ceildiv_le_ceildiv_right c at ha
   apply le_trans ha
-  simp only [←ceildiv_ite]
+  simp only [←ceildiv_ite, Fin.isValue, Prod.map_fst, Prod.map_snd]
   apply Finset.ceildiv_le_ceildiv
-  done
 
 example
   (ha : PBIneq ![(3,0),(4,0)] xs 3)
   : PBIneq ![(2,0),(2,0)] xs 2 := by
   apply Division ha 2
-  done
 
 end PseudoBoolean

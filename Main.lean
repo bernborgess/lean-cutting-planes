@@ -1,4 +1,4 @@
-import «LeanCuttingPlanes»
+import LeanCuttingPlanes
 
 open PseudoBoolean
 
@@ -6,7 +6,6 @@ def pb : PBIneq ![(1,0),(2,0)] ![0,1] 1 := by
   reduce
   rw [Nat.le_eq]
   apply Nat.one_le_ofNat
-  done
 
 def derived
   (xs : Fin 4 → Fin 2)
@@ -20,7 +19,6 @@ def derived
   let t3 : PBIneq ![(0,0),(0,0),(0,0),(0,2)] xs 0  := by apply Multiplication c3 2
   let t4 : PBIneq ![(3,0),(6,0),(6,0),(0,0)] xs 7  := by apply Addition t2 t3
   exact Division t4 3
-  done
 
 def resolved : ∃xs, PBIneq ![(1,0),(2,0),(2,0),(0,0)] xs 3 :=
   let xs := ![1,0,1,0]
@@ -30,7 +28,6 @@ def resolved : ∃xs, PBIneq ![(1,0),(2,0),(2,0),(0,0)] xs 3 :=
   by
   use xs
   exact derived xs c1 c2 c3
-  done
 
 def main : IO Unit := do
   IO.println "This is lean-cutting-planes"
