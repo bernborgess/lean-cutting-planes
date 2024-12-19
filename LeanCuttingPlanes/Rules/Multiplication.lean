@@ -23,12 +23,10 @@ theorem Multiplication
   rw [←Finset.sum_nsmul] at ha
   simp only [smul_eq_mul, Fin.isValue, mul_ite] at ha
   exact ha
-  done
 
 example
   (ha : PBIneq ![(1,0)] xs 3)
   : PBIneq ![(2,0)] xs 6 := by
   apply Multiplication ha 2
-  done
 
 end PseudoBoolean

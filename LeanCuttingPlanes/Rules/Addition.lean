@@ -14,7 +14,6 @@ theorem Addition'
   simp_rw [←ite_add_ite]
   rw [Finset.sum_add_distrib]
   exact Nat.add_le_add ha hb
-  done
 
 def ReductionProp
   (xs : Fin n → Fin 2) (ks : Coeff n) (K : ℕ)
@@ -62,7 +61,6 @@ theorem Reduction
   rw [←Finset.sum_add_distrib]
   simp_rw [←reduce_terms]
   exact ha
-  done
 
 def AdditionProp
   (xs : Fin n → Fin 2)
@@ -83,14 +81,12 @@ theorem Addition
   : AdditionProp xs as A bs B := by
   have hk := Addition' xs as A ha bs B hb
   exact Reduction xs (as + bs) (A + B) hk
-  done
 
 example
   (ha : PBIneq ![(1,0),(0,0)] xs 1)
   (hb : PBIneq ![(1,0),(1,0)] xs 2)
   : PBIneq ![(2,0),(1,0)] xs 3 := by
   apply Addition ha hb
-  done
 
 -- Reduction happens automatically
 example
@@ -98,7 +94,6 @@ example
   (hb : PBIneq ![(0,0),(2,0),(0,1)] xs 2)
   : PBIneq ![(3,0),(2,0),(0,0)] xs 2 := by
   apply Addition ha hb
-  done
 
 
 end PseudoBoolean

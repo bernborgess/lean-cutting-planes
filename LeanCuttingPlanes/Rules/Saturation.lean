@@ -46,12 +46,10 @@ theorem Saturation
   have h := le_sum_min_of_le_sum ha
   simp_rw [apply_ite (min A) ((xs _ = 1)) ((as _).1) ((as _).2)] at h
   exact h
-  done
 
 example
   (ha : PBIneq ![(3,0),(4,0)] xs 3)
   : PBIneq ![(3,0),(3,0)] xs 3 := by
   apply Saturation ha
-  done
 
 end PseudoBoolean
