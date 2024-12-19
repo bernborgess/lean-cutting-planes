@@ -315,4 +315,4 @@ TSWLatexianTemp*
 #*Notes.bib
 
 # Dowloaded assets
-*.zip
+*.zip/.lake

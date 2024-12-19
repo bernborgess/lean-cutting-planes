@@ -1,4 +1,5 @@
-import «LeanCuttingPlanes».Basic
+import LeanCuttingPlanes.Basic
+import Mathlib.Algebra.Order.Module.Defs
 
 namespace PseudoBoolean
 
@@ -16,7 +17,7 @@ theorem Multiplication
   (c : ℕ)
   : PBIneq (c • as) xs (c • A) := by
   unfold PBIneq PBSum at *
-  simp only [Fin.isValue, ge_iff_le, nsmul_eq_smul, smul_eq_mul] at *
+  simp only [Fin.isValue, nsmul_eq_smul, smul_eq_mul, ge_iff_le] at *
   apply nsmul_le_nsmul_right at ha
   specialize ha c
   rw [←Finset.sum_nsmul] at ha

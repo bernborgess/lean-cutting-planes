@@ -1,4 +1,4 @@
-import «LeanCuttingPlanes».Basic
+import LeanCuttingPlanes.Basic
 
 namespace PseudoBoolean
 
@@ -30,13 +30,12 @@ lemma ite_eq_bmul (x y : ℕ) (b : Fin 2)
   by_cases h : b = 0
   . rw [h]
     rw [if_neg]
-    . simp only [Fin.isValue, Fin.val_zero, mul_zero, tsub_zero, mul_one, zero_add]
+    . simp only [Fin.isValue, Fin.val_zero, mul_zero, tsub_zero, mul_one, zero_add,Nat.sub_zero, mul_one]
     trivial
   . -- b = 1
     apply Fin.eq_one_of_neq_zero b at h
     rw [h]
-    simp only [Fin.isValue, ↓reduceIte, Fin.val_one, mul_one, ge_iff_le, le_refl,
-      tsub_eq_zero_of_le, mul_zero, add_zero]
+    simp only [Fin.isValue, ↓reduceIte, Fin.val_one, mul_one, Nat.sub_self, mul_zero, add_zero]
 
 lemma reduce_terms (p n : ℕ) (x : Fin 2)
   : p * x + n * (1 - x) = (p - n) * x + (n - p) * (1 - x) + min p n  := by
@@ -44,13 +43,13 @@ lemma reduce_terms (p n : ℕ) (x : Fin 2)
   . rw [h]
     simp only [Fin.isValue, Fin.val_zero, mul_zero, tsub_zero, mul_one, zero_add]
     rw [Nat.min_comm]
-    exact Nat.sub_add_min_cancel n p |>.symm
+    simp only [Nat.sub_zero, mul_one, Nat.sub_add_min_cancel]
 
   . -- x = 1
     apply Fin.eq_one_of_neq_zero x at h
     rw [h]
-    simp only [Fin.isValue, Fin.val_one, mul_one, ge_iff_le, le_refl, tsub_eq_zero_of_le, mul_zero, add_zero]
-    exact Nat.sub_add_min_cancel p n |>.symm
+    simp only [Fin.isValue, Fin.val_one, mul_one, Nat.sub_self, mul_zero, add_zero,
+      Nat.sub_add_min_cancel]
 
 theorem Reduction
   (xs : Fin n → Fin 2)
@@ -59,6 +58,7 @@ theorem Reduction
   unfold ReductionProp PBIneq PBSum at *
   simp only [Fin.isValue, ge_iff_le, tsub_le_iff_right] at *
   simp_rw [ite_eq_bmul] at *
+  simp only [Nat.sub_le_iff_le_add]
   rw [←Finset.sum_add_distrib]
   simp_rw [←reduce_terms]
   exact ha

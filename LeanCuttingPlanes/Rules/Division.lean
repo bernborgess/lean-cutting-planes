@@ -1,4 +1,4 @@
-import «LeanCuttingPlanes».Basic
+import LeanCuttingPlanes.Basic
 import Mathlib.Algebra.Order.Floor.Div
 
 namespace PseudoBoolean
@@ -61,7 +61,7 @@ theorem Division
   simp only [Fin.isValue, ge_iff_le, gt_iff_lt, Prod_map, map_eq, Function.comp_apply] at *
   apply ceildiv_le_ceildiv_right c at ha
   apply le_trans ha
-  simp only [←ceildiv_ite]
+  simp only [←ceildiv_ite, Fin.isValue, Prod.map_fst, Prod.map_snd]
   apply Finset.ceildiv_le_ceildiv
   done
 

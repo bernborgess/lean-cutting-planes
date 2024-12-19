@@ -1,4 +1,4 @@
-import «LeanCuttingPlanes»
+import LeanCuttingPlanes
 
 open PseudoBoolean
 
