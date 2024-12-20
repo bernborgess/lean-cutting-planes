@@ -1,0 +1,128 @@
+\begin{RuleDescription}{cp_addition}
+    A step of the \currule{} rule represents the addition of two pseudo-Boolean
+    constraints using cutting planes reasoning. Pseudo-Boolean constraints are
+    0-1 integer linear inequalities of the form:
+    \[
+        \sum_i a_i \times l_i \geq A
+    \]
+    where $A$ is called \textbf{constant}, $a_i$ are \textbf{coefficients},
+    and $l_i$ are \textbf{literals}, that are either:
+    \begin{itemize}
+        \item \textbf{plain} literal, a term \inlineAlethe{x};
+        \item \textbf{negated} literal, a term of the form \inlineAlethe{(- 1 x)}
+    \end{itemize}
+
+    where the \inlineAlethe{x} value is a pseudo-boolean variable,
+    i.e. it will resolve to values \inlineAlethe{0} (false) or \inlineAlethe{1} (true).
+    All these values are of sort \inlineAlethe{Int}.
+
+    To form a summation we use a list of added terms of form,
+    \inlineAlethe{(+ <T1> <T2> ... 0)} and each term is
+    \inlineAlethe{(* a_i <L1>)}, with a coefficient and a literal.\\
+
+    The \currule{} rule allows two pseudo-Boolean constraints to be
+    added together, combining their coefficients and constants. Negated and plain literals
+    over the same variable cancel each other.
+
+    Formally, given two constraints:
+    \[
+        \sum_i a_i \times l_i \geq A \quad \text{and} \quad \sum_i b_i \times l_i \geq B,
+    \]
+    the result of applying the \currule{} rule is:
+    \[
+        \sum_i (a_i + b_i) \times l_i \geq (A + B).
+    \]
+
+    A {\currule} step in the proof has the form:
+
+    \begin{AletheS}
+        $i_1$. & \ctxsep & \, & ${\sum_i{a_i l_i} \ge A}$  \\
+        $i_2$. & \ctxsep  & \, & ${\sum_i{b_i l_i} \ge B}$ \\
+        $j$. & \ctxsep  & \, & ${\sum_i{(a_i + b_i) l_i} \ge (A+B)}$  & (\currule\; $i_1$, $i_2$)
+    \end{AletheS}
+
+    To verify a \currule{} step, one must check that the two given
+    pseudo-Boolean constraints are valid and that their combination satisfies
+    the addition rule.
+
+\end{RuleDescription}
+
+\begin{RuleExample}
+    A simple \proofRule{cp_addition} step might look like this:
+
+    \begin{AletheVerb}
+        (assume c1 (>= (+ (* 1 x1) 0) 1))
+        (assume c2 (>= (+ (* 1 x2) 0) 1))
+        (step t1 (cl (>= (+ (* 1 x1) (* 1 x2) 0) 2))
+        :rule cp_addition :premises (c1 c2))
+    \end{AletheVerb}
+
+    In this example, we are adding two constraints.
+    \[
+        x_1 \geq 1 \quad \text{and} \quad x_2 \geq 1.
+    \]
+    After applying the \proofRule{cp_addition} rule,
+    the combined constraint is:
+    \[
+        x_1 + x_2 \geq 1
+    \]
+\end{RuleExample}
+
+\begin{RuleExample}
+    This \proofRule{cp_addition} example has negated literals that cancel each other:
+
+    \begin{AletheVerb}
+        (assume c1 (>= (+ (* 2 x1) (* 3 x2) 0) 2))
+        (assume c2 (>= (+ (* 1 (- 1 x1)) (* 3 (- 1 x2)) 0) 4))
+        (step t1 (cl (>= (+ (* 1 x1) 0) 2))
+        :rule cp_addition :premises (c1 c2))
+    \end{AletheVerb}
+
+    In this example, we are adding two constraints.
+    \[
+        2 x_1 + 3 x_2 \geq 2 \quad \text{and} \quad \overline{x_1} + 3 \overline{x_2} \geq 4.
+    \]
+    After applying the \proofRule{cp_addition} rule,
+    the combined constraint is:
+    \[
+        x_1 \geq 2
+    \]
+    After simplification, this results in a contradiction.
+\end{RuleExample}
+
+
+
+\begin{RuleDescription}{cp_multiplication}
+    A constraint can be multiplied by any $c \in \mathbb{N}^+$:
+
+    \begin{AletheS}
+        $i$. & \ctxsep & \, & ${\sum_i{a_i l_i} \ge A}$  \\
+        $j$. & \ctxsep  & \, & ${\sum_i{c a_i l_i} \ge c A}$  & (\currule\; $i$)\,[$c$]
+    \end{AletheS}
+
+\end{RuleDescription}
+
+
+\begin{RuleDescription}{cp_divison}
+    A constraint can be divided by any $c \in \mathbb{N}^+$,
+    and the the ceiling of this division in applied:
+
+    \begin{AletheS}
+        $i$. & \ctxsep & \, & ${\sum_i{a_i l_i} \ge A}$  \\
+        $j$. & \ctxsep  & \, & ${\sum_i{ \lceil \frac{a_i}{c} \rceil l_i} \ge \lceil \frac{A}{c} \rceil}$  & (\currule\; $i$)\,[$c$]
+    \end{AletheS}
+
+\end{RuleDescription}
+
+
+\begin{RuleDescription}{cp_saturation}
+    A constraint can replace its coefficients by the minimum between them and the constant:
+
+    \begin{AletheS}
+        $i$. & \ctxsep & \, & ${\sum_i{a_i l_i} \ge A}$  \\
+        $j$. & \ctxsep  & \, & ${\sum_i{ \min(a_i,A)\cdot l_i} \ge A}$  & (\currule\; $i$)
+    \end{AletheS}
+
+\end{RuleDescription}
+
+\newpage

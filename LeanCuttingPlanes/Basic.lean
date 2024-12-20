@@ -1,3 +1,10 @@
+/-
+Copyright (c) 2024 Bernardo Borges. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Bernardo Borges
+-/
+import Mathlib.Data.Fin.Tuple.Reflection
+
 /-! # Representation of a Linear Inequality
 
   ## Basic Definition
@@ -31,11 +38,35 @@
   pseudo-Boolean PBO format (only linear objective and constraints)
 
   * ⋈ is always ≥
-  * aᵢ is a list of ℤ
-  * A is a ℤ
-
-
-
-
+  * aᵢ is a list of ℕ
+  * A is a ℕ
 
 -/
+namespace PseudoBoolean
+
+open FinVec BigOperators
+
+abbrev Coeff (n : ℕ) := Fin n → (ℕ × ℕ)
+
+def PBSum (cs : Coeff n) (xs : Fin n → Fin 2) :=
+  ∑ i, let (p,n) := cs i;
+    if xs i = 1 then p else n
+
+def PBIneq (cs : Coeff n) (xs : Fin n → Fin 2) (const : ℕ) :=
+  PBSum cs xs ≥ const
+
+example : PBIneq ![(1,0)] ![1] 1 := by
+  reduce                -- Expand the goal to 1 * 1 ≥ 1
+  exact Nat.le_refl 1   -- Prove that 1 * 1 ≥ 1
+
+example : PBIneq ![(1,0),(2,0)] ![0,1] 2 := by
+  reduce                -- Change goal to 1 * 0 + 2 * 1 ≥ 2
+  exact Nat.le_refl 2   -- Prove 1 * 0 + 2 * 1 ≥ 2
+
+example : PBIneq ![(3,0),(4,0)] ![0,1] 2 := by
+  reduce
+  simp
+
+def mapBoth (f : α → β) (t : α × α) : β × β := Prod.map f f t
+
+end PseudoBoolean
