@@ -88,6 +88,79 @@
 
 \end{RuleDescription}
 
+\begin{RuleDescription}{pbblast_bvslt}
+    The `signed-less-than' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvslt}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
+    \[
+        -(2^{n-1})\mathbf{y}_0 + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} + 2^{n-1} \mathbf{x}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} \geq 1
+    \]
+
+\end{RuleDescription}
+
+\begin{RuleDescription}{pbblast_bvsgt}
+    The `signed-greater-than' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvsgt}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
+    \[
+        -(2^{n-1})\mathbf{x}_0 + \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} + 2^{n-1} \mathbf{y}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} \geq 1
+    \]
+
+    \noindent
+    Or in terms of \proofRule{pbblast_bvslt}:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvsgt}\ x\ y) \approx (\lsymb{bvslt}\ y\ x)$ & (\currule)
+    \end{AletheX}
+
+\end{RuleDescription}
+
+\begin{RuleDescription}{pbblast_bvsge}
+    The `signed-greater-or-equal' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvsge}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
+    \[
+        -(2^{n-1})\mathbf{x}_{0} + \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} + 2^{n-1}\mathbf{y}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} \geq 0
+    \]
+
+\end{RuleDescription}
+
+\begin{RuleDescription}{pbblast_bvsle}
+    The `signed-less-or-equal' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvsle}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
+    \[
+        -(2^{n-1})\mathbf{y}_{0} + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} + 2^{n-1}\mathbf{x}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} \geq 0
+    \]
+
+    \noindent
+    Or in terms of \proofRule{pbblast_bvsge}:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvsle}\ x\ y) \approx (\lsymb{bvsge}\ y\ x)$ & (\currule)
+    \end{AletheX}
+
+\end{RuleDescription}
+
+
+
+
 \begin{RuleDescription}{bv_not_equal}
     The \currule{} rule, meaning bitwise inequality, can be concisely expressed by:
     \[
