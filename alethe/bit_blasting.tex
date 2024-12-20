@@ -5,34 +5,36 @@
     \begin{AletheX}
         $i$. & \ctxsep & $(\lsymb{=}\ x\ y) \approx A$ & (\currule)
     \end{AletheX}
-
     The term ``$A$'' is the conjunction of PseudoBoolean constraints:
 
     \[ \bigwedge_{i=0}^{n-1}{\left(x_i-y_i = 0\right)} \]
 
+    \noindent
     Or similarly, using a single constraint:
 
     \[ \sum_{i=0}^{n-1}{2^i x_{n-i-1}} - \sum_{i=0}^{n-1}{2^i y_{n-i-1}} = 0\]
 
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_not_equal}
-    The \currule{} rule, meaning bitwise inequality, can be concisely expressed by:
-    \[
-        \mathbf{z} = \text{XOR}(x, y); \qquad \sum_{i=0}^{k-1} \mathbf{z}_i \geq 0
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{pbblast_step_ult}
-    The `ult' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+\begin{RuleDescription}{pbblast_bvult}
+    The `unsigned-less-than' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
 
     \begin{AletheX}
-        $i$. & \ctxsep & $(\lsymb{bvult}\ x\ y) ≈ A$ & (\currule)
+        $i$. & \ctxsep & $(\lsymb{bvult}\ x\ y) \approx A$ & (\currule)
     \end{AletheX}
     The term ``$A$'' is `true' iff:
 
     \[
-        \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} + \sum_{i=0}^{n-1} 2^i\mathbf{\overline{x}}_{n-i-1} \ge 2^{n}.
+        \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} \ge 1.
+    \]
+
+\end{RuleDescription}
+
+
+\begin{RuleDescription}{bv_not_equal}
+    The \currule{} rule, meaning bitwise inequality, can be concisely expressed by:
+    \[
+        \mathbf{z} = \text{XOR}(x, y); \qquad \sum_{i=0}^{k-1} \mathbf{z}_i \geq 0
     \]
 \end{RuleDescription}
 
