@@ -158,126 +158,14 @@
 
 \end{RuleDescription}
 
+% VAR
+% CONST
+% XOR
+% ADD
+% AND
+% OR
+% NOT
 
-
-
-\begin{RuleDescription}{bv_not_equal}
-    The \currule{} rule, meaning bitwise inequality, can be concisely expressed by:
-    \[
-        \mathbf{z} = \text{XOR}(x, y); \qquad \sum_{i=0}^{k-1} \mathbf{z}_i \geq 0
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_not_ult}
-    The negation of the \currule{} rule, meaning $x \geq y$ for unsigned integers, can be expressed as:
-    \[
-        \neg ULT(x, y) \equiv UGE(x, y)
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_uge}
-    The \currule{} rule for unsigned greater than or equal, $x \geq y$, is defined as:
-    \[
-        \sum_{i=0}^{k-1} 2^i\mathbf{x}_{k-i-1} - \sum_{i=0}^{k-1} 2^i\mathbf{y}_{k-i-1} \geq 0.
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_not_uge}
-    The negation of the \currule{} rule, meaning $x < y$ for unsigned integers, is expressed by:
-    \[
-        \neg UGE(x, y) \equiv ULT(x, y)
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_ule}
-    The \currule{} rule for unsigned less than or equal, $x \leq y$, is equivalent to:
-    \[
-        ULE(x, y) \equiv UGE(y, x)
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_not_ule}
-    The negation of the \currule{} rule, meaning $x > y$, is expressed by:
-    \[
-        \neg ULE(x, y) \equiv UGT(x, y)
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_ugt}
-    The \currule{} rule for unsigned greater than, $x > y$, is equivalent to:
-    \[
-        UGT(x, y) \equiv ULT(y, x)
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_not_ugt}
-    The negation of the \currule{} rule, meaning $x \leq y$, is expressed by:
-    \[
-        \neg UGT(x, y) \equiv ULE(x, y)
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_pbblast_step_slt}
-    The `slt' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
-
-    \begin{AletheX}
-        $i$. & \ctxsep & $(\lsymb{bvslt}\ x\ y) ≈ A$ & (\currule) \\
-    \end{AletheX}
-    The term ``$A$'' is `true' iff:
-
-    \[
-        2^{n-1} \overline{y_0} + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} + 2^{n-1}x_0 + \sum_{i=0}^{n-2} 2^i\mathbf{\overline{x}}_{n-i-1} \ge 2^{n}.
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_not_slt}
-    The negation of the \currule{} rule, meaning $x \geq y$ for signed integers, is expressed by:
-    \[
-        \neg SLT(x, y) \equiv SGE(x, y)
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_sge}
-    The \currule{} rule for signed greater than or equal, $x \geq y$, is defined as:
-    \[
-        -(2^{k-1})\mathbf{x}_0 + \sum_{i=0}^{k-2} 2^i\mathbf{x}_{k-i-1} + 2^{k-1}\mathbf{y}_0 - \sum_{i=0}^{k-2} 2^i\mathbf{y}_{k-i-1} \geq 0.
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_not_sge}
-    The negation of the \currule{} rule, meaning $x < y$ for signed integers, is expressed by:
-    \[
-        \neg SGE(x, y) \equiv SLT(x, y)
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_sle}
-    The \currule{} rule for signed less than or equal, $x \leq y$, is equivalent to:
-    \[
-        SLE(x, y) \equiv SGE(y, x)
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_not_sle}
-    The negation of the \currule{} rule, meaning $x > y$, is expressed by:
-    \[
-        \neg SLE(x, y) \equiv SGT(x, y)
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_sgt}
-    The \currule{} rule for signed greater than, $x > y$, is equivalent to:
-    \[
-        SGT(x, y) \equiv SLT(y, x)
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_not_sgt}
-    The negation of the \currule{} rule, meaning $x \leq y$, is expressed by:
-    \[
-        \neg SGT(x, y) \equiv SLE(x, y)
-    \]
-\end{RuleDescription}
 
 \begin{RuleDescription}{pbblast_step_bvand}
     The `bvand' operation over BitVectors with n bits is expressed using PseudoBoolean inequalities by:
