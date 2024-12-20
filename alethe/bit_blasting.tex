@@ -166,7 +166,7 @@
     Constraints on each bit of the constant BitVector b:
 
     \begin{AletheX}
-        $i$. & \ctxsep & $b = \lsymb{pbbT} r \land \bigwedge_{i=0}^{n-1}{r_i = \lsymb{PB\_ZERO\_OR\_ONE}(b_{n-i-1})}$ & (\currule) \\
+        $i$. & \ctxsep & $\left(b \approx \lsymb{pbbT}\ r\right) \land \bigwedge_{i=0}^{n-1}{\left(r_i = \lsymb{PB\_ZERO\_OR\_ONE}(b_{n-i-1})\right)}$ & (\currule) \\
     \end{AletheX}
     % TODO: Explain PB_ZERO_OR_ONE := if b_i is 1 then b_i = 1 else b_i = 0
     \noindent
@@ -177,7 +177,20 @@
     \end{itemize}
 \end{RuleDescription}
 
-% XOR
+\begin{RuleDescription}{pbblast_bvxor}
+    The `bvxor' operation over BitVectors with n bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvxor}\ x\ y) \approx [r_0,\dots,r_1] \land A$ & (\currule) \\
+    \end{AletheX}
+    The term ``$A$'' is the conjunction of these PseudoBoolean inequalities, for $0 \le i < n$:
+
+    \[ -\textbf{r}_i+\textbf{x}_i+\textbf{y}_i\ge  0 \]
+    \[ -\textbf{r}_i-\textbf{x}_i-\textbf{y}_i\ge -2 \]
+    \[  \textbf{r}_i+\textbf{x}_i-\textbf{y}_i\ge  0 \]
+    \[  \textbf{r}_i-\textbf{x}_i+\textbf{y}_i\ge  0 \]
+\end{RuleDescription}
+
 % ADD
 % AND
 % OR
