@@ -15,10 +15,16 @@
     \]
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_ult}
-    The \currule{} rule for unsigned less than, $x < y$, is defined as:
+\begin{RuleDescription}{bv_pbblast_step_ult}
+    The `ult' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvult}\ x\ y) ≈ A$ & (\currule) \\
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
     \[
-        \sum_{i=0}^{k-1} 2^i\mathbf{y}_{k-i-1} - \sum_{i=0}^{k-1} 2^i\mathbf{x}_{k-i-1} \geq 1.
+        \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} + \sum_{i=0}^{n-1} 2^i\mathbf{\overline{x}}_{n-i-1} \ge 2^{n}.
     \]
 \end{RuleDescription}
 
@@ -71,10 +77,16 @@
     \]
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_slt}
-    The \currule{} rule for signed less than, $x < y$, is defined as:
+\begin{RuleDescription}{bv_pbblast_step_slt}
+    The `slt' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvslt}\ x\ y) ≈ A$ & (\currule) \\
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
     \[
-        -(2^{k-1})\mathbf{y}_0 + \sum_{i=0}^{k-2} 2^i\mathbf{y}_{k-i-1} + 2^{k-1} \mathbf{x}_{0} - \sum_{i=0}^{k-2} 2^i\mathbf{x}_{k-i-1} \geq 1.
+        2^{n-1} \overline{y_0} + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} + 2^{n-1}x_0 + \sum_{i=0}^{n-2} 2^i\mathbf{\overline{x}}_{n-i-1} \ge 2^{n}.
     \]
 \end{RuleDescription}
 
@@ -125,6 +137,29 @@
     \[
         \neg SGT(x, y) \equiv SLE(x, y)
     \]
+\end{RuleDescription}
+
+\begin{RuleDescription}{bv_pbblast_step_bvand}
+    The `bvand' operation over BitVectors with n bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\mathrm{bvand}\ x\ y) ≈ A$ & (\currule) \\
+    \end{AletheX}
+    The term ``$A$'' is
+    \begin{align*}
+        (\lsymb{bbT}\; & ((\lsymb{bitOf}_{0}\ x) \,\lsymb{and}\,(\lsymb{bitOf}_{0}\ y))       \\
+                       & ((\lsymb{bitOf}_{1}\ x) \,\lsymb{and}\,(\lsymb{bitOf}_{1}\ y))       \\
+                       & \ldots                                                               \\
+                       & ((\lsymb{bitOf}_{n-1}\ x) \,\lsymb{and}\, (\lsymb{bitOf}_{n-1}\ y)))
+    \end{align*}
+    and for $0 \leq i < n$, taking $r := (\mathrm{bvand}\ x\ y) $
+    \[
+        \begin{array}{lcl}
+            x_i + y_i + \overline{r_i}            & \ge & 1 \\
+            r_i + \overline{x_i} + \overline{y_i} & \ge & 1 \\
+        \end{array}
+    \]
+
 \end{RuleDescription}
 
 \newpage

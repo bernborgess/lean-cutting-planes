@@ -3,7 +3,7 @@
     constraints using cutting planes reasoning. Pseudo-Boolean constraints are
     0-1 integer linear inequalities of the form:
     \[
-        \sum_i a_i \times l_i \geq A
+        \sum_i a_i \cdot l_i \geq A
     \]
     where $A$ is called \textbf{constant}, $a_i$ are \textbf{coefficients},
     and $l_i$ are \textbf{literals}, that are either:
@@ -26,11 +26,11 @@
 
     Formally, given two constraints:
     \[
-        \sum_i a_i \times l_i \geq A \quad \text{and} \quad \sum_i b_i \times l_i \geq B,
+        \sum_i a_i \cdot l_i \geq A \quad \text{and} \quad \sum_i b_i \cdot l_i \geq B,
     \]
     the result of applying the \currule{} rule is:
     \[
-        \sum_i (a_i + b_i) \times l_i \geq (A + B).
+        \sum_i (a_i + b_i) \cdot l_i \geq (A + B).
     \]
 
     A {\currule} step in the proof has the form:
