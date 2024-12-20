@@ -1,11 +1,19 @@
-\begin{RuleDescription}{bv_equal}
-    Consider bitvectors $x$ of length $k$ with respective PB-blasted vectors $x$
-    - i.e. $x$ is a vector of Pseudo-Boolean variables.
+\begin{RuleDescription}{pbblast_bveq}
+    Consider bitvectors \textbf{x} and \textbf{y} of length $n$.
+    The pseudo-boolean bitblasting of their equality is expressed by:
 
-    A step of the \currule{} rule means bitwise equality, expressed by:
-    \[
-        \sum_{i=0}^{k-1} 2^i\mathbf{x}_{k-i-1} - \sum_{i=0}^{k-1} 2^i\mathbf{y}_{k-i-1} = 0.
-    \]
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{=}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+
+    The term ``$A$'' is the conjunction of PseudoBoolean constraints:
+
+    \[ \bigwedge_{i=0}^{n-1}{\left(x_i-y_i = 0\right)} \]
+
+    Or similarly, using a single constraint:
+
+    \[ \sum_{i=0}^{n-1}{2^i x_{n-i-1}} - \sum_{i=0}^{n-1}{2^i y_{n-i-1}} = 0\]
+
 \end{RuleDescription}
 
 \begin{RuleDescription}{bv_not_equal}
@@ -15,11 +23,11 @@
     \]
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_pbblast_step_ult}
+\begin{RuleDescription}{pbblast_step_ult}
     The `ult' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
 
     \begin{AletheX}
-        $i$. & \ctxsep & $(\lsymb{bvult}\ x\ y) ≈ A$ & (\currule) \\
+        $i$. & \ctxsep & $(\lsymb{bvult}\ x\ y) ≈ A$ & (\currule)
     \end{AletheX}
     The term ``$A$'' is `true' iff:
 
@@ -139,26 +147,17 @@
     \]
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_pbblast_step_bvand}
+\begin{RuleDescription}{pbblast_step_bvand}
     The `bvand' operation over BitVectors with n bits is expressed using PseudoBoolean inequalities by:
 
     \begin{AletheX}
-        $i$. & \ctxsep & $(\mathrm{bvand}\ x\ y) ≈ A$ & (\currule) \\
-    \end{AletheX}
-    The term ``$A$'' is
-    \begin{align*}
-        (\lsymb{bbT}\; & ((\lsymb{bitOf}_{0}\ x) \,\lsymb{and}\,(\lsymb{bitOf}_{0}\ y))       \\
-                       & ((\lsymb{bitOf}_{1}\ x) \,\lsymb{and}\,(\lsymb{bitOf}_{1}\ y))       \\
-                       & \ldots                                                               \\
-                       & ((\lsymb{bitOf}_{n-1}\ x) \,\lsymb{and}\, (\lsymb{bitOf}_{n-1}\ y)))
-    \end{align*}
-    and for $0 \leq i < n$, taking $r := (\mathrm{bvand}\ x\ y) $
-    \[
-        \begin{array}{lcl}
-            x_i + y_i + \overline{r_i}            & \ge & 1 \\
-            r_i + \overline{x_i} + \overline{y_i} & \ge & 1 \\
-        \end{array}
-    \]
+        $i$. & \ctxsep & $(\lsymb{bvand}\ x\ y) \approx [r_0,\dots,r_1] \land A$ & (\currule) \\
+    \end{AletheX}\\
+    The term ``$A$'' is the conjunction of these PseudoBoolean inequalities, for $0 \le i < n$:
+
+    \[ x_i-r_i\ge 0 \]
+    \[ y_i-r_i\ge 0 \]
+    \[ r_i-x_i-y_1\ge -1 \]
 
 \end{RuleDescription}
 
