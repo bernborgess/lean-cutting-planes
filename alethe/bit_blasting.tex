@@ -169,9 +169,14 @@
         $i$. & \ctxsep & $b = \lsymb{pbbT} r \land \bigwedge_{i=0}^{n-1}{r_i = \lsymb{PB\_ZERO\_OR\_ONE}(b_{n-i-1})}$ & (\currule) \\
     \end{AletheX}
     % TODO: Explain PB_ZERO_OR_ONE := if b_i is 1 then b_i = 1 else b_i = 0
+    \noindent
+    In which we expand \textbf{PB\_ZERO\_OR\_ONE($b_i$)} into:
+    \begin{itemize}
+        \item $\left(b_i = 0\right)$ if $b_i$ is $0$
+        \item $\left(b_i = 1\right)$ if $b_i$ is $1$
+    \end{itemize}
 \end{RuleDescription}
 
-% CONST
 % XOR
 % ADD
 % AND
