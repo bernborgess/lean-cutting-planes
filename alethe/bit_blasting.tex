@@ -30,6 +30,63 @@
 
 \end{RuleDescription}
 
+\begin{RuleDescription}{pbblast_bvugt}
+    The `unsigned-greater-than' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvugt}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
+    \[
+        \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} \ge 1.
+    \]
+
+    \noindent
+    Or in terms of \proofRule{pbblast_bvult}:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvugt}\ x\ y) \approx (\lsymb{bvult}\ y\ x)$ & (\currule)
+    \end{AletheX}
+
+\end{RuleDescription}
+
+
+% https://github.com/cvc5/cvc5/blob/96a35d7cc97ee375e263ab43a2ed9ba03cc32858/src/rewriter/node.py#L44
+\begin{RuleDescription}{pbblast_bvuge}
+    The `unsigned-greater-or-equal' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvuge}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
+    \[
+        \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} \ge 0.
+    \]
+
+\end{RuleDescription}
+
+\begin{RuleDescription}{pbblast_bvule}
+    The `unsigned-greater-or-equal' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvule}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
+    \[
+        \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} \ge 0.
+    \]
+
+    \noindent
+    Or in terms of \proofRule{pbblast_bvuge}:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvule}\ x\ y) \approx (\lsymb{bvuge}\ y\ x)$ & (\currule)
+    \end{AletheX}
+
+\end{RuleDescription}
 
 \begin{RuleDescription}{bv_not_equal}
     The \currule{} rule, meaning bitwise inequality, can be concisely expressed by:
