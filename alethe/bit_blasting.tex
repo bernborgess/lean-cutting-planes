@@ -48,7 +48,6 @@
     \begin{AletheX}
         $i$. & \ctxsep & $(\lsymb{bvugt}\ x\ y) \approx (\lsymb{bvult}\ y\ x)$ & (\currule)
     \end{AletheX}
-
 \end{RuleDescription}
 
 
@@ -85,7 +84,6 @@
     \begin{AletheX}
         $i$. & \ctxsep & $(\lsymb{bvule}\ x\ y) \approx (\lsymb{bvuge}\ y\ x)$ & (\currule)
     \end{AletheX}
-
 \end{RuleDescription}
 
 \begin{RuleDescription}{pbblast_bvslt}
@@ -120,7 +118,6 @@
     \begin{AletheX}
         $i$. & \ctxsep & $(\lsymb{bvsgt}\ x\ y) \approx (\lsymb{bvslt}\ y\ x)$ & (\currule)
     \end{AletheX}
-
 \end{RuleDescription}
 
 \begin{RuleDescription}{pbblast_bvsge}
@@ -155,10 +152,25 @@
     \begin{AletheX}
         $i$. & \ctxsep & $(\lsymb{bvsle}\ x\ y) \approx (\lsymb{bvsge}\ y\ x)$ & (\currule)
     \end{AletheX}
-
 \end{RuleDescription}
 
-% VAR
+\begin{RuleDescription}{pbblast_pbbvar}
+    Conversion from a BitVector of $n$ bits to $n$ PseudoBoolean variables passed to pbbT:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $x \approx \lsymb{pbbT}\; x_1 \dots x_{n+1}$ & (\currule)
+    \end{AletheX}
+\end{RuleDescription}
+
+\begin{RuleDescription}{pbblast_pbbconst}
+    Constraints on each bit of the constant BitVector b:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $b = \lsymb{pbbT} r \land \bigwedge_{i=0}^{n-1}{r_i = \lsymb{PB\_ZERO\_OR\_ONE}(b_{n-i-1})}$ & (\currule) \\
+    \end{AletheX}
+    % TODO: Explain PB_ZERO_OR_ONE := if b_i is 1 then b_i = 1 else b_i = 0
+\end{RuleDescription}
+
 % CONST
 % XOR
 % ADD
@@ -172,13 +184,12 @@
 
     \begin{AletheX}
         $i$. & \ctxsep & $(\lsymb{bvand}\ x\ y) \approx [r_0,\dots,r_1] \land A$ & (\currule) \\
-    \end{AletheX}\\
+    \end{AletheX}
     The term ``$A$'' is the conjunction of these PseudoBoolean inequalities, for $0 \le i < n$:
 
     \[ x_i-r_i\ge 0 \]
     \[ y_i-r_i\ge 0 \]
     \[ r_i-x_i-y_1\ge -1 \]
-
 \end{RuleDescription}
 
 \newpage
