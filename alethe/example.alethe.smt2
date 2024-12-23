@@ -9,6 +9,103 @@
 (assert (= (bvand x y) #b10))
 
 ;; pb-blasting process of (bvand x y), with r being the name of AND(x,y)
+
+(step i1
+  (cl (= x (pbbT (! (_ intOf x 0) :named @x0) (! (_ intOf x 1) :named @x1)))
+    :rule pbblast_pbvar))
+
+(step i2
+  (cl (= y (pbbT (! (_ intOf y 0) :named @y0) (! (_ intOf y 1) :named @y1)))
+    :rule pbblast_pbvar))
+
+(step i3
+  (cl (= (! (bvand x y) :named @r) (bvand (pbbT @x0 @x1) (pbbT @y0 @y1))))
+    :rule cong :premises (i1 i2))
+
+(step i4
+  (cl
+    (and
+      (=
+        (bvand (pbbT @x0 @x1) (pbbT @y0 @y1))
+        (pbbT (! (_ intOf @r 0) :named @r0) (! (_ intOf @r 1) :named @r1))
+        )
+      (>= (- @x0 @r0) 0)
+      (>= (- @x1 @r1) 0)
+      (>= (- @y0 @r0) 0)
+      (>= (- @y1 @r1) 0)
+      (>= (- @r0 @x0 @y0) (- 1))
+      (>= (- @r1 @x1 @y1) (- 1))
+    ))  :rule pbblast_step_bvand)
+
+(step i5
+  (cl
+    (=
+        (bvand (pbbT @x0 @x1) (pbbT @y0 @y1))
+        (pbbT (! (_ intOf @r 0) :named @r0) (! (_ intOf @r 1) :named @r1))
+    ))  :rule and :premises i4 :args 1)
+
+(step i6
+  (cl (=
+        (bvand x y)
+        (pbbT @r0 @r1)
+  )) :rule trans :premises (i3 i5))
+
+(step i7
+  (cl (=
+        #b10
+        (pbbT 0 1)
+  )) :rule pbblast_pbbconst :args #b10)
+
+(step i8
+  (cl (=
+        (= (bvand x y) #b10)
+        (= (pbbT @r0 @r1) (pbbT 0 1))
+  )) :rule cong :premises i6 i7)
+
+(step i9
+  (cl (=
+        (= (pbbT @r0 @r1) (pbbT 0 1))
+        (= (- (+ @r1 (* 2 @r0)) (+ 1 (* 2 0))) 0)
+  )) :rule pbblast_bveq :args (pbbT @r0 @r1) (pbbT 0 1))
+
+(step i10
+  (cl (=
+        (= (bvand x y) #b10)
+        (= (- (+ @r1 (* 2 @r0)) (+ 1 (* 2 0))) 0)
+  )) :rule trans :premises i8 i9)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;; pb-blasting process of (bvand x y), with r being the name of AND(x,y)
 (step i0
   (cl (= x (pbbT (! (_ intOf x 0) :named @x0) (! (_ intOf x 1) :named @x1)))
     :rule pb_blast_step_var))
