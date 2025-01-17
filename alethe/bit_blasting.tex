@@ -178,7 +178,8 @@
     \begin{AletheX}
         $i$. & \ctxsep & $(\lsymb{bvxor}\ x\ y) \approx [r_0,\dots,r_1] \land A$ & (\currule) \\
     \end{AletheX}
-    The term ``$A$'' is the conjunction of these PseudoBoolean inequalities, for $0 \le i < n$:
+    The term ``$A$'' is the conjunction of these PseudoBoolean inequalities and the term \textbf{r} stands
+    for the result of the `bvxor' operation between \textbf{x} and \textbf{y}, for $0 \le i < n$:
 
     \[ -\textbf{r}_i+\textbf{x}_i+\textbf{y}_i\ge  0 \]
     \[ -\textbf{r}_i-\textbf{x}_i-\textbf{y}_i\ge -2 \]
@@ -187,7 +188,6 @@
 \end{RuleDescription}
 
 % ADD
-% AND
 % OR
 % NOT
 
@@ -198,11 +198,12 @@
     \begin{AletheX}
         $i$. & \ctxsep & $(\lsymb{bvand}\ x\ y) \approx [r_0,\dots,r_1] \land A$ & (\currule) \\
     \end{AletheX}
-    The term ``$A$'' is the conjunction of these PseudoBoolean inequalities, for $0 \le i < n$:
+    The term ``$A$'' is the conjunction of these PseudoBoolean inequalities and the term \textbf{r} stands
+    for the result of the `bvand' operation between \textbf{x} and \textbf{y}, for $0 \le i < n$:
 
-    \[ x_i-r_i\ge 0 \]
-    \[ y_i-r_i\ge 0 \]
-    \[ r_i-x_i-y_1\ge -1 \]
+    \[ \textbf{x}_i-\textbf{r}_i\ge 0 \]
+    \[ \textbf{y}_i-\textbf{r}_i\ge 0 \]
+    \[ \textbf{r}_i-\textbf{x}_i-\textbf{y}_1\ge -1 \]
 \end{RuleDescription}
 
 \newpage
