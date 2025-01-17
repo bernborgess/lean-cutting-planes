@@ -1,0 +1,38 @@
+\subsection{Pseudo Boolean Reasoning}
+
+Pseudo-Boolean constraints are mathematical expressions involving binary (0 or 1) variables
+(or literals) and integer coefficients, typically in the form of inequalities.
+Specifically, a pseudo-Boolean constraint is an inequality of the following form:
+\[
+    \sum_i a_i \cdot l_i \geq A
+\]
+where $A$ is called \textbf{constant}, $a_i$ are \textbf{coefficients},
+and $l_i$ are \textbf{literals}, that are either:
+\begin{itemize}
+    \item \textbf{plain} literal, a term \inlineAlethe{x};
+    \item \textbf{negated} literal, a term of the form \inlineAlethe{(- 1 x)}
+\end{itemize}
+
+where the \inlineAlethe{x} value is a pseudo-boolean variable,
+i.e. it will resolve to values \inlineAlethe{0} (false) or \inlineAlethe{1} (true).
+All these values are of sort \inlineAlethe{Int}.
+
+To form a summation we use a list of added terms of form,
+\inlineAlethe{(+ <T1> <T2> ... 0)} and each term is
+\inlineAlethe{(* a_i <L1>)}, with a coefficient and a literal, always ending with a \inlineAlethe{0}.
+
+
+\paragraph{Normalized Form}
+A pseudo-Boolean constraint is in the \textbf{normalized form} if:
+\begin{itemize}
+    \item All \textbf{coefficients} $a_i$ are non-negative;
+    \item The \textbf{constant} $A$ is non-negative;
+\end{itemize}
+
+%This form is a precondition for the \proofRule{cp_division} and \proofRule{cp_saturation} rules.
+This form is a precondition for the \texttt{cp\_division} and \texttt{cp\_saturation} rules.
+
+% TODO: Add section `Bitvector Reasoning with Pseudo-Boolean Bitblasting'
+% TODO: Express that indexing is done with `intOf'
+% TODO: Explain what `r_i' mean in the bvxor rule
+
