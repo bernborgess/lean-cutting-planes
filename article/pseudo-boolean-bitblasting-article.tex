@@ -1,9 +1,8 @@
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
-% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
-\usepackage{cite}
-\usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{cite}
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
@@ -38,23 +37,17 @@
 \end{IEEEkeywords}
 
 \section{Introdução}
-% TODO: Adicionar mais referencias e revisar.
 A verificação formal é uma área de pequisa que visa garantir a confiabilidade de sistemas críticos,
 como hardware e software, onde erros podem ter consequências graves. Entre as ferramentas utilizadas
-nesse contexto, os solucionadores SMT (Satisfiability Modulo Theories) desempenham um papel central
-ao permitir o raciocínio automático sobre diversas estruturas e operações, como as realizadas sobre
-vetores de bits (bit-vectors). Operações em bit-vectors são amplamente empregadas em circuitos
-digitais e modelagem de sistemas computacionais, mas sua análise pode ser desafiadora devido à
-complexidade combinatória envolvida.
-Para lidar com essas operações, técnicas como o bit-blasting convertem problemas envolvendo
-bit-vectors em restrições proposicionais, enquanto o uso de Pseudo-Booleanos oferece uma alternativa
-mais compacta e eficiente para representar essas operações. Nesse sentido a verificação da corretude
-dos solucionadores SMT, especialmente em casos de insatisfiabilidade (UNSAT), exige certificados de
-prova que podem ser verificados de forma independente. Este trabalho explora a integração dessas
-técnicas, propondo uma extensão do verificador de prova Carcara, que utiliza o formato Alethe,
-para lidar com bit-blasting baseado em Pseudo-Booleanos, buscando eficiência e precisão na
-validação de provas e resultados.
-
+nesse contexto, os solucionadores SMT como o cvc5\cite{Cvc5} desempenham um papel central ao permitir
+o raciocínio automático sobre diversas estruturas e operações, como as realizadas sobre
+vetores de bits, amplamente empregadas em circuitos digitais.
+% TODO: Cite some usage of bitvector reasoning for digital circuit verification
+Sendo este um processo complexo, técnicas como o bit-blasting são necessárias para dividir o problema
+de vetores de bits em termos menores, o que tradicionalmente é feito com valores proposicionais, agora
+experimentamos com valores pseudo-booleanos.
+Este trabalho explora a integração dessas técnicas, propondo uma extensão ao formato de prova Alethe \cite{Alethe}
+e do verificador Carcara \cite{Carcara}, buscando maior confiança e precisão na validação de provas e seus resultados.
 
 \section{Referencial Teórico}
 % Capítulo referencial: identificação de trabalhos correlatos, referencial teórico.
@@ -130,326 +123,20 @@ no formato Alethe.
 
 % TODO DAQUI PRA FRENTE
 
-% * Definição da inequação pseudo-booleana
-\subsection{Definição de Inequações Pseudo-Booleanas}
-Uma expressão booleana na forma CNF consiste de:
-\begin{equation}
-    C_1 \land C_2 \land \dots \land C_n
-\end{equation}
-em que,
-\begin{equation}
-    C_i = a_1^i \lor a_2^i \lor \dots \lor a_k^i
-\end{equation}
-e para cada $j$
-\begin{equation}
-    a_j^i \in \{ x_1,x_2,\dots,x_m,\neg x_1,\neg x_2,\dots, \neg x_m \}
-\end{equation}
-
-Um exemplo desse formato é a formula:
-\begin{equation}
-    (x_1 \lor x_2) \land (x_1 \lor \neg x_3) \land (x_2 \lor \neg x_3)
-\end{equation}
-Em que $x_1$, $x_2$ e $x_3$ são nossas variáveis booleanas e a atribuição $x_1=T$, $x_2=T$, $x_3=T$ satisfaz essa fórmula.
-
-O formato pseudo-booleano consiste de:
-\begin{equation}
-    \sum_i{a_i l_i} \ge A
-\end{equation}
-em que,
-\begin{equation}
-    \begin{gathered}
-        A, a_i \in \mathbb{N} \\
-        l_i \in \{ x_i, \overline x_i \}, \qquad x_i + \overline x_i = 1
-    \end{gathered}
-\end{equation}
-
-A mesma fórmula acima nesse formato é expressa por:
-\begin{equation}
-    x_1 + x_2 + \overline x_3 \ge 2
-\end{equation}
-
-Lean é uma linguagem de tipos dependentes, ou seja, é possível definir tipos que tem relações com valores concretos.
-Um caso útil é o tipo \texttt{Fin n}, que contém os números naturais até \texttt{n}.
-Para modelar os Pseudo-Booleanos utilizamos o tipo \texttt{Fin 2}, que contém os valores $0$ e $1$.
-
-Para os coeficientes \texttt{Coeff}, utilizamos a estrutura \texttt{FinVec},
-que permite definir uma lista com exatamente \texttt{n} elementos,
-expressa por uma função que toma um \texttt{Fin n} e retorna o elemento,
-em que cada um será um par de dois números naturais, o tipo $\mathbb{N}$ em Lean:
-\begin{minted}[fontsize=\small]{lean4}
-abbrev Coeff (n : ℕ) := Fin n → (ℕ × ℕ)
-\end{minted}
-
-Esse par consiste do coeficiente de $x_i$ no primeiro elemento e
-o coeficiente de $\overline x_i$ no segundo elemento.
-
-Com essa definição, definimos o \textit{PBSum}, que, com os coeficientes $cs$ e os valores 0-1 $xs$,
-utiliza o \textit{BigOperator} de somatório ($\sum$) para somar os elementos da lista iterando no índice $i$:
-\begin{minted}[fontsize=\small]{lean4}
-def PBSum (cs : Coeff n) (xs : Fin n → Fin 2) :=
-  ∑ i, let (p,n) := cs i;
-    if xs i = 1 then p else n
-\end{minted}
-
-E com esse somatório podemos agora criar o \textit{PBIneq} que é a verificação que o \textit{PBSum}
-é maior ou igual à constante $const$:
-\begin{minted}[fontsize=\small]{lean4}
-def PBIneq (cs : Coeff n) (xs : Fin n → Fin 2)
-    (const : ℕ) :=
-  PBSum cs xs ≥ const
-\end{minted}
-
-Para criar uma expressão desse tipo basta fornecer as listas de coeficientes, pseudo-booleanos e a constante,
-e em seguida provar que a propriedade vale:
-\\
-\begin{minted}[fontsize=\small]{lean4}
-example : PBIneq ![(1,0),(2,0)] ![0,1] 2 := by
-  -- Change goal to 1 * 0 + 2 * 1 ≥ 2
-  reduce               
-  -- Prove 1 * 0 + 2 * 1 ≥ 2
-  exact Nat.le_refl 2  
-  done
-\end{minted}
-
-O exemplo acima prova a expressão $x_1 + 2 x_2 \ge 2$, quando $x_1 = 0$ e $x_2 = 1$.
-
-
-% * Prova da Regra Multiplication
-\subsection{Prova da Regra Multiplicação}
-A primeira regra a ser formalizada é a multiplicação, que diz que dada uma inequação pseudo-booleana, podemos obter
-outra inequação válida ao multiplicar os coeficientes por um escalar natural $c \in \mathbb{N}^+ $, ao mesmo tempo que multiplicamos
-a constante pelo mesmo valor.
-
-\begin{equation}
-    \frac
-    {\sum_i{a_i l_i} \ge A}
-    {\sum_i{c a_i l_i} \ge c A}
-\end{equation}
-
-O teorema \textit{Multiplication} implementa esse comportamento em Lean:
-\begin{minted}[fontsize=\small]{lean4}
-theorem Multiplication
-  {xs : Fin n → Fin 2}
-  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
-  (c : ℕ)
-  : PBIneq (c • as) xs (c • A)
-\end{minted}
-
-Podemos usar o fato \texttt{nsmul\_le\_nsmul\_right} que, se $a \le b$, então $c \cdot a \le c \cdot b$, aplicamos isso em nossa premissa para obter:
-\begin{equation}
-    c \cdot \sum_i{a_i l_i} \ge c \cdot A
-\end{equation}
-
-Como a multiplicação por escalares já está definida na \textit{mathlib4} para
-os \texttt{FinVec}s pelo teorema \texttt{Finset.sum\_nsmul} da biblioteca,
-que diz:
-\begin{equation}
-    \sum_{x \in s}{n \cdot f(x)} = n \cdot \sum_{x \in s}{f(x)}
-\end{equation}
-
-Podemos aplicá-la da direita para esquerda para obter:
-\begin{equation}
-    \sum_i{c \cdot a_i l_i} \ge c \cdot A
-\end{equation}
-
-A prova completa se encontra no Apêndice B.
-
-
-% * Prova da Regra Saturation
-\subsection{Prova da Regra Saturação}
-A regra da Saturação permite substituir os coeficientes de uma inequação pelo \textit{mínimo} desse número com a constante $A$:
-\begin{equation}
-    \frac
-    {\sum_i{a_i l_i} \ge A}
-    {\sum_i{ \min(a_i,A)\cdot l_i} \ge A}
-\end{equation}
-
-O teorema \textit{Saturation} implementa esse comportamento ao aplicar \textit{map} na lista de coeficientes com a função
-\texttt{mapBoth (min A)}, que transforma ambos elementos do par no mínimo entre eles e a constante $A$:
-\begin{minted}[fontsize=\small]{lean4}
-theorem Saturation
-  {xs : Fin n → Fin 2}
-  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
-  : PBIneq (map (mapBoth (min A)) as) xs A
-\end{minted}
-
-Este teorema (Apêndice C) envolveu mais passos, pois não havia o mesmo suporte nativo da \textit{mathlib4}.
-O lema que provamos, chamado \texttt{le\_sum\_min\_of\_le\_sum} é o caso mais simples, onde trabalhamos com uma
-lista de naturais e desejamos mostrar que a relação menor-ou-igual se mantém ao aplicar o mínimo de $A$:
-\begin{minted}[fontsize=\small]{lean4}
-lemma le_sum_min_of_le_sum {n A : ℕ}
-  {as : Fin n → ℕ}
-  (h : A ≤ ∑i, as i)
-  : A ≤ ∑i, min A (as i)
-\end{minted}
-
-Em alto nível, podemos provar isso por casos:
-\begin{enumerate}
-    \item Todos os elementos de $as$ são menores-ou-iguais a $A$.
-          Nesse caso $\min(A,as_i) = as_i$, para todo $i$, logo temos a mesma lista.
-          % os elementos,
-          Então a afirmação vale pela hipótese.
-    \item Caso contrário, existe ao menos um índice $k$ da lista $as$, em que $as_k > A$.
-          Podemos dividir o somatório em $\sum_{i\neq k}{\min(A,as_i) + \min(A,as_k)}$, separando esse índice em específico.
-          Como $as_k > A$, substituímos $\min(A,as_k)$ por $A$.
-          Como queremos mostrar que $A \le \sum_{i\neq k}{\min(A,as_i) + A}$,
-          terminamos a prova com o teorema \texttt{Nat.le\_add\_left A}, que diz
-          $A \le B + A$, para qualquer $B \in \mathbb{N}$.
-
-\end{enumerate}
-
-
-% * Prova da Regra Division
-\subsection{Prova da Regra Divisão}
-A regra Divisão nos permite fazer o caminho inverso da Multiplicação, dividindo por um escalar $c \in \mathbb{N}^+$, com a diferença que divisões não exatas serão arrendondadas
-para cima:
-\begin{equation}
-    \frac
-    {\sum_i{a_i l_i} \ge A}
-    {\sum_i{ \lceil \frac{a_i}{c} \rceil l_i} \ge \lceil \frac{A}{c} \rceil}
-\end{equation}
-
-O teorema \textit{Division} implementa esse comportamento ao aplicar \textit{map} na lista de coeficientes com a função
-\texttt{mapBoth (ceildiv c)}, que divide ambos elementos do par por $c$, arredondando para cima:
-\begin{minted}[fontsize=\small]{lean4}
-theorem Division
-  {xs : Fin n → Fin 2}
-  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
-  (c : ℕ)
-  : PBIneq (map (mapBoth (ceildiv c)) as)
-    xs (ceildiv c A)
-\end{minted}
-
-Essa prova foi mais complexa, pois precisamos mostrar o comportamento para a lista toda,
-não sendo suficiente apenas mostrar para algum elemento em particular, como no caso da Saturação.
-Dispondo de ajuda pelo \textit{Zulip do Lean}, chegamos em dois lemas que permitem provar a propriedade.
-
-Mostramos primeiramente que, para dois elementos em isolados, a divisão com teto da soma é menor-ou-igual à soma das divisões com teto:
-\begin{minted}[fontsize=\small]{lean4}
-theorem Nat.add_ceildiv_le_add_ceildiv
-    (a b c : ℕ)
-  : (a + b) ⌈/⌉ c ≤ (a ⌈/⌉ c) + (b ⌈/⌉ c) 
-\end{minted}
-
-Com esse teorema, agora podemos criar uma prova por indução que vai valer para listas de qualquer tamanho:
-\begin{minted}[fontsize=\small]{lean4}
-theorem Finset.ceildiv_le_ceildiv {α : Type*}
-    (as : α → ℕ) (s : Finset α) (c : ℕ)
-  : (∑i in s, as i) ⌈/⌉ c
-  ≤ ∑i in s,(as i ⌈/⌉ c)
-\end{minted}
-
-O último detalhe que tivemos que provar é que podemos distribuir o \textit{ceildiv} sobre a expressão \texttt{if-then-else}:
-\begin{minted}[fontsize=\small]{lean4}
-lemma ceildiv_ite (P : Prop) [Decidable P]
-    (a b c : ℕ)
-  : (if P then b else c) ⌈/⌉ a
-  = if P then (b ⌈/⌉ a) else (c ⌈/⌉ a)
-\end{minted}
-
-Com isso concluímos a prova.
-
-
-
-% * Prova da Regra Addition
-\subsection{Prova da Regra Adição}
-Adição foi a última prova demonstrada, e se tornou a mais difícil, pois, além de somar duas inequações,
-dois literais de polaridades opostas se aniquilam, o que chamamos aqui de \textit{Redução}:
-
-\begin{equation}
-    \frac
-    {{\sum_i{a_i l_i} \ge A}\qquad {\sum_i{b_i l_i} \ge B}}
-    {\sum_i{(a_i + b_i) l_i} \ge (A+B)}
-\end{equation}
-
-Primeiro implementamos uma regra \textit{Addition'}, que realiza a adição diretamente sem a redução:
-
-\begin{minted}[fontsize=\small]{lean4}
-theorem Addition'
-  (xs : Fin n → Fin 2)
-  (as : Coeff n) (A : ℕ) (ha : PBIneq as xs A)
-  (bs : Coeff n) (B : ℕ) (hb : PBIneq bs xs B)
-  : PBIneq (as + bs) xs (A + B)
-\end{minted}
-
-Os teoremas da \textit{mathlib4} deram bom suporte à prova, o que \texttt{Finset.sum\_add\_distrib} resolveu em um passo.
-
-Um lema usado para seguir adiante foi \texttt{ite\_eq\_bmul},
-que nos permite transitar da notação \texttt{if-then-else}
-para a multiplicação dos termos pseudo-booleanos:
-
-\begin{minted}[fontsize=\small]{lean4}
-lemma ite_eq_bmul (x y : ℕ) (b : Fin 2)
-  : (if b = 1 then x else y)
-  = (x * b + y * (1 - b))
-\end{minted}
-
-Em seguida, implementamos a regra \textit{Reduction}, que toma uma inequação e aniquila coeficientes
-em que ambos elementos do par são maiores que $0$.
-Quando isso acontece, essa diferença "\textit{slack}" deve ser subtraída da constante:
-
-\begin{minted}[fontsize=\small]{lean4}
-def ReductionProp (xs : Fin n → Fin 2)
-    (ks : Coeff n) (K : ℕ) : Prop :=
-  let pos := λ i => ks i |>.1
-  let neg := λ i => ks i |>.2
-  let slack := (∑i, min (pos i) (neg i))
-  let rs := λ i => (pos i - neg i,neg i - pos i)
-  PBIneq rs xs (K - slack)
-
-theorem Reduction
-  (xs : Fin n → Fin 2)
-  (ks : Coeff n) (K : ℕ) (ha : PBIneq ks xs K)
-  : ReductionProp xs ks K
-\end{minted}
-
-Com esses dois teoremas, definimos \textit{Addition} compondo-os:
-
-\begin{minted}[fontsize=\small]{lean4}
-theorem Addition
-  {xs : Fin n → Fin 2}
-  {as : Coeff n} {A : ℕ} (ha : PBIneq as xs A)
-  {bs : Coeff n} {B : ℕ} (hb : PBIneq bs xs B)
-  : ReductionProp xs (as + bs) (A + B) := by
-  have hk := Addition' xs as A ha bs B hb
-  exact Reduction xs (as + bs) (A + B) hk
-  done
-\end{minted}
-
-% * Implementação do Toy Example
-
-\newpage
-\subsection{Implementação do Exemplo}
-Com todas as regras necessárias, prosseguimos para um exemplo retirado da apresentação
-(Apêndice F). Aqui podemos ver como usar as regras, com auxílio da tática \texttt{apply}.
-
-
-O leitor fica convidado a visitar o repositório público em \texttt{github.com/bernborgess/lean-cutting-planes}
-e tentar por conta própria.
-
-
 \section*{Conclusões}
 % Capítulo de fechamento: conclusões e relação de trabalhos futuros.
-Nós demonstramos a lógica de planos de corte como método correto para trabalhar com pseudo-booleanos.
-Com nossa biblioteca \texttt{lean-cutting-planes} agora podemos utilizar o sistema de tipos de Lean
-para validar com confiança passos dessa lógica. Com a documentação convidamos novos pesquisadores e
-matemáticos a usar os resultados em verificadores.
-
+% TODO
+% Nós demonstramos a lógica de planos de corte como método correto para trabalhar com pseudo-booleanos.
+% Com nossa biblioteca \texttt{lean-cutting-planes} agora podemos utilizar o sistema de tipos de Lean
+% para validar com confiança passos dessa lógica. Com a documentação convidamos novos pesquisadores e
+% matemáticos a usar os resultados em verificadores.
 
 \begin{thebibliography}{00}
-    \bibitem{Alethe}        ALETHE PAPER HERE, ``Am I watching enough cult movies?'', Novembro de 2023.
-    \bibitem{Carcara}       CARCARA PAPER HERE
-
-    % \bibitem{CutPlane}      J. Nordström, ``A Unified Proof System for Discrete Combinatorial Problems'', Novembro de 2023.
-    % \bibitem{SatLive}       D. Le Berre, ``Sat Live! keep up to date with research on the satisfiability problem'', Acesso em http://www.satlive.org/.
-    % \bibitem{SatComp}       M. Heule, M. Jävisalo, M. Suda, ``The International SAT Competition Web Page'', Acesso em https://satcompetition.github.io/.
-    % \bibitem{CNF}           ``Conjunctive normal form'', Encyclopedia of Mathematics, EMS Press, 2001.
-    % \bibitem{PBSolve}       J. Nordström, ``Pseudo-Boolean Solving and Optimization'', Fevereiro de 2021.
-    % \bibitem{LeanProver}    L. de Moura, S. Kong, J. Avigad, F. van Doorn, J. von Raumer ``The Lean Theorem Prover'', 25th International Conference on Automated Deduction (CADE-25), Berlin, Germany, 2015. Acesso em https://lean-lang.org/papers/system.pdf.
-    % \bibitem{Lean4}         L. de Moura, S. Ullrich ``The Lean 4 Theorem Prover and Programming Language'', 28th International Conference on Automated Deduction (CADE-28), Pittsburgh, USA, 2021. Acesso em https://lean-lang.org/papers/lean4.pdf.
-    % \bibitem{LTE}           J. Commelin, P. Scholze ``Liquid Tensor Experiment''. Acesso em https://math.commelin.net/files/LTE.pdf
-    % \bibitem{PFR}           T. Tao, ``The Polynomial Freiman-Ruzsa Conjecture'', Novembro de 2023. Acesso em https://teorth.github.io/pfr/.
-    % \bibitem{mathlib4}      The mathlib Community. 2020. ``The lean mathematical library''. In CPP 2020. 367-381. https://doi.org/10.1145/3372885.3373824
+    \bibitem{Cvc5}          H. Barbosa, C. W. Barrett, M. Brain, G. Kremer, H. Lachnitt, M. Mann, A. Mohamed, M. Mohamed, A. Niemetz, A. Nötzli, A. Ozdemir, M. Preiner, A. Reynolds, Y. Sheng, C. Tinelli, Y. Zohar, ``cvc5: A Versatile and Industrial-Strength SMT Solver'', Abril de 2022, Acesso em https://link.springer.com/chapter/10.1007/978-3-030-99524-9\_24.
+    \bibitem{Alethe}        H. Barbosa, M. Fleury, P. Fontaine, H. Schurr, ``The Alethe Proof Format - An Evolving Specification and Reference'', Dezembro de 2024, Acesso em https://verit.gitlabpages.uliege.be/alethe/specification.pdf.
+    \bibitem{Carcara}       B. Andreotti, H. Lachnitt, H. Barbosa ``Carcara: An Efficient Proof Checker and Elaborator for SMT Proofs in the Alethe Format'', Abril de 2023, Acesso em https://link.springer.com/chapter/10.1007/978-3-031-30823-9\_19.
+    \bibitem{CNF}           ``Conjunctive normal form'', Encyclopedia of Mathematics, EMS Press, 2001.
+    \bibitem{PBSolve}       J. Nordström, ``Pseudo-Boolean Solving and Optimization'', Fevereiro de 2021.
 \end{thebibliography}
 
 \end{document}
