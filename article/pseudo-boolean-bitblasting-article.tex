@@ -121,6 +121,7 @@ pseudo booleano para cada operação suportada entre bit-vectors, e então a imp
 \textit{checker} no projeto Carcara que permite verificar a correta aplicação de tais regras
 no formato Alethe.
 
+\section{Definição das Regras em Alethe}
 \subsection{Formato das Inequações Pseudo-Booleanas}
 Uma inequação pseudo-booleana é uma desigualdade da seguinte forma:
 \[
@@ -167,10 +168,9 @@ e são definidas como
 
 Todos os outros conceitos não relacionados a essas regras usarão as mesmas definições de bitblasting proposicional.
 
-\subsection{Definição das Regras em Alethe}
-\subsubsection{Regras de Predicados}
+\subsection{Regras de Predicados}
+\subsubsection{\textbf{pbblast\_bveq}}
 \noindent\\
-\textbf{pbblast\_bveq}\\
 Considere os bitvectors \textbf{x} e \textbf{y} de comprimento $n$.
 O bitblasting pseudo-booleano de sua igualdade é expresso por:
 \begin{align*}
@@ -181,8 +181,8 @@ Em que o termo ``$A$'' é a restrição pseudo-booleana:
 
 \[ \sum_{i=0}^{n-1}{2^i x_{n-i-1}} - \sum_{i=0}^{n-1}{2^i y_{n-i-1}} = 0\]
 
+\subsubsection{\textbf{pbblast\_bvult}}
 \noindent\\
-\textbf{pbblast\_bvult}\\
 A operação `unsigned-less-than', menor ou igual, sem sinal, sobre BitVectors com $n$ bits é
 expressa por:
 \begin{align*}
@@ -195,8 +195,8 @@ Em que o termo ``$A$'' é a restrição pseudo-booleana:
     \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} \ge 1.
 \]
 
+\subsubsection{\textbf{pbblast\_bvugt}}
 \noindent\\
-\textbf{pbblast\_bvugt}\\
 A operação `unsigned-greater-than', maior sem sinal, sobre BitVectors com $n$ bits é expressa por:
 \begin{align*}
     i. \vartriangleright &  & (\textbf{bvugt}\ x\ y) \approx A &  & (\text{pbblast\_bvugt})
@@ -212,8 +212,8 @@ Alternativamente, em termos de \textbf{pbblast\_bvult}, temos:
     i. \vartriangleright &  & (\textbf{bvugt}\ x\ y) \approx (\textbf{bvult}\ y\ x) &  & (\text{pbblast\_bvugt})
 \end{align*}
 
+\subsubsection{\textbf{pbblast\_bvuge}}
 \noindent\\
-\textbf{pbblast\_bvuge}\\
 A operação `unsigned-greater-or-equal', maior ou igual sem sinal, sobre BitVectors com $n$ bits é expressa por:
 \begin{align*}
     i. \vartriangleright &  & (\textbf{bvuge}\ x\ y) \approx A &  & (\text{pbblast\_bvuge})
@@ -224,8 +224,8 @@ Em que o termo ``$A$'' é verdadeiro se, e somente se:
     \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} \ge 0.
 \]
 
+\subsubsection{\textbf{pbblast\_bvule}}
 \noindent\\
-\textbf{pbblast\_bvule}\\
 A operação `unsigned-less-or-equal', menor ou igual sem sinal, sobre BitVectors com $n$ bits é expressa por:
 \begin{align*}
     i. \vartriangleright &  & (\textbf{bvule}\ x\ y) \approx A &  & (\text{pbblast\_bvule})
@@ -241,8 +241,8 @@ Alternativamente, em termos de \textbf{pbblast\_bvuge}, temos:
     i. \vartriangleright &  & (\textbf{bvule}\ x\ y) \approx (\textbf{bvuge}\ y\ x) &  & (\text{pbblast\_bvule})
 \end{align*}
 
+\subsubsection{\textbf{pbblast\_bvslt}}
 \noindent\\
-\textbf{pbblast\_bvslt}\\
 A operação `signed-less-than', menor com sinal, sobre BitVectors com $n$ bits é expressa por:
 \begin{align*}
     i. \vartriangleright &  & (\textbf{bvslt}\ x\ y) \approx A &  & (\text{pbblast\_bvslt})
@@ -253,8 +253,8 @@ Em que o termo ``$A$'' é verdadeiro se, e somente se:
     -(2^{n-1})\mathbf{y}_0 + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} + 2^{n-1} \mathbf{x}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} \geq 1
 \]
 
+\subsubsection{\textbf{pbblast\_bvsgt}}
 \noindent\\
-\textbf{pbblast\_bvsgt}\\
 A operação `signed-greater-than', maior com sinal, sobre BitVectors com $n$ bits é expressa por:
 \begin{align*}
     i. \vartriangleright &  & (\textbf{bvsgt}\ x\ y) \approx A &  & (\text{pbblast\_bvsgt})
@@ -270,8 +270,8 @@ Alternativamente, em termos de \textbf{pbblast\_bvslt}, temos:
     i. \vartriangleright &  & (\textbf{bvsgt}\ x\ y) \approx (\textbf{bvslt}\ y\ x) &  & (\text{pbblast\_bvsgt})
 \end{align*}
 
+\subsubsection{\textbf{pbblast\_bvsge}}
 \noindent\\
-\textbf{pbblast\_bvsge}\\
 A operação `signed-greater-or-equal', maior ou igual com sinal, sobre BitVectors com $n$ bits é expressa por:
 \begin{align*}
     i. \vartriangleright &  & (\textbf{bvsge}\ x\ y) \approx A &  & (\text{pbblast\_bvsge})
@@ -282,8 +282,8 @@ Em que o termo ``$A$'' é verdadeiro se, e somente se:
     -(2^{n-1})\mathbf{x}_{0} + \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} + 2^{n-1}\mathbf{y}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} \geq 0
 \]
 
+\subsubsection{\textbf{pbblast\_bvsle}}
 \noindent\\
-\textbf{pbblast\_bvsle}\\
 A operação `signed-less-or-equal', menor ou igual com sinal, sobre BitVectors com $n$ bits é expressa por:
 \begin{align*}
     i. \vartriangleright &  & (\textbf{bvsle}\ x\ y) \approx A &  & (\text{pbblast\_bvsle})
@@ -299,10 +299,54 @@ Alternativamente, em termos de \textbf{pbblast\_bvsge}, temos:
     i. \vartriangleright &  & (\textbf{bvsle}\ x\ y) \approx (\textbf{bvsge}\ y\ x) &  & (\text{pbblast\_bvsle})
 \end{align*}
 
+\subsection{Regras Aritméticas}
+\subsubsection{\textbf{pbblast\_pbbvar}}
+\noindent\\
+Conversão de um BitVector de $n$ bits para $n$ variáveis pseudo-booleanas introduzidas com \textbf{pbbT}:
+\begin{align*}
+    i. \vartriangleright &  & x \approx \textbf{pbbT}\; x_1 \dots x_{n+1} &  & (\text{pbblast\_pbbvar})
+\end{align*}
 
-\subsubsection{Regras de IDK}
+\subsubsection{\textbf{pbblast\_pbbconst}}
+\noindent\\
+Restrições para cada bit do bitvector constante $b$:
+\begin{align*}
+    i.\vartriangleright & \left(b \approx \textbf{pbbT}r\right) \land \bigwedge_{i=0}^{n-1}{\left(r_i = \textbf{VAL}(b_{n-i-1})\right)}\ (\text{pbblast\_bvsle})
+\end{align*}
+Em que expandimos \textbf{VAL($b_i$)} em:
+\begin{itemize}
+    \item $\left(b_i = 0\right)$ se $b_i$ é $0$
+    \item $\left(b_i = 1\right)$ se $b_i$ é $1$
+\end{itemize}
 
-\subsection{Verificação das Regras no Carcara}
+\subsubsection{\textbf{pbblast\_bvxor}}
+\noindent\\
+A operação `bvxor' sobre BitVectors com $n$ bits é expressa usando desigualdades PseudoBooleanas por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvxor}\ x\ y) \approx [r_0,\dots,r_1] \land A &  & (\text{pbblast\_bvxor})
+\end{align*}
+O termo ``$A$'' é a conjunção dessas desigualdades pseudo-booleanas e o termo \textbf{r} representa
+o resultado da operação `bvxor' entre \textbf{x} e \textbf{y}, para $0 \le i < n$:
+
+\[ -\textbf{r}_i+\textbf{x}_i+\textbf{y}_i\ge 0 \]
+\[ -\textbf{r}_i-\textbf{x}_i-\textbf{y}_i\ge -2 \]
+\[ \textbf{r}_i+\textbf{x}_i-\textbf{y}_i\ge 0 \]
+\[ \textbf{r}_i-\textbf{x}_i+\textbf{y}_i\ge 0 \]
+
+\subsubsection{\textbf{pbblast\_bvand}}
+\noindent\\
+A operação `bvand' sobre BitVectors com $n$ bits é expressa usando desigualdades PseudoBooleanas por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvand}\ x\ y) \approx [r_0,\dots,r_1] \land A &  & (\text{pbblast\_bvand})
+\end{align*}
+O termo ``$A$'' é a conjunção dessas desigualdades pseudo-booleanas e o termo \textbf{r} representa
+o resultado da operação `bvand' entre \textbf{x} e \textbf{y}, para $0 \le i < n$:
+
+\[ \textbf{x}_i-\textbf{r}_i\ge 0 \]
+\[ \textbf{y}_i-\textbf{r}_i\ge 0 \]
+\[ \textbf{r}_i-\textbf{x}_i-\textbf{y}_1\ge -1 \]
+
+\section{Verificação das Regras no Carcara}
 
 \begin{minted}{rust}
 pub fn main() {
