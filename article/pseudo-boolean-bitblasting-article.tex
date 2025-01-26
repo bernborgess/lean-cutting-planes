@@ -169,6 +169,136 @@ Todos os outros conceitos não relacionados a essas regras usarão as mesmas def
 
 \subsection{Definição das Regras em Alethe}
 \subsubsection{Regras de Predicados}
+\noindent\\
+\textbf{pbblast\_bveq}\\
+Considere os bitvectors \textbf{x} e \textbf{y} de comprimento $n$.
+O bitblasting pseudo-booleano de sua igualdade é expresso por:
+\begin{align*}
+    i. \vartriangleright & (=\ x\ y) \approx A &  & (\text{pbblast\_bveq})
+\end{align*}
+
+Em que o termo ``$A$'' é a restrição pseudo-booleana:
+
+\[ \sum_{i=0}^{n-1}{2^i x_{n-i-1}} - \sum_{i=0}^{n-1}{2^i y_{n-i-1}} = 0\]
+
+\noindent\\
+\textbf{pbblast\_bvult}\\
+A operação `unsigned-less-than', menor ou igual, sem sinal, sobre BitVectors com $n$ bits é
+expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvult}\ x\ y) \approx A &  & (\text{pbblast\_bvult})
+\end{align*}
+
+Em que o termo ``$A$'' é a restrição pseudo-booleana:
+
+\[
+    \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} \ge 1.
+\]
+
+\noindent\\
+\textbf{pbblast\_bvugt}\\
+A operação `unsigned-greater-than', maior sem sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvugt}\ x\ y) \approx A &  & (\text{pbblast\_bvugt})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} \ge 1.
+\]
+
+Alternativamente, em termos de \textbf{pbblast\_bvult}, temos:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvugt}\ x\ y) \approx (\textbf{bvult}\ y\ x) &  & (\text{pbblast\_bvugt})
+\end{align*}
+
+\noindent\\
+\textbf{pbblast\_bvuge}\\
+A operação `unsigned-greater-or-equal', maior ou igual sem sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvuge}\ x\ y) \approx A &  & (\text{pbblast\_bvuge})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} \ge 0.
+\]
+
+\noindent\\
+\textbf{pbblast\_bvule}\\
+A operação `unsigned-less-or-equal', menor ou igual sem sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvule}\ x\ y) \approx A &  & (\text{pbblast\_bvule})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} \ge 0.
+\]
+
+Alternativamente, em termos de \textbf{pbblast\_bvuge}, temos:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvule}\ x\ y) \approx (\textbf{bvuge}\ y\ x) &  & (\text{pbblast\_bvule})
+\end{align*}
+
+\noindent\\
+\textbf{pbblast\_bvslt}\\
+A operação `signed-less-than', menor com sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvslt}\ x\ y) \approx A &  & (\text{pbblast\_bvslt})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    -(2^{n-1})\mathbf{y}_0 + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} + 2^{n-1} \mathbf{x}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} \geq 1
+\]
+
+\noindent\\
+\textbf{pbblast\_bvsgt}\\
+A operação `signed-greater-than', maior com sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvsgt}\ x\ y) \approx A &  & (\text{pbblast\_bvsgt})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    -(2^{n-1})\mathbf{x}_0 + \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} + 2^{n-1} \mathbf{y}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} \geq 1
+\]
+
+Alternativamente, em termos de \textbf{pbblast\_bvslt}, temos:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvsgt}\ x\ y) \approx (\textbf{bvslt}\ y\ x) &  & (\text{pbblast\_bvsgt})
+\end{align*}
+
+\noindent\\
+\textbf{pbblast\_bvsge}\\
+A operação `signed-greater-or-equal', maior ou igual com sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvsge}\ x\ y) \approx A &  & (\text{pbblast\_bvsge})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    -(2^{n-1})\mathbf{x}_{0} + \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} + 2^{n-1}\mathbf{y}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} \geq 0
+\]
+
+\noindent\\
+\textbf{pbblast\_bvsle}\\
+A operação `signed-less-or-equal', menor ou igual com sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvsle}\ x\ y) \approx A &  & (\text{pbblast\_bvsle})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    -(2^{n-1})\mathbf{y}_{0} + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} + 2^{n-1}\mathbf{x}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} \geq 0
+\]
+
+Alternativamente, em termos de \textbf{pbblast\_bvsge}, temos:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvsle}\ x\ y) \approx (\textbf{bvsge}\ y\ x) &  & (\text{pbblast\_bvsle})
+\end{align*}
+
 
 \subsubsection{Regras de IDK}
 
