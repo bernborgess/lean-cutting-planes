@@ -38,16 +38,23 @@
 \end{IEEEkeywords}
 
 \section{Introdução}
+% TODO: Adicionar mais referencias e revisar.
+A verificação formal é uma área de pequisa que visa garantir a confiabilidade de sistemas críticos,
+como hardware e software, onde erros podem ter consequências graves. Entre as ferramentas utilizadas
+nesse contexto, os solucionadores SMT (Satisfiability Modulo Theories) desempenham um papel central
+ao permitir o raciocínio automático sobre diversas estruturas e operações, como as realizadas sobre
+vetores de bits (bit-vectors). Operações em bit-vectors são amplamente empregadas em circuitos
+digitais e modelagem de sistemas computacionais, mas sua análise pode ser desafiadora devido à
+complexidade combinatória envolvida.
+Para lidar com essas operações, técnicas como o bit-blasting convertem problemas envolvendo
+bit-vectors em restrições proposicionais, enquanto o uso de Pseudo-Booleanos oferece uma alternativa
+mais compacta e eficiente para representar essas operações. Nesse sentido a verificação da corretude
+dos solucionadores SMT, especialmente em casos de insatisfiabilidade (UNSAT), exige certificados de
+prova que podem ser verificados de forma independente. Este trabalho explora a integração dessas
+técnicas, propondo uma extensão do verificador de prova Carcara, que utiliza o formato Alethe,
+para lidar com bit-blasting baseado em Pseudo-Booleanos, buscando eficiência e precisão na
+validação de provas e resultados.
 
-% TODO
-HUH
-% O cálculo formal de Planos de Corte\cite{CutPlane} é uma técnica matemática utilizada na área de otimização,
-% particularmente em Programação Linear.
-% Neste trabalho, procuramos trazer essa lógica para os resultados formalizados em \texttt{Lean 4},
-% seguindo a tendência crescente no mundo da matemática e atendendo a necessidade de confiança
-% nos resultados de solucionadores. Além da formalização, procuramos aqui disponibilizar estes
-% resultados para a comunidade em geral, para que mais integrações entre projetos possam ser possíveis
-% no futuro.
 
 \section{Referencial Teórico}
 % Capítulo referencial: identificação de trabalhos correlatos, referencial teórico.
