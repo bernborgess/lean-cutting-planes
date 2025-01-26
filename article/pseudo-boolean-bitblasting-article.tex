@@ -121,7 +121,53 @@ pseudo booleano para cada operação suportada entre bit-vectors, e então a imp
 \textit{checker} no projeto Carcara que permite verificar a correta aplicação de tais regras
 no formato Alethe.
 
-% TODO DAQUI PRA FRENTE
+\subsection{Formato das Inequações Pseudo-Booleanas}
+Uma inequação pseudo-booleana é uma desigualdade da seguinte forma:
+\[
+    \sum_i a_i \cdot l_i \geq A
+\]
+onde $A$ é chamado de \textbf{constante}, $a_i$ são \textbf{coeficientes},
+e $l_i$ são \textbf{literais}, que são:
+\begin{itemize}
+    \item \textbf{literal} simples, um termo \texttt{x};
+    \item literal \textbf{negado}, um termo da forma \texttt{(- 1 x)}
+\end{itemize}
+
+em que o valor \texttt{x} é uma variável pseudo-booleana, ou seja, ele resolverá para valores
+\texttt{0} ou \texttt{1}. Todos esses valores são do tipo \textbf{Int}.
+
+Para formar um somatório, usamos uma lista de termos somados da forma,
+\texttt{(+ <T1> <T2> ... 0)} sempre terminando com um \textbf{0}, e cada termo é
+\texttt{(* $a_i$ <L1>)}, com um coeficiente e um literal.
+
+\subsection{BitBlasting PseudoBooleano em Alethe}
+Similarmente ao bitblasting regular, o cálculo Alethe usa várias famílias de funções auxiliares
+para expressar bitblasting pseudo-booleano.
+As funções $\textbf{bvsize}$ e $\textbf{bv}_n^i$ funcionam da mesma forma que no bitblasting regular,
+ao passo que $\textbf{pbbT}$ e $\textbf{intOf}_m$ introduzem e eliminam a representação em
+pseudo-booleanos de um BitVector, que são representados como valores de \textbf{Int}.
+
+A família $\textbf{pbbT}$ consiste em uma função para cada bitvector de \textit{sort} $(\textbf{BitVec}\;n)$:
+\[
+    \textbf{pbbT}\,:\,\underbrace{\textbf{Int}\,\dots\,\textbf{Int}}_n\;(\textbf{BitVec}\;n).
+\]
+
+\subsection{Definição das Regras em Alethe}
+\subsubsection{Regras de Predicados}
+
+\subsubsection{Regras de IDK}
+
+\subsection{Verificação das Regras no Carcara}
+
+\begin{minted}{rust}
+pub fn main() {
+    println!("Hello World!");
+}
+\end{minted}
+
+Essa regra expressa como algo pode estar
+
+
 
 \section*{Conclusões}
 % Capítulo de fechamento: conclusões e relação de trabalhos futuros.
