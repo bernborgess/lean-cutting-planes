@@ -151,6 +151,21 @@ A família $\textbf{pbbT}$ consiste em uma função para cada bitvector de \text
 \[
     \textbf{pbbT}\,:\,\underbrace{\textbf{Int}\,\dots\,\textbf{Int}}_n\;(\textbf{BitVec}\;n).
 \]
+o que toma uma lista de argumentos pseudo-booleanos e os agrega em um bitvector.
+
+As funções $\textbf{intOf}_m$ são o inverso de $\textbf{pbbT}$. Elas extraem
+um bit de um bitvector como um pseudo-booleano. Assim como o símbolo $\textbf{extract}$,
+$\textbf{intOf}_m$ é usado como um símbolo indexado. Portanto, para $m \leq n$,
+escrevemos \texttt{(\_ @intOf $m$ )}, para denotar funções
+\[
+    \textbf{intOf}_m : (\textbf{BitVec}\;n) \to \textbf{Int}.
+\]
+e são definidas como
+\[
+    \textbf{intOf}_m \langle u_1, \dots, u_n \rangle := u_m.
+\]
+
+Todos os outros conceitos não relacionados a essas regras usarão as mesmas definições de bitblasting proposicional.
 
 \subsection{Definição das Regras em Alethe}
 \subsubsection{Regras de Predicados}
