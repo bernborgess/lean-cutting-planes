@@ -347,14 +347,83 @@ o resultado da operação `bvand' entre \textbf{x} e \textbf{y}, para $0 \le i <
 \[ \textbf{r}_i-\textbf{x}_i-\textbf{y}_1\ge -1 \]
 
 \section{Verificação das Regras no Carcara}
+Com a definição das regras, partimos para a implementação do checker dentro do Carcara.
+O primeiro passo é alterações na `ast', a árvore de sintaxe abstrata que faz a leitura de um
+arquivo de prova no formato alethe e obtém uma representação da estrutura dos termos envolvidos
+naquela regra. Como um parser para esse formato já existe no projeto, temos apenas que estendê-lo
+para aceitar os novos símbolos \texttt{pbbT} e \texttt{int\_of}, para introdução e eliminação de
+bitvectors por meio de variáveis pseudo-booleanas, nesse caso, \textbf{Int}.
 
-\begin{minted}{rust}
-pub fn main() {
-    println!("Hello World!");
+\subsubsection{Extensão do Parser}
+\noindent\\
+No arquivo \texttt{carcara/src/ast/term.rs} criamos novos construtores:
+
+\begin{minted}[fontsize=\footnotesize]{rust}
+pub enum Operator {
+    // ...
+    BvPBbTerm
+}
+pub enum ParamOperator {
+    // ...
+    BvIntOf
+}
+\end{minted}
+Com essa extensão podemos usar `int\_of' e `pbbterm' nos nossos testes e arquivos contendo
+estes símbolos serão corretamente lidos pelo sistema.
+\subsubsection{Verificação de Regras}
+\noindent\\
+Podemos dessa forma implementar a verificação de aplicações corretas de cada regra, o que se
+dará no arquivo\\ `\texttt{carcara/src/checker/rules/pb\_blasting.rs}',
+
+Vejamos com mais detalhes a verificação da regra \textbf{pbblast\_bveq}:
+% TODO: Put code in appendix, just name a pseudo-code here for clarity
+\begin{minted}[fontsize=\footnotesize]{rust}
+pub fn pbblast_bveq(RuleArgs {
+    pool, args, conclusion, .. }: RuleArgs)
+    -> RuleResult {
+    let ((x, y), ((sum_x, sum_y), _)) = ?;
+    let Sort::BitVec(size) = pool.sort(x).?
+        unreachable!();
+    let size = size.to_usine().unwrap();
+    Ok(())
 }
 \end{minted}
 
-Essa regra expressa como algo pode estar
+O código completo dessa verificação pode ser encontrado no apêndice, mas o que podemos
+analisar aqui é que várias propriedades sintáticas são testadas pelo código:
+\begin{itemize}
+    \item O número de argumentos aplicados à regra é o esperado?
+    \item O tipo dos termos aplicados é apropriado (testado pelo parser)?
+          % TODO: mais propriedades aqui
+\end{itemize}
+
+Para atender todos estes aspectos é que o Carcara implementa para cada nova construção um
+conjunto de testes de unidade, que são executados rapidamente e além de evitar possíveis erros,
+servem como documentação viva do comportamento esperado por cada regra. Continuando o exemplo
+da regra \textbf{pbblast\_bveq}, vejamos um destes testes:
+\begin{minted}[fontsize=\footnotesize]{rust}
+mod tests {
+  #[test]
+  fn pbblast_bveq() {
+    test_cases! {
+     definitions = "
+        (declare-const x1 (_ BitVec 1))
+        (declare-const y1 (_ BitVec 1))
+        ",
+     "Equality on single bits" {
+       r#"(step t1 (cl
+         (= (= x1 y1)
+         (= (-
+              (+ (* 1 ((_ int_of 0) x1)) 0)
+              (+ (* 1 ((_ int_of 0) y1)) 0)
+            ) 0))) :rule pbblast_bveq)"#: true,
+      }
+    }
+  }
+}
+\end{minted}
+Aqui podemos ver um teste que espera \textbf{true}, ou seja, deve ser julgado como uma aplicação
+correta da regra \texttt{pbblast\_bveq}.
 
 
 
