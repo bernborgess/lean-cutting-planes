@@ -15,7 +15,7 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{Formalizando Bit-blasting com Pseudo-booleanos e verificando sua aplicação\\
+\title{Formalizando Bit-blasting com Pseudo-booleanos e verificando no projeto Carcara\\
 {\footnotesize Projeto Orientado em Computação II - Pesquisa Científica}
 }
 
@@ -40,24 +40,42 @@
 \section{Introdução}
 
 % TODO
-O cálculo formal de Planos de Corte\cite{CutPlane} é uma técnica matemática utilizada na área de otimização,
-particularmente em Programação Linear.
-Neste trabalho, procuramos trazer essa lógica para os resultados formalizados em \texttt{Lean 4},
-seguindo a tendência crescente no mundo da matemática e atendendo a necessidade de confiança
-nos resultados de solucionadores. Além da formalização, procuramos aqui disponibilizar estes
-resultados para a comunidade em geral, para que mais integrações entre projetos possam ser possíveis
-no futuro.
+HUH
+% O cálculo formal de Planos de Corte\cite{CutPlane} é uma técnica matemática utilizada na área de otimização,
+% particularmente em Programação Linear.
+% Neste trabalho, procuramos trazer essa lógica para os resultados formalizados em \texttt{Lean 4},
+% seguindo a tendência crescente no mundo da matemática e atendendo a necessidade de confiança
+% nos resultados de solucionadores. Além da formalização, procuramos aqui disponibilizar estes
+% resultados para a comunidade em geral, para que mais integrações entre projetos possam ser possíveis
+% no futuro.
 
 \section{Referencial Teórico}
 % Capítulo referencial: identificação de trabalhos correlatos, referencial teórico.
 
-% TODO
-\subsection{Satisfatibilidade}
-O problema da satisfatibilidade booliana (SAT) é muito importante para a Ciência da Computação, sendo o
-primeiro demonstrado ser NP-Completo. Ele é o problema de decidir para dada expressão booleana
-se é possível escolher valores para as variáveis de forma que a expressão como um todo seja verdadeira.
-Este problema é extensivamente pesquisado na área de métodos formais\cite{SatLive} e existem inclusive competições para
-definir qual é o melhor solucionador do mundo \cite{SatComp}.
+\subsection{Aritmética de Bit-Vectors}
+A aritmética de Bit-Vectors é amplamente utilizada em áreas como verificação formal,
+circuitos digitais e design de hardware, pois permite modelar o comportamento de sistemas
+que operam diretamente em representações binárias. Um vetor de bits é uma sequência de bits
+(0s e 1s) de comprimento fixo, onde cada bit representa um dígito binário. Operações como soma,
+subtração, multiplicação e deslocamento são realizadas diretamente sobre esses vetores,
+respeitando restrições como largura fixa e ocorrência de overflow.
+
+
+\subsection{Bit Blasting}
+Uma forma que solucionadores SMT utilizam para raciocinar sobre tais Bit-Vectors é o bit-blasting,
+uma representação que utiliza-se de uma variável proposicional para cada bit, o que então pode ser
+repassado para outras regras de raciocínio.
+
+O bit-blasting converte operações aritméticas e lógicas em vetores de bits para fórmulas
+proposicionais que podem ser resolvidas por solucionadores SAT (Satisfiability). Nesse processo,
+cada bit de um vetor é tratado como uma variável proposicional independente, e as operações sobre
+os vetores são traduzidas em expressões lógicas que representam o comportamento bit a bit.
+Por exemplo, uma operação de soma em vetores de bits pode ser reduzida a uma série de expressões que
+modelam o comportamento de somadores completos e meio-somadores, incluindo a propagação de carry
+(ou transporte) entre os bits. Assim, uma operação que ocorre em um nível mais abstrato, como
+$A + B$, é traduzida em uma série de restrições lógicas que descrevem a interação entre os bits
+individuais de $A$ e $B$.
+
 
 \subsection{Pseudo-Booleanos}
 Um formato comumente utilizado para representar expressões booleanas é a Forma Normal Conjuntiva (CNF), que
@@ -67,33 +85,43 @@ desde os anos 1960 na área de pesquisa operacional, em programação inteira. E
 do produto de um coeficiente por um literal, que é maior ou igual a uma constante natural.
 Este formato é exponencialmente mais compacto que o CNF, o que motiva seu uso\cite{PBSolve}.
 
-\subsection{Raciocínio Pseudo-Booleano}
-A lógica formal de Planos de Corte introduz 2 axiomas e 4 regras de inferência, nomeadamente
-\textbf{Adição}, \textbf{Multiplicação}, \textbf{Divisão} e \textbf{Saturação},
-que permitem derivar novas inequações a partir de outras\cite{CutPlane},
-o que será detalhado na próxima seção. Com essa regras, podemos manipular as equações
-de forma algébrica e construir uma árvore de derivação que demonstra novos resultados,
-unindo somatórios diferentes pela adição, e variando seus coeficientes pela multiplicação,
-divisão ou saturação.
 
-\subsection{Lean Theorem Prover}
-Lean é uma linguagem de programação e provador de teoremas criado por Leonardo de Moura em 2013\cite{LeanProver}, com
-influência de ML, Coq e Haskell.
-A sua versão mais atual de 2021, Lean 4\cite{Lean4}, se tornou proeminente entre matemáticos, por permitir a
-\textbf{formalização} e \textbf{verificação} de teoremas, auxiliando o trabalho teórico.
-Em 2021, uma equipe de pesquisadores usou o Lean para verificar a correção de uma prova de Peter Scholze na área
-de matemática condensada\cite{LTE}, o que atraiu atenção por formalizar um resultado na vanguarda da pesquisa matemática.
-Em 2023, Terence Tao usou o Lean para formalizar uma prova da conjectura Polinomial de Freiman-Ruzsa\cite{PFR},
-um resultado publicado por Tao e colaboradores no mesmo ano.
+\subsection{Bit Blasting Pseudo Booleano}
+Aproveitando sua estrutura, os Pseudo-Booleanos oferecem uma abordagem alternativa para o
+processo de Bit Blasting, permitindo uma representação mais direta da semântica
+associada a vetores de bits. Essa semântica está relacionada ao significado numérico ou lógico
+dos vetores, que pode ser expressa utilizando coeficientes que ponderam a contribuição de cada
+bit em cálculos aritméticos ou restrições lógicas
+
+
+\subsection{Formato de Prova Alethe}
+A corretude é uma preocupação central em solucionadores SMT, dado que eles são amplamente
+utilizados em verificação formal, onde a precisão é essencial para garantir que sistemas críticos
+funcionem conforme especificado. No entanto, provar a corretude desses solucionadores é um desafio
+devido à vasta base de código e às constantes inovações que introduzem alterações frequentes.
+Quando um solucionador SMT retorna um resultado `SAT', é relativamente simples verificar de forma
+independente se o modelo gerado satisfaz todas as condições impostas. Contudo, no caso de um
+resultado `UNSAT', a verificação da corretude requer um \textit{certificado}, ou seja, um registro
+detalhado dos passos de raciocínio que levaram à conclusão de insatisfiabilidade.
+Nesse sentido, foi desenvolvido o formato Alethe\cite{Alethe}, inspirado na linguagem SMT-LIB, que representa de
+forma flexível e padronizada as provas geradas por solucionadores SMT, que podem ser verificados de
+forma independente.
+
+
+\subsection{Verificador de prova Carcara}
+Carcara\cite{Carcara} é um verificador de prova desenvolvido em Rust pelo laboratório SMITE da UFMG,
+sob a liderança do professor Haniel Barbosa, projetado para verificar certificados de prova no
+formato Alethe. Este projeto permite a identificação de erros lógicos nos sistemas que geram
+esses certificados, aumentando a confiança nos resultados apresentados.
 
 \section{Contribuições}
 % Capítulo de contribuição: descrição organizada das atividades conduzidas pelo aluno.
-A contribuição deste trabalho está na criação de código em Lean 4 para lidar com a lógica de cutting planes.
-Com essa implementação conseguimos demonstrar formalmente que as regras são corretas, ao verificá-las pelo sistema de tipos de Lean.
-Primeiramente, as inequações foram formalmente definidas utilizando teoremas e definições da biblioteca
-matemática \textit{mathlib4}\cite{mathlib4}.
-Assim, as quatro regras foram definidas e formalizadas, e, em seguida,
-um exemplo de raciocínio apresentado por Jakob Nordström foi formalizado nessa biblioteca.
+A contribuição deste trabalho está na definição dos passos tomados para realizar bit-blasting
+pseudo booleano para cada operação suportada entre bit-vectors, e então a implementação do
+\textit{checker} no projeto Carcara que permite verificar a correta aplicação de tais regras
+no formato Alethe.
+
+% TODO DAQUI PRA FRENTE
 
 % * Definição da inequação pseudo-booleana
 \subsection{Definição de Inequações Pseudo-Booleanas}
@@ -402,16 +430,19 @@ matemáticos a usar os resultados em verificadores.
 
 
 \begin{thebibliography}{00}
-    \bibitem{CutPlane}      J. Nordström, ``A Unified Proof System for Discrete Combinatorial Problems'', Novembro de 2023.
-    \bibitem{SatLive}       D. Le Berre, ``Sat Live! keep up to date with research on the satisfiability problem'', Acesso em http://www.satlive.org/.
-    \bibitem{SatComp}       M. Heule, M. Jävisalo, M. Suda, ``The International SAT Competition Web Page'', Acesso em https://satcompetition.github.io/.
-    \bibitem{CNF}           ``Conjunctive normal form'', Encyclopedia of Mathematics, EMS Press, 2001.
-    \bibitem{PBSolve}       J. Nordström, ``Pseudo-Boolean Solving and Optimization'', Fevereiro de 2021.
-    \bibitem{LeanProver}    L. de Moura, S. Kong, J. Avigad, F. van Doorn, J. von Raumer ``The Lean Theorem Prover'', 25th International Conference on Automated Deduction (CADE-25), Berlin, Germany, 2015. Acesso em https://lean-lang.org/papers/system.pdf.
-    \bibitem{Lean4}         L. de Moura, S. Ullrich ``The Lean 4 Theorem Prover and Programming Language'', 28th International Conference on Automated Deduction (CADE-28), Pittsburgh, USA, 2021. Acesso em https://lean-lang.org/papers/lean4.pdf.
-    \bibitem{LTE}           J. Commelin, P. Scholze ``Liquid Tensor Experiment''. Acesso em https://math.commelin.net/files/LTE.pdf
-    \bibitem{PFR}           T. Tao, ``The Polynomial Freiman-Ruzsa Conjecture'', Novembro de 2023. Acesso em https://teorth.github.io/pfr/.
-    \bibitem{mathlib4}      The mathlib Community. 2020. ``The lean mathematical library''. In CPP 2020. 367-381. https://doi.org/10.1145/3372885.3373824
+    \bibitem{Alethe}        ALETHE PAPER HERE, ``Am I watching enough cult movies?'', Novembro de 2023.
+    \bibitem{Carcara}       CARCARA PAPER HERE
+
+    % \bibitem{CutPlane}      J. Nordström, ``A Unified Proof System for Discrete Combinatorial Problems'', Novembro de 2023.
+    % \bibitem{SatLive}       D. Le Berre, ``Sat Live! keep up to date with research on the satisfiability problem'', Acesso em http://www.satlive.org/.
+    % \bibitem{SatComp}       M. Heule, M. Jävisalo, M. Suda, ``The International SAT Competition Web Page'', Acesso em https://satcompetition.github.io/.
+    % \bibitem{CNF}           ``Conjunctive normal form'', Encyclopedia of Mathematics, EMS Press, 2001.
+    % \bibitem{PBSolve}       J. Nordström, ``Pseudo-Boolean Solving and Optimization'', Fevereiro de 2021.
+    % \bibitem{LeanProver}    L. de Moura, S. Kong, J. Avigad, F. van Doorn, J. von Raumer ``The Lean Theorem Prover'', 25th International Conference on Automated Deduction (CADE-25), Berlin, Germany, 2015. Acesso em https://lean-lang.org/papers/system.pdf.
+    % \bibitem{Lean4}         L. de Moura, S. Ullrich ``The Lean 4 Theorem Prover and Programming Language'', 28th International Conference on Automated Deduction (CADE-28), Pittsburgh, USA, 2021. Acesso em https://lean-lang.org/papers/lean4.pdf.
+    % \bibitem{LTE}           J. Commelin, P. Scholze ``Liquid Tensor Experiment''. Acesso em https://math.commelin.net/files/LTE.pdf
+    % \bibitem{PFR}           T. Tao, ``The Polynomial Freiman-Ruzsa Conjecture'', Novembro de 2023. Acesso em https://teorth.github.io/pfr/.
+    % \bibitem{mathlib4}      The mathlib Community. 2020. ``The lean mathematical library''. In CPP 2020. 367-381. https://doi.org/10.1145/3372885.3373824
 \end{thebibliography}
 
 \end{document}
