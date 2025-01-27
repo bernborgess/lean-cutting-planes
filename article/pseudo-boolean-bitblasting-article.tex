@@ -1,6 +1,7 @@
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
-\usepackage{algorithmic}
+% \usepackage{algorithmic}
+\usepackage{algpseudocode}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{cite}
 \usepackage{graphicx}
@@ -376,64 +377,106 @@ Podemos dessa forma implementar a verificação de aplicações corretas de cada
 dará no arquivo\\ `\texttt{carcara/src/checker/rules/pb\_blasting.rs}',
 
 Vejamos com mais detalhes a verificação da regra \textbf{pbblast\_bveq}:
-% TODO: Put code in appendix, just name a pseudo-code here for clarity
-\begin{minted}[fontsize=\footnotesize]{rust}
-pub fn pbblast_bveq(RuleArgs {
-    pool, args, conclusion, .. }: RuleArgs)
-    -> RuleResult {
-    let ((x, y), ((sum_x, sum_y), _)) = ?;
-    let Sort::BitVec(size) = pool.sort(x).?
-        unreachable!();
-    let size = size.to_usine().unwrap();
-    Ok(())
-}
-\end{minted}
+\begin{algorithmic}[1]
+    \Statex \textbf{Entrada:} Argumentos da regra, incluindo um \texttt{pool} de termos, um conjunto de \texttt{args}, e um termo de \texttt{conclusão}.
+    \Statex \textbf{Saída:} Verifica se a regra foi aplicada corretamente ou gera um erro caso alguma condição não seja satisfeita.
+
+    \Procedure{pbblast\_bveq}{$pool, args, conclusion$}
+
+    \State \textbf{Passo 1: Verificar a estrutura da conclusão}
+    \State Extraia os termos $x$, $y$, $sum\_x$ e $sum\_y$ da \texttt{conclusão},
+    garantindo que ela esteja no formato:
+    \[
+        (=\ (=\ x\ y)\ (= (- (+\ \ldots)\ (+\ \ldots))\ 0))
+    \]
+    Caso a estrutura não corresponda, gere um erro.\\
+
+    \State \textbf{Passo 2: Verificar a largura do bitvector}
+    \State Recupere a largura do bitvector $size$ do \texttt{pool} para a variável $x$.
+    \State \textbf{Passo 3: Verificar os termos de $sum\_x$ quanto à sua correção}
+    \For{($i$,$el$) em $sum\_x$}
+    \State Extraia o coeficiente $c$, o índice $idx$ e o bitvector $bv$ do $i$-ésimo elemento de $sum\_x$, garantindo que o termo esteja no formato:
+    \[
+        (*\ c\ ((\_\ \texttt{int\_of}\ idx)\ bv))
+    \]
+    Se $i = 0$, permita que $c$ seja omitido.
+    \State Converta $c$ e $idx$ para tipos inteiros.
+    \State Verifique as seguintes condições:
+    \begin{itemize}
+        \item $c$ é igual a $2^i$
+        \item $idx$ é igual a $size - i - 1$
+        \item $bv$ é igual a $x$
+    \end{itemize}
+    \If{qualquer uma dessas condições falhar}
+    \State Gere um erro
+    \EndIf
+    \EndFor
+    \State \textbf{Passo 4: Verificar os termos de $sum\_y$ quanto à sua correção}
+    \State Realize as mesmas verificações do \textbf{Passo 3}, mas com $sum\_y$ e $y$.
+    \State \textbf{Passo 5: Retornar sucesso}
+    \EndProcedure
+\end{algorithmic}
 
 O código completo dessa verificação pode ser encontrado no apêndice, mas o que podemos
 analisar aqui é que várias propriedades sintáticas são testadas pelo código:
 \begin{itemize}
     \item O número de argumentos aplicados à regra é o esperado?
-    \item O tipo dos termos aplicados é apropriado (testado pelo parser)?
-          % TODO: mais propriedades aqui
+    \item O tipo dos termos aplicados é apropriado?
+    \item A estrutura da conclusão corresponde à forma lógica esperada, garantindo que seja uma equivalência entre uma igualdade de bitvector e a igualdade de duas somas subtraídas a zero?
+    \item A largura do bitvector para os termos $x$ e $y$ está definida corretamente e disponível no conjunto de termos?
+    \item Os coeficientes na soma estão representados corretamente como potências de dois, garantindo o alinhamento com a natureza binária dos bitvectors?
+    \item Os índices nos termos da soma são consistentes com a ordenação esperada, especificamente $size - i - 1$, onde $i$ representa a posição atual do bit?
+    \item Os bitvectors sendo indexados dentro das somas estão corretamente correspondidos às variáveis originais $x$ e $y$?
+    \item A correspondência geral entre os termos da soma e a igualdade original do bitvector é preservada, garantindo que não haja incompatibilidade na representação da equivalência?
 \end{itemize}
+
+Essas verificações garantem que a regra esteja de acordo com os requisitos sintáticos e
+semânticos da sintaxe Alethe, garantindo que a transformação representada pela regra
+seja logicamente válida. Qualquer incompatibilidade na estrutura, tipo ou conteúdo
+dos termos resultará em um erro, sinalizando uma violação dos requisitos da regra.
 
 Para atender todos estes aspectos é que o Carcara implementa para cada nova construção um
 conjunto de testes de unidade, que são executados rapidamente e além de evitar possíveis erros,
 servem como documentação viva do comportamento esperado por cada regra. Continuando o exemplo
 da regra \textbf{pbblast\_bveq}, vejamos um destes testes:
-\begin{minted}[fontsize=\footnotesize]{rust}
-mod tests {
-  #[test]
-  fn pbblast_bveq() {
-    test_cases! {
-     definitions = "
-        (declare-const x1 (_ BitVec 1))
-        (declare-const y1 (_ BitVec 1))
-        ",
-     "Equality on single bits" {
-       r#"(step t1 (cl
-         (= (= x1 y1)
-         (= (-
-              (+ (* 1 ((_ int_of 0) x1)) 0)
-              (+ (* 1 ((_ int_of 0) y1)) 0)
-            ) 0))) :rule pbblast_bveq)"#: true,
-      }
-    }
-  }
-}
-\end{minted}
-Aqui podemos ver um teste que espera \textbf{true}, ou seja, deve ser julgado como uma aplicação
-correta da regra \texttt{pbblast\_bveq}.
 
+\begin{algorithmic}[1]
+    \Statex \textbf{Caso de Teste: Igualdade em Bits Simples}
+    \Procedure{Test-pbblast\_bveq}{}
+    \State \textbf{Definições:}
+    \begin{itemize}
+        \item Declarar uma constante bitvector $x1$ de largura $1$: \texttt{(declare-const x1 (\_BitVec 1))}
+        \item Declarar uma constante bitvector $y1$ de largura $1$: \texttt{(declare-const y1 (\_BitVec 1))}
+    \end{itemize}
+    \State \textbf{Entrada:} Uma cláusula de conclusão para a regra \textbf{pbblast\_bveq}:
+    \begin{itemize}
+        \item Seja $lhs$ a igualdade entre os bitvectors:
+              \[
+                  lhs = (=\ x1\ y1)
+              \]
+        \item Seja $sum\_x$ a representação da soma para $x1$:
+              \[
+                  sum\_x = (+\ (*\ 1\ ((\_\ int\_of\ 0)\ x1))\ 0)
+              \]
+        \item Seja $sum\_y$ a representação da soma para $y1$:
+              \[
+                  sum\_y = (+\ (*\ 1\ ((\_\ int\_of\ 0)\ y1))\ 0)
+              \]
+        \item Combine no conjunto completo de conclusão:
+              \[
+                  conclusion = (=\ lhs\ (=\ (-\ sum\_x\ sum\_y)\ 0))
+              \]
+    \end{itemize}
+    \State \textbf{Resultado Esperado:} \texttt{true} (a regra foi aplicada corretamente e verificada com sucesso).
+    \EndProcedure
 
+    \Statex
+    \Statex Neste teste, declaramos duas constantes bitvector de um único bit ($x1$ e $y1$), decompomos os termos de soma em $sum\_x$ e $sum\_y$, e fornecemos a cláusula de conclusão completa de forma simplificada. O teste verifica se a regra \textbf{pbblast\_bveq} valida corretamente essa transformação de igualdade, garantindo que todos os requisitos estruturais e semânticos sejam atendidos. O resultado esperado do teste é \texttt{true}, indicando a validação bem-sucedida da regra.
+\end{algorithmic}
 
 \section*{Conclusões}
 % Capítulo de fechamento: conclusões e relação de trabalhos futuros.
 % TODO
-% Nós demonstramos a lógica de planos de corte como método correto para trabalhar com pseudo-booleanos.
-% Com nossa biblioteca \texttt{lean-cutting-planes} agora podemos utilizar o sistema de tipos de Lean
-% para validar com confiança passos dessa lógica. Com a documentação convidamos novos pesquisadores e
-% matemáticos a usar os resultados em verificadores.
 
 \begin{thebibliography}{00}
     \bibitem{Cvc5}          H. Barbosa, C. W. Barrett, M. Brain, G. Kremer, H. Lachnitt, M. Mann, A. Mohamed, M. Mohamed, A. Niemetz, A. Nötzli, A. Ozdemir, M. Preiner, A. Reynolds, Y. Sheng, C. Tinelli, Y. Zohar, ``cvc5: A Versatile and Industrial-Strength SMT Solver'', Abril de 2022, Acesso em https://link.springer.com/chapter/10.1007/978-3-030-99524-9\_24.
@@ -442,5 +485,119 @@ correta da regra \texttt{pbblast\_bveq}.
     \bibitem{CNF}           ``Conjunctive normal form'', Encyclopedia of Mathematics, EMS Press, 2001.
     \bibitem{PBSolve}       J. Nordström, ``Pseudo-Boolean Solving and Optimization'', Fevereiro de 2021.
 \end{thebibliography}
+
+\newpage
+\onecolumn
+\appendix
+
+\subsection{Código para a regra pbblast\_bveq}
+\begin{minted}[fontsize=\small]{rust}
+pub fn pbblast_bveq(RuleArgs { pool, conclusion, .. }: RuleArgs) -> RuleResult {
+    // Check that conclusion is an equivalence between bitvector equality
+    // and difference of summations equal to zero
+    let ((x, y), ((sum_x, sum_y), _)) =
+        match_term_err!((= (= x y) (= (- (+ ...) (+ ...)) 0)) = &conclusion[0])?;
+
+    // Drops the last element, that is zero
+    let sum_x = &sum_x[..sum_x.len() - 1];
+    let sum_y = &sum_y[..sum_y.len() - 1];
+
+    // Check that `x`'s bitvector width exists in the `pool`
+    let Sort::BitVec(x_width) = pool.sort(x).as_sort().cloned().unwrap() else {
+        unreachable!();
+    };
+
+    // Transforms the width of x to a usize type
+    let x_width = x_width.to_usize().unwrap();
+
+    // Check that `sum_x` has the same length as `x`
+    rassert!(x_width == sum_x.len(), CheckerError::Unspecified);
+
+    // Check that `y`'s bitvector width exists in the `pool`
+    let Sort::BitVec(y_width) = pool.sort(y).as_sort().cloned().unwrap() else {
+        unreachable!();
+    };
+
+    // Transforms the width of y to a usize type
+    let y_width = y_width.to_usize().unwrap();
+
+    // Check that `sum_y` has the same length as `y`
+    rassert!(y_width == sum_y.len(), CheckerError::Unspecified);
+
+    // Check that both bitvectors x and y have the same length
+    rassert!(x_width == y_width, CheckerError::Unspecified);
+
+    // Define a closure to check the terms for a bitvector and its summation
+    let check_bitvector_sum =
+        |sum: &[Rc<Term>], width: usize, bitvector: &Rc<Term>| -> RuleResult {
+            for (i, element) in sum.iter().enumerate() {
+                // Match `element` with a coefficient times an `int_of` application on bitvector `bv`
+                let (c, (idx, bv)) = match_term_err!((* c ((_ int_of idx) bv)) = element)?;
+
+                // Convert `c` and `idx` to integers
+                let c: Integer = c.as_integer_err()?;
+                let idx: Integer = idx.as_integer_err()?;
+
+                // Check that the coefficient is actually 2^i
+                rassert!(c == (1 << i), CheckerError::Unspecified);
+                // Check that the index is actually `width - i - 1`
+                rassert!(idx == width - i - 1, CheckerError::Unspecified);
+                // Check that the bitvector being indexed is actually `bitvector`
+                rassert!(*bv == *bitvector, CheckerError::Unspecified);
+            }
+            Ok(())
+        };
+
+    // Use the closure to check the `sum_x` terms
+    check_bitvector_sum(sum_x, x_width, x)?;
+
+    // Use the closure to check the `sum_y` terms
+    check_bitvector_sum(sum_y, y_width, y)?;
+
+    Ok(())
+}
+\end{minted}
+
+\subsection{Teste para a regra pbblast\_bveq}
+\begin{minted}[fontsize=\small]{rust}
+mod tests {
+    #[test]
+    fn pbblast_bveq() {
+        test_cases! {
+            definitions = "
+                (declare-const x1 (_ BitVec 1))
+                (declare-const y1 (_ BitVec 1))
+                (declare-const x2 (_ BitVec 2))
+                (declare-const y2 (_ BitVec 2))
+                ",
+            "Equality on single bits" {
+                r#"(step t1 (cl (= (= x1 y1) (= (- (+ (* 1 ((_ int_of 0) x1)) 0)
+                (+ (* 1 ((_ int_of 0) y1)) 0)) 0))) :rule pbblast_bveq)"#: true,
+            }
+            "Omit multiplication by 1" {
+                r#"(step t1 (cl (= (= x1 y1) (= (- (+ ((_ int_of 0) x1) 0)
+                (+ ((_ int_of 0) y1) 0)) 0))) :rule pbblast_bveq)"#: true,
+            }
+            "Not a subtraction of sums" {
+                r#"(step t1 (cl (= (= x1 y1) (= (+ (* 1 ((_ int_of 0) x1)) 0) 0)))
+                :rule pbblast_bveq)"#: false,
+            }
+            "Malformed products" {
+                r#"(step t1 (cl (= (= x1 y1) (= (- (+ (* 0 ((_ int_of 0) x1)) 0)
+                (+ (* 1 ((_ int_of 0) y1)) 0)) 0))) :rule pbblast_bveq)"#: false,
+                r#"(step t1 (cl (= (= x1 y1) (= (- (+ (* 1 ((_ int_of 0) x1)) 0)
+                (+ (* 0 ((_ int_of 0) y1)) 0)) 0))) :rule pbblast_bveq)"#: false,
+            }
+            "Equality on two bits" {
+                r#"(step t1 (cl (= (= x2 y2) (= (- (+ (* 1 ((_ int_of 1) x2))
+                (* 2 ((_ int_of 0) x2)) 0) (+ (* 1 ((_ int_of 1) y2)) (* 2
+                ((_ int_of 0) y2)) 0)) 0))) :rule pbblast_bveq)"#: true,
+            }
+        }
+    }
+ 
+}
+\end{minted}
+
 
 \end{document}
