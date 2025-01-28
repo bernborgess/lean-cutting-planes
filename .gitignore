@@ -6,6 +6,7 @@
 /lake-packages/*
 
 /.vscode
+!alethe/.vscode/*
 /.lake
 ## Core latex/pdflatex auxiliary files:
 *.aux

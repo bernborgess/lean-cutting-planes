@@ -1,0 +1,68 @@
+\subsection{Pseudo Boolean Reasoning}
+
+Pseudo-Boolean constraints are mathematical expressions involving binary (0 or 1) variables
+(or literals) and integer coefficients, typically in the form of inequalities.
+Specifically, a pseudo-Boolean constraint is an inequality of the following form:
+\[
+    \sum_i a_i \cdot l_i \geq A
+\]
+where $A$ is called \textbf{constant}, $a_i$ are \textbf{coefficients},
+and $l_i$ are \textbf{literals}, that are either:
+\begin{itemize}
+    \item \textbf{plain} literal, a term \inlineAlethe{x};
+    \item \textbf{negated} literal, a term of the form \inlineAlethe{(- 1 x)}
+\end{itemize}
+
+where the \inlineAlethe{x} value is a pseudo-boolean variable,
+i.e. it will resolve to values \inlineAlethe{0} (false) or \inlineAlethe{1} (true).
+All these values are of sort \inlineAlethe{Int}.
+
+To form a summation we use a list of added terms of form,
+\inlineAlethe{(+ <T1> <T2> ... 0)} and each term is
+\inlineAlethe{(* a_i <L1>)}, with a coefficient and a literal, always ending with a \inlineAlethe{0}.
+
+
+\paragraph{Normalized Form}
+A pseudo-Boolean constraint is in the \textbf{normalized form} if:
+\begin{itemize}
+    \item All \textbf{coefficients} $a_i$ are non-negative;
+    \item The \textbf{constant} $A$ is non-negative;
+\end{itemize}
+
+%This form is a precondition for the \proofRule{cp_division} and \proofRule{cp_saturation} rules.
+This form is a precondition for the \texttt{cp\_division} and \texttt{cp\_saturation} rules.
+
+\subsection{Bitvector Reasoning with Pseudo-Boolean Bitblasting}
+An alternative approach to do bitvector reasoning is to perform bitblasting with Pseudo-Boolean expressions, which
+are more expressive in terms of conciseness for some operations.
+
+Similarly to regular bitblasting, the Alethe calculus uses
+multiple families of helper functions to express pseudo-boolean bitblasting:
+$\lsymb{pbbT}$, $\lsymb{intOf}_m$, $\lsymb{bvsize}$, and $\lsymb{bv}_n^i$.
+The last two functions work the same as in regular bitblasting, where the first two introduce the different
+underlying pseudo-boolean values, which are represented as values of \inlineAlethe{Int}.
+
+The family $\lsymb{pbbT}$ consists of one function for each bitvector sort
+$(\lsymb{BitVec}\;n)$.
+\[
+    \lsymb{pbbT}\,:\,\underbrace{\lsymb{Int}\,\dots\,\lsymb{Int}}_n\;(\lsymb{BitVec}\;n).
+\]
+
+\noindent
+The function $\lsymb{pbbT}$ takes a list of pseudo-booleans i.e. integers that must be
+\inlineAlethe{0} or \inlineAlethe{1} arguments and packs them into a bitvector.
+
+The functions $\lsymb{intOf}_m$ are the inverse of $\lsymb{pbbT}$.  They extract
+a bit of a bitvector as a boolean.  Just as the built in $\lsymb{extract}$
+symbol, $\lsymb{intOf}_m$ is used as an indexed symbol.  Hence, for $m \leq n$, we
+write \inlineAlethe{(_ @intOf} $m$ \inlineAlethe{)}, to denote functions
+\[
+    \lsymb{intOf}_m : (\lsymb{BitVec}\;n) \to \lsymb{Int}.
+\]
+These functions are defined as
+\[
+    \lsymb{intOf}_m \langle u_1, \dots, u_n \rangle := u_m.
+\]
+
+All other concepts not related with these rules will use the same definitions of propositional
+bitblasting.

@@ -12,4 +12,5 @@ shell.nix
 Title.jpg
 version.sh
 .vscode
+!alethe/.vscode
 BitBlasting_Atoms_and_Terms.pdf

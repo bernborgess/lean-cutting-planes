@@ -1,38 +1,7 @@
 \begin{RuleDescription}{cp_addition}
     A step of the \currule{} rule represents the addition of two pseudo-Boolean
-    constraints using cutting planes reasoning. Pseudo-Boolean constraints are
-    0-1 integer linear inequalities of the form:
-    \[
-        \sum_i a_i \times l_i \geq A
-    \]
-    where $A$ is called \textbf{constant}, $a_i$ are \textbf{coefficients},
-    and $l_i$ are \textbf{literals}, that are either:
-    \begin{itemize}
-        \item \textbf{plain} literal, a term \inlineAlethe{x};
-        \item \textbf{negated} literal, a term of the form \inlineAlethe{(- 1 x)}
-    \end{itemize}
-
-    where the \inlineAlethe{x} value is a pseudo-boolean variable,
-    i.e. it will resolve to values \inlineAlethe{0} (false) or \inlineAlethe{1} (true).
-    All these values are of sort \inlineAlethe{Int}.
-
-    To form a summation we use a list of added terms of form,
-    \inlineAlethe{(+ <T1> <T2> ... 0)} and each term is
-    \inlineAlethe{(* a_i <L1>)}, with a coefficient and a literal.\\
-
-    The \currule{} rule allows two pseudo-Boolean constraints to be
-    added together, combining their coefficients and constants. Negated and plain literals
-    over the same variable cancel each other.
-
-    Formally, given two constraints:
-    \[
-        \sum_i a_i \times l_i \geq A \quad \text{and} \quad \sum_i b_i \times l_i \geq B,
-    \]
-    the result of applying the \currule{} rule is:
-    \[
-        \sum_i (a_i + b_i) \times l_i \geq (A + B).
-    \]
-
+    constraints using cutting planes reasoning, combining their coefficients and constants.
+    Negated and plain literals over the same variable cancel each other.
     A {\currule} step in the proof has the form:
 
     \begin{AletheS}
@@ -112,6 +81,9 @@
         $j$. & \ctxsep  & \, & ${\sum_i{ \lceil \frac{a_i}{c} \rceil l_i} \ge \lceil \frac{A}{c} \rceil}$  & (\currule\; $i$)\,[$c$]
     \end{AletheS}
 
+    \ruleparagraph{Remark.} This rule needs constraints in \textbf{normalized form}
+    i.e. no negative coefficients, no negative constant.
+
 \end{RuleDescription}
 
 
@@ -123,6 +95,7 @@
         $j$. & \ctxsep  & \, & ${\sum_i{ \min(a_i,A)\cdot l_i} \ge A}$  & (\currule\; $i$)
     \end{AletheS}
 
-\end{RuleDescription}
+    \ruleparagraph{Remark.} This rule needs constraints in \textbf{normalized form}
+    i.e. no negative coefficients, no negative constant.
 
-\newpage
+\end{RuleDescription}

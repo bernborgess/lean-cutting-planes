@@ -1,130 +1,209 @@
-\begin{RuleDescription}{bv_equal}
-    Consider bitvectors $x$ of length $k$ with respective PB-blasted vectors $x$
-    - i.e. $x$ is a vector of Pseudo-Boolean variables.
+\begin{RuleDescription}{pbblast_bveq}
+    Consider bitvectors \textbf{x} and \textbf{y} of length $n$.
+    The pseudo-boolean bitblasting of their equality is expressed by:
 
-    A step of the \currule{} rule means bitwise equality, expressed by:
-    \[
-        \sum_{i=0}^{k-1} 2^i\mathbf{x}_{k-i-1} - \sum_{i=0}^{k-1} 2^i\mathbf{y}_{k-i-1} = 0.
-    \]
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{=}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is the PseudoBoolean constraint:
+
+    \[ \sum_{i=0}^{n-1}{2^i x_{n-i-1}} - \sum_{i=0}^{n-1}{2^i y_{n-i-1}} = 0\]
+
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_not_equal}
-    The \currule{} rule, meaning bitwise inequality, can be concisely expressed by:
+\begin{RuleDescription}{pbblast_bvult}
+    The `unsigned-less-than' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvult}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
     \[
-        \mathbf{z} = \text{XOR}(x, y); \qquad \sum_{i=0}^{k-1} \mathbf{z}_i \geq 0
+        \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} \ge 1.
     \]
+
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_ult}
-    The \currule{} rule for unsigned less than, $x < y$, is defined as:
+\begin{RuleDescription}{pbblast_bvugt}
+    The `unsigned-greater-than' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvugt}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
     \[
-        \sum_{i=0}^{k-1} 2^i\mathbf{y}_{k-i-1} - \sum_{i=0}^{k-1} 2^i\mathbf{x}_{k-i-1} \geq 1.
+        \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} \ge 1.
     \]
+
+    \noindent
+    Or in terms of \proofRule{pbblast_bvult}:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvugt}\ x\ y) \approx (\lsymb{bvult}\ y\ x)$ & (\currule)
+    \end{AletheX}
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_not_ult}
-    The negation of the \currule{} rule, meaning $x \geq y$ for unsigned integers, can be expressed as:
+
+% https://github.com/cvc5/cvc5/blob/96a35d7cc97ee375e263ab43a2ed9ba03cc32858/src/rewriter/node.py#L44
+\begin{RuleDescription}{pbblast_bvuge}
+    The `unsigned-greater-or-equal' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvuge}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
     \[
-        \neg ULT(x, y) \equiv UGE(x, y)
+        \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} \ge 0.
     \]
+
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_uge}
-    The \currule{} rule for unsigned greater than or equal, $x \geq y$, is defined as:
+\begin{RuleDescription}{pbblast_bvule}
+    The `unsigned-less-or-equal' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvule}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
     \[
-        \sum_{i=0}^{k-1} 2^i\mathbf{x}_{k-i-1} - \sum_{i=0}^{k-1} 2^i\mathbf{y}_{k-i-1} \geq 0.
+        \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} \ge 0.
     \]
+
+    \noindent
+    Or in terms of \proofRule{pbblast_bvuge}:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvule}\ x\ y) \approx (\lsymb{bvuge}\ y\ x)$ & (\currule)
+    \end{AletheX}
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_not_uge}
-    The negation of the \currule{} rule, meaning $x < y$ for unsigned integers, is expressed by:
+\begin{RuleDescription}{pbblast_bvslt}
+    The `signed-less-than' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvslt}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
     \[
-        \neg UGE(x, y) \equiv ULT(x, y)
+        -(2^{n-1})\mathbf{y}_0 + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} + 2^{n-1} \mathbf{x}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} \geq 1
     \]
+
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_ule}
-    The \currule{} rule for unsigned less than or equal, $x \leq y$, is equivalent to:
+\begin{RuleDescription}{pbblast_bvsgt}
+    The `signed-greater-than' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvsgt}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
     \[
-        ULE(x, y) \equiv UGE(y, x)
+        -(2^{n-1})\mathbf{x}_0 + \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} + 2^{n-1} \mathbf{y}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} \geq 1
     \]
+
+    \noindent
+    Or in terms of \proofRule{pbblast_bvslt}:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvsgt}\ x\ y) \approx (\lsymb{bvslt}\ y\ x)$ & (\currule)
+    \end{AletheX}
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_not_ule}
-    The negation of the \currule{} rule, meaning $x > y$, is expressed by:
+\begin{RuleDescription}{pbblast_bvsge}
+    The `signed-greater-or-equal' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvsge}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
     \[
-        \neg ULE(x, y) \equiv UGT(x, y)
+        -(2^{n-1})\mathbf{x}_{0} + \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} + 2^{n-1}\mathbf{y}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} \geq 0
     \]
+
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_ugt}
-    The \currule{} rule for unsigned greater than, $x > y$, is equivalent to:
+\begin{RuleDescription}{pbblast_bvsle}
+    The `signed-less-or-equal' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvsle}\ x\ y) \approx A$ & (\currule)
+    \end{AletheX}
+    The term ``$A$'' is `true' iff:
+
     \[
-        UGT(x, y) \equiv ULT(y, x)
+        -(2^{n-1})\mathbf{y}_{0} + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} + 2^{n-1}\mathbf{x}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} \geq 0
     \]
+
+    \noindent
+    Or in terms of \proofRule{pbblast_bvsge}:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvsle}\ x\ y) \approx (\lsymb{bvsge}\ y\ x)$ & (\currule)
+    \end{AletheX}
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_not_ugt}
-    The negation of the \currule{} rule, meaning $x \leq y$, is expressed by:
-    \[
-        \neg UGT(x, y) \equiv ULE(x, y)
-    \]
+\begin{RuleDescription}{pbblast_pbbvar}
+    Conversion from a BitVector of $n$ bits to $n$ PseudoBoolean variables passed to pbbT:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $x \approx \lsymb{pbbT}\; x_1 \dots x_{n+1}$ & (\currule)
+    \end{AletheX}
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_slt}
-    The \currule{} rule for signed less than, $x < y$, is defined as:
-    \[
-        -(2^{k-1})\mathbf{y}_0 + \sum_{i=0}^{k-2} 2^i\mathbf{y}_{k-i-1} + 2^{k-1} \mathbf{x}_{0} - \sum_{i=0}^{k-2} 2^i\mathbf{x}_{k-i-1} \geq 1.
-    \]
+\begin{RuleDescription}{pbblast_pbbconst}
+    Constraints on each bit of the constant BitVector b:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $\left(b \approx \lsymb{pbbT}\ r\right) \land \bigwedge_{i=0}^{n-1}{\left(r_i = \lsymb{PB\_ZERO\_OR\_ONE}(b_{n-i-1})\right)}$ & (\currule) \\
+    \end{AletheX}
+    % TODO: Explain PB_ZERO_OR_ONE := if b_i is 1 then b_i = 1 else b_i = 0
+    \noindent
+    In which we expand \textbf{PB\_ZERO\_OR\_ONE($b_i$)} into:
+    \begin{itemize}
+        \item $\left(b_i = 0\right)$ if $b_i$ is $0$
+        \item $\left(b_i = 1\right)$ if $b_i$ is $1$
+    \end{itemize}
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_not_slt}
-    The negation of the \currule{} rule, meaning $x \geq y$ for signed integers, is expressed by:
-    \[
-        \neg SLT(x, y) \equiv SGE(x, y)
-    \]
+\begin{RuleDescription}{pbblast_bvxor}
+    The `bvxor' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
+
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvxor}\ x\ y) \approx [r_0,\dots,r_1] \land A$ & (\currule) \\
+    \end{AletheX}
+    The term ``$A$'' is the conjunction of these PseudoBoolean inequalities and the term \textbf{r} stands
+    for the result of the `bvxor' operation between \textbf{x} and \textbf{y}, for $0 \le i < n$:
+
+    \[ -\textbf{r}_i+\textbf{x}_i+\textbf{y}_i\ge  0 \]
+    \[ -\textbf{r}_i-\textbf{x}_i-\textbf{y}_i\ge -2 \]
+    \[  \textbf{r}_i+\textbf{x}_i-\textbf{y}_i\ge  0 \]
+    \[  \textbf{r}_i-\textbf{x}_i+\textbf{y}_i\ge  0 \]
 \end{RuleDescription}
 
-\begin{RuleDescription}{bv_sge}
-    The \currule{} rule for signed greater than or equal, $x \geq y$, is defined as:
-    \[
-        -(2^{k-1})\mathbf{x}_0 + \sum_{i=0}^{k-2} 2^i\mathbf{x}_{k-i-1} + 2^{k-1}\mathbf{y}_0 - \sum_{i=0}^{k-2} 2^i\mathbf{y}_{k-i-1} \geq 0.
-    \]
-\end{RuleDescription}
+% ADD
+% OR
+% NOT
 
-\begin{RuleDescription}{bv_not_sge}
-    The negation of the \currule{} rule, meaning $x < y$ for signed integers, is expressed by:
-    \[
-        \neg SGE(x, y) \equiv SLT(x, y)
-    \]
-\end{RuleDescription}
 
-\begin{RuleDescription}{bv_sle}
-    The \currule{} rule for signed less than or equal, $x \leq y$, is equivalent to:
-    \[
-        SLE(x, y) \equiv SGE(y, x)
-    \]
-\end{RuleDescription}
+\begin{RuleDescription}{pbblast_bvand}
+    The `bvand' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
 
-\begin{RuleDescription}{bv_not_sle}
-    The negation of the \currule{} rule, meaning $x > y$, is expressed by:
-    \[
-        \neg SLE(x, y) \equiv SGT(x, y)
-    \]
-\end{RuleDescription}
+    \begin{AletheX}
+        $i$. & \ctxsep & $(\lsymb{bvand}\ x\ y) \approx [r_0,\dots,r_1] \land A$ & (\currule) \\
+    \end{AletheX}
+    The term ``$A$'' is the conjunction of these PseudoBoolean inequalities and the term \textbf{r} stands
+    for the result of the `bvand' operation between \textbf{x} and \textbf{y}, for $0 \le i < n$:
 
-\begin{RuleDescription}{bv_sgt}
-    The \currule{} rule for signed greater than, $x > y$, is equivalent to:
-    \[
-        SGT(x, y) \equiv SLT(y, x)
-    \]
-\end{RuleDescription}
-
-\begin{RuleDescription}{bv_not_sgt}
-    The negation of the \currule{} rule, meaning $x \leq y$, is expressed by:
-    \[
-        \neg SGT(x, y) \equiv SLE(x, y)
-    \]
+    \[ \textbf{x}_i-\textbf{r}_i\ge 0 \]
+    \[ \textbf{y}_i-\textbf{r}_i\ge 0 \]
+    \[ \textbf{r}_i-\textbf{x}_i-\textbf{y}_1\ge -1 \]
 \end{RuleDescription}
 
 \newpage

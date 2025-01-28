@@ -1,0 +1,613 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% \usepackage{algorithmic}
+\usepackage{algpseudocode}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{cite}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage[mathletters]{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage{minted}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Formalizando Bit-blasting com Pseudo-booleanos e verificando no projeto Carcara\\
+{\footnotesize Projeto Orientado em Computação II - Pesquisa Científica}
+}
+
+\author{\IEEEauthorblockN{Bernardo Borges}
+    \IEEEauthorblockA{\textit{Departamento de Ciência da Computação} \\
+        \textit{Universidade Federal de Minas Gerais}\\
+        Belo Horizonte, Brasil\\
+        bernardoborges@dcc.ufmg.br}
+}
+
+\maketitle
+
+\begin{abstract}
+    Esta pesquisa envolve a aplicação da teoria de Pseudo-booleanos para realizar o procedimento de
+    bit-blasting, utilizado para se raciocinar sobre vetores de bits e operações que os envolvem.
+\end{abstract}
+
+\begin{IEEEkeywords}
+    formal methods, pseudo boolean reasoning, bit blasting, proof checking
+\end{IEEEkeywords}
+
+\section{Introdução}
+A verificação formal é uma área de pequisa que visa garantir a confiabilidade de sistemas críticos,
+como hardware e software, onde erros podem ter consequências graves. Entre as ferramentas utilizadas
+nesse contexto, os solucionadores SMT como o cvc5\cite{Cvc5} desempenham um papel central ao permitir
+o raciocínio automático sobre diversas estruturas e operações, como as realizadas sobre
+vetores de bits, amplamente empregadas em circuitos digitais.
+% TODO: Cite some usage of bitvector reasoning for digital circuit verification
+Sendo este um processo complexo, técnicas como o bit-blasting são necessárias para dividir o problema
+de vetores de bits em termos menores, o que tradicionalmente é feito com valores proposicionais, agora
+experimentamos com valores pseudo-booleanos.
+Este trabalho explora a integração dessas técnicas, propondo uma extensão ao formato de prova Alethe \cite{Alethe}
+e do verificador Carcara \cite{Carcara}, buscando maior confiança e precisão na validação de provas e seus resultados.
+
+\section{Referencial Teórico}
+% Capítulo referencial: identificação de trabalhos correlatos, referencial teórico.
+
+\subsection{Aritmética de Bit-Vectors}
+A aritmética de Bit-Vectors é amplamente utilizada em áreas como verificação formal,
+circuitos digitais e design de hardware, pois permite modelar o comportamento de sistemas
+que operam diretamente em representações binárias. Um vetor de bits é uma sequência de bits
+(0s e 1s) de comprimento fixo, onde cada bit representa um dígito binário. Operações como soma,
+subtração, multiplicação e deslocamento são realizadas diretamente sobre esses vetores,
+respeitando restrições como largura fixa e ocorrência de overflow.
+
+
+\subsection{Bit Blasting}
+Uma forma que solucionadores SMT utilizam para raciocinar sobre tais Bit-Vectors é o bit-blasting,
+uma representação que utiliza-se de uma variável proposicional para cada bit, o que então pode ser
+repassado para outras regras de raciocínio.
+
+O bit-blasting converte operações aritméticas e lógicas em vetores de bits para fórmulas
+proposicionais que podem ser resolvidas por solucionadores SAT (Satisfiability). Nesse processo,
+cada bit de um vetor é tratado como uma variável proposicional independente, e as operações sobre
+os vetores são traduzidas em expressões lógicas que representam o comportamento bit a bit.
+Por exemplo, uma operação de soma em vetores de bits pode ser reduzida a uma série de expressões que
+modelam o comportamento de somadores completos e meio-somadores, incluindo a propagação de carry
+(ou transporte) entre os bits. Assim, uma operação que ocorre em um nível mais abstrato, como
+$A + B$, é traduzida em uma série de restrições lógicas que descrevem a interação entre os bits
+individuais de $A$ e $B$.
+
+
+\subsection{Pseudo-Booleanos}
+Um formato comumente utilizado para representar expressões booleanas é a Forma Normal Conjuntiva (CNF), que
+consiste da conjunção de cláusulas, em que cada cláusula é a disjunção de variáveis ou negação de variáveis\cite{CNF}.
+Neste trabalho, usamos uma outra representação para expressões, chamados Pseudo-Booleanos, funções estudadas
+desde os anos 1960 na área de pesquisa operacional, em programação inteira. Este formato consiste de um somatório
+do produto de um coeficiente por um literal, que é maior ou igual a uma constante natural.
+Este formato é exponencialmente mais compacto que o CNF, o que motiva seu uso\cite{PBSolve}.
+
+
+\subsection{Bit Blasting Pseudo Booleano}
+Aproveitando sua estrutura, os Pseudo-Booleanos oferecem uma abordagem alternativa para o
+processo de Bit Blasting, permitindo uma representação mais direta da semântica
+associada a vetores de bits. Essa semântica está relacionada ao significado numérico ou lógico
+dos vetores, que pode ser expressa utilizando coeficientes que ponderam a contribuição de cada
+bit em cálculos aritméticos ou restrições lógicas
+
+
+\subsection{Formato de Prova Alethe}
+A corretude é uma preocupação central em solucionadores SMT, dado que eles são amplamente
+utilizados em verificação formal, onde a precisão é essencial para garantir que sistemas críticos
+funcionem conforme especificado. No entanto, provar a corretude desses solucionadores é um desafio
+devido à vasta base de código e às constantes inovações que introduzem alterações frequentes.
+Quando um solucionador SMT retorna um resultado `SAT', é relativamente simples verificar de forma
+independente se o modelo gerado satisfaz todas as condições impostas. Contudo, no caso de um
+resultado `UNSAT', a verificação da corretude requer um \textit{certificado}, ou seja, um registro
+detalhado dos passos de raciocínio que levaram à conclusão de insatisfiabilidade.
+Nesse sentido, foi desenvolvido o formato Alethe\cite{Alethe}, inspirado na linguagem SMT-LIB, que representa de
+forma flexível e padronizada as provas geradas por solucionadores SMT, que podem ser verificados de
+forma independente.
+
+
+\subsection{Verificador de prova Carcara}
+Carcara\cite{Carcara} é um verificador de prova desenvolvido em Rust pelo laboratório SMITE da UFMG,
+sob a liderança do professor Haniel Barbosa, projetado para verificar certificados de prova no
+formato Alethe. Este projeto permite a identificação de erros lógicos nos sistemas que geram
+esses certificados, aumentando a confiança nos resultados apresentados.
+
+\section{Contribuições}
+% Capítulo de contribuição: descrição organizada das atividades conduzidas pelo aluno.
+A contribuição deste trabalho está na definição dos passos tomados para realizar bit-blasting
+pseudo booleano para cada operação suportada entre bit-vectors, e então a implementação do
+\textit{checker} no projeto Carcara que permite verificar a correta aplicação de tais regras
+no formato Alethe.
+
+\section{Definição das Regras em Alethe}
+\subsection{Formato das Inequações Pseudo-Booleanas}
+Uma inequação pseudo-booleana é uma desigualdade da seguinte forma:
+\[
+    \sum_i a_i \cdot l_i \geq A
+\]
+onde $A$ é chamado de \textbf{constante}, $a_i$ são \textbf{coeficientes},
+e $l_i$ são \textbf{literais}, que são:
+\begin{itemize}
+    \item \textbf{literal} simples, um termo \texttt{x};
+    \item literal \textbf{negado}, um termo da forma \texttt{(- 1 x)}
+\end{itemize}
+
+em que o valor \texttt{x} é uma variável pseudo-booleana, ou seja, ele resolverá para valores
+\texttt{0} ou \texttt{1}. Todos esses valores são do tipo \textbf{Int}.
+
+Para formar um somatório, usamos uma lista de termos somados da forma,
+\texttt{(+ <T1> <T2> ... 0)} sempre terminando com um \textbf{0}, e cada termo é
+\texttt{(* $a_i$ <L1>)}, com um coeficiente e um literal.
+
+\subsection{BitBlasting PseudoBooleano em Alethe}
+Similarmente ao bitblasting regular, o cálculo Alethe usa várias famílias de funções auxiliares
+para expressar bitblasting pseudo-booleano.
+As funções $\textbf{bvsize}$ e $\textbf{bv}_n^i$ funcionam da mesma forma que no bitblasting regular,
+ao passo que $\textbf{pbbT}$ e $\textbf{intOf}_m$ introduzem e eliminam a representação em
+pseudo-booleanos de um BitVector, que são representados como valores de \textbf{Int}.
+
+A família $\textbf{pbbT}$ consiste em uma função para cada bitvector de \textit{sort} $(\textbf{BitVec}\;n)$:
+\[
+    \textbf{pbbT}\,:\,\underbrace{\textbf{Int}\,\dots\,\textbf{Int}}_n\;(\textbf{BitVec}\;n).
+\]
+o que toma uma lista de argumentos pseudo-booleanos e os agrega em um bitvector.
+
+As funções $\textbf{intOf}_m$ são o inverso de $\textbf{pbbT}$. Elas extraem
+um bit de um bitvector como um pseudo-booleano. Assim como o símbolo $\textbf{extract}$,
+$\textbf{intOf}_m$ é usado como um símbolo indexado. Portanto, para $m \leq n$,
+escrevemos \texttt{(\_ @intOf $m$ )}, para denotar funções
+\[
+    \textbf{intOf}_m : (\textbf{BitVec}\;n) \to \textbf{Int}.
+\]
+e são definidas como
+\[
+    \textbf{intOf}_m \langle u_1, \dots, u_n \rangle := u_m.
+\]
+
+Todos os outros conceitos não relacionados a essas regras usarão as mesmas definições de bitblasting proposicional.
+
+\subsection{Regras de Predicados}
+\subsubsection{\textbf{pbblast\_bveq}}
+\noindent\\
+Considere os bitvectors \textbf{x} e \textbf{y} de comprimento $n$.
+O bitblasting pseudo-booleano de sua igualdade é expresso por:
+\begin{align*}
+    i. \vartriangleright & (=\ x\ y) \approx A &  & (\text{pbblast\_bveq})
+\end{align*}
+
+Em que o termo ``$A$'' é a restrição pseudo-booleana:
+
+\[ \sum_{i=0}^{n-1}{2^i x_{n-i-1}} - \sum_{i=0}^{n-1}{2^i y_{n-i-1}} = 0\]
+
+\subsubsection{\textbf{pbblast\_bvult}}
+\noindent\\
+A operação `unsigned-less-than', menor ou igual, sem sinal, sobre BitVectors com $n$ bits é
+expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvult}\ x\ y) \approx A &  & (\text{pbblast\_bvult})
+\end{align*}
+
+Em que o termo ``$A$'' é a restrição pseudo-booleana:
+
+\[
+    \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} \ge 1.
+\]
+
+\subsubsection{\textbf{pbblast\_bvugt}}
+\noindent\\
+A operação `unsigned-greater-than', maior sem sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvugt}\ x\ y) \approx A &  & (\text{pbblast\_bvugt})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} \ge 1.
+\]
+
+Alternativamente, em termos de \textbf{pbblast\_bvult}, temos:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvugt}\ x\ y) \approx (\textbf{bvult}\ y\ x) &  & (\text{pbblast\_bvugt})
+\end{align*}
+
+\subsubsection{\textbf{pbblast\_bvuge}}
+\noindent\\
+A operação `unsigned-greater-or-equal', maior ou igual sem sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvuge}\ x\ y) \approx A &  & (\text{pbblast\_bvuge})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} \ge 0.
+\]
+
+\subsubsection{\textbf{pbblast\_bvule}}
+\noindent\\
+A operação `unsigned-less-or-equal', menor ou igual sem sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvule}\ x\ y) \approx A &  & (\text{pbblast\_bvule})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} \ge 0.
+\]
+
+Alternativamente, em termos de \textbf{pbblast\_bvuge}, temos:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvule}\ x\ y) \approx (\textbf{bvuge}\ y\ x) &  & (\text{pbblast\_bvule})
+\end{align*}
+
+\subsubsection{\textbf{pbblast\_bvslt}}
+\noindent\\
+A operação `signed-less-than', menor com sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvslt}\ x\ y) \approx A &  & (\text{pbblast\_bvslt})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    -(2^{n-1})\mathbf{y}_0 + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} + 2^{n-1} \mathbf{x}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} \geq 1
+\]
+
+\subsubsection{\textbf{pbblast\_bvsgt}}
+\noindent\\
+A operação `signed-greater-than', maior com sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvsgt}\ x\ y) \approx A &  & (\text{pbblast\_bvsgt})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    -(2^{n-1})\mathbf{x}_0 + \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} + 2^{n-1} \mathbf{y}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} \geq 1
+\]
+
+Alternativamente, em termos de \textbf{pbblast\_bvslt}, temos:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvsgt}\ x\ y) \approx (\textbf{bvslt}\ y\ x) &  & (\text{pbblast\_bvsgt})
+\end{align*}
+
+\subsubsection{\textbf{pbblast\_bvsge}}
+\noindent\\
+A operação `signed-greater-or-equal', maior ou igual com sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvsge}\ x\ y) \approx A &  & (\text{pbblast\_bvsge})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    -(2^{n-1})\mathbf{x}_{0} + \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} + 2^{n-1}\mathbf{y}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} \geq 0
+\]
+
+\subsubsection{\textbf{pbblast\_bvsle}}
+\noindent\\
+A operação `signed-less-or-equal', menor ou igual com sinal, sobre BitVectors com $n$ bits é expressa por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvsle}\ x\ y) \approx A &  & (\text{pbblast\_bvsle})
+\end{align*}
+
+Em que o termo ``$A$'' é verdadeiro se, e somente se:
+\[
+    -(2^{n-1})\mathbf{y}_{0} + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} + 2^{n-1}\mathbf{x}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} \geq 0
+\]
+
+Alternativamente, em termos de \textbf{pbblast\_bvsge}, temos:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvsle}\ x\ y) \approx (\textbf{bvsge}\ y\ x) &  & (\text{pbblast\_bvsle})
+\end{align*}
+
+\subsection{Regras Aritméticas}
+\subsubsection{\textbf{pbblast\_pbbvar}}
+\noindent\\
+Conversão de um BitVector de $n$ bits para $n$ variáveis pseudo-booleanas introduzidas com \textbf{pbbT}:
+\begin{align*}
+    i. \vartriangleright &  & x \approx \textbf{pbbT}\; x_1 \dots x_{n+1} &  & (\text{pbblast\_pbbvar})
+\end{align*}
+
+\subsubsection{\textbf{pbblast\_pbbconst}}
+\noindent\\
+Restrições para cada bit do bitvector constante $b$:
+\begin{align*}
+    i.\vartriangleright & \left(b \approx \textbf{pbbT}r\right) \land \bigwedge_{i=0}^{n-1}{\left(r_i = \textbf{VAL}(b_{n-i-1})\right)}\ (\text{pbblast\_bvsle})
+\end{align*}
+Em que expandimos \textbf{VAL($b_i$)} em:
+\begin{itemize}
+    \item $\left(b_i = 0\right)$ se $b_i$ é $0$
+    \item $\left(b_i = 1\right)$ se $b_i$ é $1$
+\end{itemize}
+
+\subsubsection{\textbf{pbblast\_bvxor}}
+\noindent\\
+A operação `bvxor' sobre BitVectors com $n$ bits é expressa usando desigualdades PseudoBooleanas por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvxor}\ x\ y) \approx [r_0,\dots,r_1] \land A &  & (\text{pbblast\_bvxor})
+\end{align*}
+O termo ``$A$'' é a conjunção dessas desigualdades pseudo-booleanas e o termo \textbf{r} representa
+o resultado da operação `bvxor' entre \textbf{x} e \textbf{y}, para $0 \le i < n$:
+
+\[ -\textbf{r}_i+\textbf{x}_i+\textbf{y}_i\ge 0 \]
+\[ -\textbf{r}_i-\textbf{x}_i-\textbf{y}_i\ge -2 \]
+\[ \textbf{r}_i+\textbf{x}_i-\textbf{y}_i\ge 0 \]
+\[ \textbf{r}_i-\textbf{x}_i+\textbf{y}_i\ge 0 \]
+
+\subsubsection{\textbf{pbblast\_bvand}}
+\noindent\\
+A operação `bvand' sobre BitVectors com $n$ bits é expressa usando desigualdades PseudoBooleanas por:
+\begin{align*}
+    i. \vartriangleright &  & (\textbf{bvand}\ x\ y) \approx [r_0,\dots,r_1] \land A &  & (\text{pbblast\_bvand})
+\end{align*}
+O termo ``$A$'' é a conjunção dessas desigualdades pseudo-booleanas e o termo \textbf{r} representa
+o resultado da operação `bvand' entre \textbf{x} e \textbf{y}, para $0 \le i < n$:
+
+\[ \textbf{x}_i-\textbf{r}_i\ge 0 \]
+\[ \textbf{y}_i-\textbf{r}_i\ge 0 \]
+\[ \textbf{r}_i-\textbf{x}_i-\textbf{y}_1\ge -1 \]
+
+\section{Verificação das Regras no Carcara}
+Com a definição das regras, partimos para a implementação do checker dentro do Carcara.
+O primeiro passo é alterações na `ast', a árvore de sintaxe abstrata que faz a leitura de um
+arquivo de prova no formato alethe e obtém uma representação da estrutura dos termos envolvidos
+naquela regra. Como um parser para esse formato já existe no projeto, temos apenas que estendê-lo
+para aceitar os novos símbolos \texttt{pbbT} e \texttt{int\_of}, para introdução e eliminação de
+bitvectors por meio de variáveis pseudo-booleanas, nesse caso, \textbf{Int}.
+
+\subsubsection{Extensão do Parser}
+\noindent\\
+No arquivo \texttt{carcara/src/ast/term.rs} criamos novos construtores:
+
+\begin{minted}[fontsize=\footnotesize]{rust}
+pub enum Operator {
+    // ...
+    BvPBbTerm
+}
+pub enum ParamOperator {
+    // ...
+    BvIntOf
+}
+\end{minted}
+Com essa extensão podemos usar `int\_of' e `pbbterm' nos nossos testes e arquivos contendo
+estes símbolos serão corretamente lidos pelo sistema.
+\subsubsection{Verificação de Regras}
+\noindent\\
+Podemos dessa forma implementar a verificação de aplicações corretas de cada regra, o que se
+dará no arquivo\\ `\texttt{carcara/src/checker/rules/pb\_blasting.rs}',
+
+Vejamos com mais detalhes a verificação da regra \textbf{pbblast\_bveq}:
+\begin{algorithmic}[1]
+    \Statex \textbf{Entrada:} Argumentos da regra, incluindo um \texttt{pool} de termos, um conjunto de \texttt{args}, e um termo de \texttt{conclusão}.
+    \Statex \textbf{Saída:} Verifica se a regra foi aplicada corretamente ou gera um erro caso alguma condição não seja satisfeita.
+
+    \Procedure{pbblast\_bveq}{$pool, args, conclusion$}
+
+    \State \textbf{Passo 1: Verificar a estrutura da conclusão}
+    \State Extraia os termos $x$, $y$, $sum\_x$ e $sum\_y$ da \texttt{conclusão},
+    garantindo que ela esteja no formato:
+    \[
+        (=\ (=\ x\ y)\ (= (- (+\ \ldots)\ (+\ \ldots))\ 0))
+    \]
+    Caso a estrutura não corresponda, gere um erro.\\
+
+    \State \textbf{Passo 2: Verificar a largura do bitvector}
+    \State Recupere a largura do bitvector $size$ do \texttt{pool} para a variável $x$.
+    \State \textbf{Passo 3: Verificar os termos de $sum\_x$ quanto à sua correção}
+    \For{($i$,$el$) em $sum\_x$}
+    \State Extraia o coeficiente $c$, o índice $idx$ e o bitvector $bv$ do $i$-ésimo elemento de $sum\_x$, garantindo que o termo esteja no formato:
+    \[
+        (*\ c\ ((\_\ \texttt{int\_of}\ idx)\ bv))
+    \]
+    Se $i = 0$, permita que $c$ seja omitido.
+    \State Converta $c$ e $idx$ para tipos inteiros.
+    \State Verifique as seguintes condições:
+    \begin{itemize}
+        \item $c$ é igual a $2^i$
+        \item $idx$ é igual a $size - i - 1$
+        \item $bv$ é igual a $x$
+    \end{itemize}
+    \If{qualquer uma dessas condições falhar}
+    \State Gere um erro
+    \EndIf
+    \EndFor
+    \State \textbf{Passo 4: Verificar os termos de $sum\_y$ quanto à sua correção}
+    \State Realize as mesmas verificações do \textbf{Passo 3}, mas com $sum\_y$ e $y$.
+    \State \textbf{Passo 5: Retornar sucesso}
+    \EndProcedure
+\end{algorithmic}
+
+O código completo dessa verificação pode ser encontrado no apêndice, mas o que podemos
+analisar aqui é que várias propriedades sintáticas são testadas pelo código:
+\begin{itemize}
+    \item O número de argumentos aplicados à regra é o esperado?
+    \item O tipo dos termos aplicados é apropriado?
+    \item A estrutura da conclusão corresponde à forma lógica esperada, garantindo que seja uma equivalência entre uma igualdade de bitvector e a igualdade de duas somas subtraídas a zero?
+    \item A largura do bitvector para os termos $x$ e $y$ está definida corretamente e disponível no conjunto de termos?
+    \item Os coeficientes na soma estão representados corretamente como potências de dois, garantindo o alinhamento com a natureza binária dos bitvectors?
+    \item Os índices nos termos da soma são consistentes com a ordenação esperada, especificamente $size - i - 1$, onde $i$ representa a posição atual do bit?
+    \item Os bitvectors sendo indexados dentro das somas estão corretamente correspondidos às variáveis originais $x$ e $y$?
+    \item A correspondência geral entre os termos da soma e a igualdade original do bitvector é preservada, garantindo que não haja incompatibilidade na representação da equivalência?
+\end{itemize}
+
+Essas verificações garantem que a regra esteja de acordo com os requisitos sintáticos e
+semânticos da sintaxe Alethe, garantindo que a transformação representada pela regra
+seja logicamente válida. Qualquer incompatibilidade na estrutura, tipo ou conteúdo
+dos termos resultará em um erro, sinalizando uma violação dos requisitos da regra.
+
+Para atender todos estes aspectos é que o Carcara implementa para cada nova construção um
+conjunto de testes de unidade, que são executados rapidamente e além de evitar possíveis erros,
+servem como documentação viva do comportamento esperado por cada regra. Continuando o exemplo
+da regra \textbf{pbblast\_bveq}, vejamos um destes testes:
+
+\begin{algorithmic}[1]
+    \Statex \textbf{Caso de Teste: Igualdade em Bits Simples}
+    \Procedure{Test-pbblast\_bveq}{}
+    \State \textbf{Definições:}
+    \begin{itemize}
+        \item Declarar uma constante bitvector $x1$ de largura $1$: \texttt{(declare-const x1 (\_BitVec 1))}
+        \item Declarar uma constante bitvector $y1$ de largura $1$: \texttt{(declare-const y1 (\_BitVec 1))}
+    \end{itemize}
+    \State \textbf{Entrada:} Uma cláusula de conclusão para a regra \textbf{pbblast\_bveq}:
+    \begin{itemize}
+        \item Seja $lhs$ a igualdade entre os bitvectors:
+              \[
+                  lhs = (=\ x1\ y1)
+              \]
+        \item Seja $sum\_x$ a representação da soma para $x1$:
+              \[
+                  sum\_x = (+\ (*\ 1\ ((\_\ int\_of\ 0)\ x1))\ 0)
+              \]
+        \item Seja $sum\_y$ a representação da soma para $y1$:
+              \[
+                  sum\_y = (+\ (*\ 1\ ((\_\ int\_of\ 0)\ y1))\ 0)
+              \]
+        \item Combine no conjunto completo de conclusão:
+              \[
+                  conclusion = (=\ lhs\ (=\ (-\ sum\_x\ sum\_y)\ 0))
+              \]
+    \end{itemize}
+    \State \textbf{Resultado Esperado:} \texttt{true} (a regra foi aplicada corretamente e verificada com sucesso).
+    \EndProcedure
+
+    \Statex
+    \Statex Neste teste, declaramos duas constantes bitvector de um único bit ($x1$ e $y1$), decompomos os termos de soma em $sum\_x$ e $sum\_y$, e fornecemos a cláusula de conclusão completa de forma simplificada. O teste verifica se a regra \textbf{pbblast\_bveq} valida corretamente essa transformação de igualdade, garantindo que todos os requisitos estruturais e semânticos sejam atendidos. O resultado esperado do teste é \texttt{true}, indicando a validação bem-sucedida da regra.
+\end{algorithmic}
+
+\section*{Conclusões}
+% Capítulo de fechamento: conclusões e relação de trabalhos futuros.
+Nós formalizamos o que significa realizar o processo de bitblasting no contexto de variáveis
+pseudo-booleanas, definindo precisamente como cada possível operação entre bitvectors deve se
+comportar em sua forma transformada. Com isso possibilitamos que uma expressão arbitrária que
+envolve bitvectors passe pelo processo de blasting e seja, portanto, compatível com solucionadores
+pseudo booleanos como Rounding Sat \cite{RoundingSat}. Além disso, implementamos uma extensão no
+verificador Carcara, que permitirá aferir a correta aplicação de tais regras, aumentando a confiança
+na implementação do resolvedor em questão. Com esse processo em curso, partimos para novas etapas,
+em que procuraremos aperfeiçoar tais procedimentos para resolver ainda mais rapidamente o problema
+da verificação formal.
+
+
+\begin{thebibliography}{00}
+    \bibitem{Cvc5}          H. Barbosa, C. W. Barrett, M. Brain, G. Kremer, H. Lachnitt, M. Mann, A. Mohamed, M. Mohamed, A. Niemetz, A. Nötzli, A. Ozdemir, M. Preiner, A. Reynolds, Y. Sheng, C. Tinelli, Y. Zohar, ``cvc5: A Versatile and Industrial-Strength SMT Solver'', Abril de 2022, Acesso em https://link.springer.com/chapter/10.1007/978-3-030-99524-9\_24.
+    \bibitem{Alethe}        H. Barbosa, M. Fleury, P. Fontaine, H. Schurr, ``The Alethe Proof Format - An Evolving Specification and Reference'', Dezembro de 2024, Acesso em https://verit.gitlabpages.uliege.be/alethe/specification.pdf.
+    \bibitem{Carcara}       B. Andreotti, H. Lachnitt, H. Barbosa ``Carcara: An Efficient Proof Checker and Elaborator for SMT Proofs in the Alethe Format'', Abril de 2023, Acesso em https://link.springer.com/chapter/10.1007/978-3-031-30823-9\_19.
+    \bibitem{CNF}           ``Conjunctive normal form'', Encyclopedia of Mathematics, EMS Press, 2001.
+    \bibitem{PBSolve}       J. Nordström, ``Pseudo-Boolean Solving and Optimization'', Fevereiro de 2021.
+    \bibitem{RoundingSat}   J. Elffers, J. Nordström, ``Divide and Conquer: Towards Faster Pseudo-Boolean Solving'', IJCAI 2018.
+\end{thebibliography}
+
+\newpage
+\onecolumn
+\appendix
+
+\subsection{Código para a regra pbblast\_bveq}
+\begin{minted}[fontsize=\small]{rust}
+pub fn pbblast_bveq(RuleArgs { pool, conclusion, .. }: RuleArgs) -> RuleResult {
+    // Check that conclusion is an equivalence between bitvector equality
+    // and difference of summations equal to zero
+    let ((x, y), ((sum_x, sum_y), _)) =
+        match_term_err!((= (= x y) (= (- (+ ...) (+ ...)) 0)) = &conclusion[0])?;
+
+    // Drops the last element, that is zero
+    let sum_x = &sum_x[..sum_x.len() - 1];
+    let sum_y = &sum_y[..sum_y.len() - 1];
+
+    // Check that `x`'s bitvector width exists in the `pool`
+    let Sort::BitVec(x_width) = pool.sort(x).as_sort().cloned().unwrap() else {
+        unreachable!();
+    };
+
+    // Transforms the width of x to a usize type
+    let x_width = x_width.to_usize().unwrap();
+
+    // Check that `sum_x` has the same length as `x`
+    rassert!(x_width == sum_x.len(), CheckerError::Unspecified);
+
+    // Check that `y`'s bitvector width exists in the `pool`
+    let Sort::BitVec(y_width) = pool.sort(y).as_sort().cloned().unwrap() else {
+        unreachable!();
+    };
+
+    // Transforms the width of y to a usize type
+    let y_width = y_width.to_usize().unwrap();
+
+    // Check that `sum_y` has the same length as `y`
+    rassert!(y_width == sum_y.len(), CheckerError::Unspecified);
+
+    // Check that both bitvectors x and y have the same length
+    rassert!(x_width == y_width, CheckerError::Unspecified);
+
+    // Define a closure to check the terms for a bitvector and its summation
+    let check_bitvector_sum =
+        |sum: &[Rc<Term>], width: usize, bitvector: &Rc<Term>| -> RuleResult {
+            for (i, element) in sum.iter().enumerate() {
+                // Match `element` with a coefficient times an `int_of` application on bitvector `bv`
+                let (c, (idx, bv)) = match_term_err!((* c ((_ int_of idx) bv)) = element)?;
+
+                // Convert `c` and `idx` to integers
+                let c: Integer = c.as_integer_err()?;
+                let idx: Integer = idx.as_integer_err()?;
+
+                // Check that the coefficient is actually 2^i
+                rassert!(c == (1 << i), CheckerError::Unspecified);
+                // Check that the index is actually `width - i - 1`
+                rassert!(idx == width - i - 1, CheckerError::Unspecified);
+                // Check that the bitvector being indexed is actually `bitvector`
+                rassert!(*bv == *bitvector, CheckerError::Unspecified);
+            }
+            Ok(())
+        };
+
+    // Use the closure to check the `sum_x` terms
+    check_bitvector_sum(sum_x, x_width, x)?;
+
+    // Use the closure to check the `sum_y` terms
+    check_bitvector_sum(sum_y, y_width, y)?;
+
+    Ok(())
+}
+\end{minted}
+
+\subsection{Teste para a regra pbblast\_bveq}
+\begin{minted}[fontsize=\small]{rust}
+mod tests {
+    #[test]
+    fn pbblast_bveq() {
+        test_cases! {
+            definitions = "
+                (declare-const x1 (_ BitVec 1))
+                (declare-const y1 (_ BitVec 1))
+                (declare-const x2 (_ BitVec 2))
+                (declare-const y2 (_ BitVec 2))
+                ",
+            "Equality on single bits" {
+                r#"(step t1 (cl (= (= x1 y1) (= (- (+ (* 1 ((_ int_of 0) x1)) 0)
+                (+ (* 1 ((_ int_of 0) y1)) 0)) 0))) :rule pbblast_bveq)"#: true,
+            }
+            "Omit multiplication by 1" {
+                r#"(step t1 (cl (= (= x1 y1) (= (- (+ ((_ int_of 0) x1) 0)
+                (+ ((_ int_of 0) y1) 0)) 0))) :rule pbblast_bveq)"#: true,
+            }
+            "Not a subtraction of sums" {
+                r#"(step t1 (cl (= (= x1 y1) (= (+ (* 1 ((_ int_of 0) x1)) 0) 0)))
+                :rule pbblast_bveq)"#: false,
+            }
+            "Malformed products" {
+                r#"(step t1 (cl (= (= x1 y1) (= (- (+ (* 0 ((_ int_of 0) x1)) 0)
+                (+ (* 1 ((_ int_of 0) y1)) 0)) 0))) :rule pbblast_bveq)"#: false,
+                r#"(step t1 (cl (= (= x1 y1) (= (- (+ (* 1 ((_ int_of 0) x1)) 0)
+                (+ (* 0 ((_ int_of 0) y1)) 0)) 0))) :rule pbblast_bveq)"#: false,
+            }
+            "Equality on two bits" {
+                r#"(step t1 (cl (= (= x2 y2) (= (- (+ (* 1 ((_ int_of 1) x2))
+                (* 2 ((_ int_of 0) x2)) 0) (+ (* 1 ((_ int_of 1) y2)) (* 2
+                ((_ int_of 0) y2)) 0)) 0))) :rule pbblast_bveq)"#: true,
+            }
+        }
+    }
+ 
+}
+\end{minted}
+
+
+\end{document}
