@@ -476,7 +476,16 @@ da regra \textbf{pbblast\_bveq}, vejamos um destes testes:
 
 \section*{Conclusões}
 % Capítulo de fechamento: conclusões e relação de trabalhos futuros.
-% TODO
+Nós formalizamos o que significa realizar o processo de bitblasting no contexto de variáveis
+pseudo-booleanas, definindo precisamente como cada possível operação entre bitvectors deve se
+comportar em sua forma transformada. Com isso possibilitamos que uma expressão arbitrária que
+envolve bitvectors passe pelo processo de blasting e seja, portanto, compatível com solucionadores
+pseudo booleanos como Rounding Sat \cite{RoundingSat}. Além disso, implementamos uma extensão no
+verificador Carcara, que permitirá aferir a correta aplicação de tais regras, aumentando a confiança
+na implementação do resolvedor em questão. Com esse processo em curso, partimos para novas etapas,
+em que procuraremos aperfeiçoar tais procedimentos para resolver ainda mais rapidamente o problema
+da verificação formal.
+
 
 \begin{thebibliography}{00}
     \bibitem{Cvc5}          H. Barbosa, C. W. Barrett, M. Brain, G. Kremer, H. Lachnitt, M. Mann, A. Mohamed, M. Mohamed, A. Niemetz, A. Nötzli, A. Ozdemir, M. Preiner, A. Reynolds, Y. Sheng, C. Tinelli, Y. Zohar, ``cvc5: A Versatile and Industrial-Strength SMT Solver'', Abril de 2022, Acesso em https://link.springer.com/chapter/10.1007/978-3-030-99524-9\_24.
@@ -484,6 +493,7 @@ da regra \textbf{pbblast\_bveq}, vejamos um destes testes:
     \bibitem{Carcara}       B. Andreotti, H. Lachnitt, H. Barbosa ``Carcara: An Efficient Proof Checker and Elaborator for SMT Proofs in the Alethe Format'', Abril de 2023, Acesso em https://link.springer.com/chapter/10.1007/978-3-031-30823-9\_19.
     \bibitem{CNF}           ``Conjunctive normal form'', Encyclopedia of Mathematics, EMS Press, 2001.
     \bibitem{PBSolve}       J. Nordström, ``Pseudo-Boolean Solving and Optimization'', Fevereiro de 2021.
+    \bibitem{RoundingSat}   J. Elffers, J. Nordström, ``Divide and Conquer: Towards Faster Pseudo-Boolean Solving'', IJCAI 2018.
 \end{thebibliography}
 
 \newpage
