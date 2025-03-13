@@ -1,19 +1,35 @@
 {
-    "latex-workshop.latex.recipe.default": "latexmk (lualatex)",
+    "latex-workshop.latex.recipe.default": "lualatex+bibtex",
     "latex-workshop.latex.tools": [
         {
-            "name": "lualatexmk",
-            "command": "latexmk",
+            "name": "lualatex",
+            "command": "lualatex",
             "args": [
-                "-synctex=1",
-                "--shell-escape",
-                "-interaction=nonstopmode",
-                "-file-line-error",
-                "-lualatex",
-                "-outdir=%OUTDIR%",
-                "%DOC%"
+                "-shell-escape",
+                "-recorder",
+                "\\def\\nocomments{}\\input{doc.tex}"
             ],
-            "env": {}
+            "env": {},
         },
+        {
+            "name": "bibtex",
+            "command": "bibtex",
+            "args": [
+                "doc"
+            ],
+            "env": {},
+        }
+    ],
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "lualatex+bibtex",
+            "tools": [
+                "lualatex",
+                "bibtex",
+                "lualatex",
+                "bibtex",
+                "lualatex"
+            ]
+        }
     ]
 }
