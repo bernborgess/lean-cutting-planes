@@ -7,7 +7,7 @@
     \end{AletheX}
     The term ``$A$'' is the PseudoBoolean constraint:
 
-    \[ \sum_{i=0}^{n-1}{2^i x_{n-i-1}} - \sum_{i=0}^{n-1}{2^i y_{n-i-1}} = 0\]
+    \[ \sum_{i=0}^{n-1}{2^i x_{i}} - \sum_{i=0}^{n-1}{2^i y_{i}} = 0\]
 
 \end{RuleDescription}
 
@@ -20,7 +20,7 @@
     The term ``$A$'' is `true' iff:
 
     \[
-        \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} \ge 1.
+        \sum_{i=0}^{n-1} 2^i\mathbf{y}_{i} - \sum_{i=0}^{n-1} 2^i\mathbf{x}_{i} \ge 1.
     \]
 
 \end{RuleDescription}
@@ -34,7 +34,7 @@
     The term ``$A$'' is `true' iff:
 
     \[
-        \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} \ge 1.
+        \sum_{i=0}^{n-1} 2^i\mathbf{x}_{i} - \sum_{i=0}^{n-1} 2^i\mathbf{y}_{i} \ge 1.
     \]
 
     \noindent
@@ -56,7 +56,7 @@
     The term ``$A$'' is `true' iff:
 
     \[
-        \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} \ge 0.
+        \sum_{i=0}^{n-1} 2^i\mathbf{x}_{i} - \sum_{i=0}^{n-1} 2^i\mathbf{y}_{i} \ge 0.
     \]
 
 \end{RuleDescription}
@@ -70,7 +70,7 @@
     The term ``$A$'' is `true' iff:
 
     \[
-        \sum_{i=0}^{n-1} 2^i\mathbf{y}_{n-i-1} - \sum_{i=0}^{n-1} 2^i\mathbf{x}_{n-i-1} \ge 0.
+        \sum_{i=0}^{n-1} 2^i\mathbf{y}_{i} - \sum_{i=0}^{n-1} 2^i\mathbf{x}_{i} \ge 0.
     \]
 
     \noindent
@@ -90,7 +90,7 @@
     The term ``$A$'' is `true' iff:
 
     \[
-        -(2^{n-1})\mathbf{y}_0 + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} + 2^{n-1} \mathbf{x}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} \geq 1
+        -(2^{n-1})\mathbf{y}_{n-1} + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{i} + 2^{n-1} \mathbf{x}_{n-1} - \sum_{i=0}^{n-2} 2^i\mathbf{x}_{i} \geq 1
     \]
 
 \end{RuleDescription}
@@ -104,7 +104,7 @@
     The term ``$A$'' is `true' iff:
 
     \[
-        -(2^{n-1})\mathbf{x}_0 + \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} + 2^{n-1} \mathbf{y}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} \geq 1
+        -(2^{n-1})\mathbf{x}_{n-1} + \sum_{i=0}^{n-2} 2^i\mathbf{x}_{i} + 2^{n-1} \mathbf{y}_{n-1} - \sum_{i=0}^{n-2} 2^i\mathbf{y}_{i} \geq 1
     \]
 
     \noindent
@@ -124,7 +124,7 @@
     The term ``$A$'' is `true' iff:
 
     \[
-        -(2^{n-1})\mathbf{x}_{0} + \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} + 2^{n-1}\mathbf{y}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} \geq 0
+        -(2^{n-1})\mathbf{x}_{n-1} + \sum_{i=0}^{n-2} 2^i\mathbf{x}_{i} + 2^{n-1}\mathbf{y}_{n-1} - \sum_{i=0}^{n-2} 2^i\mathbf{y}_{i} \geq 0
     \]
 
 \end{RuleDescription}
@@ -138,7 +138,7 @@
     The term ``$A$'' is `true' iff:
 
     \[
-        -(2^{n-1})\mathbf{y}_{0} + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{n-i-1} + 2^{n-1}\mathbf{x}_{0} - \sum_{i=0}^{n-2} 2^i\mathbf{x}_{n-i-1} \geq 0
+        -(2^{n-1})\mathbf{y}_{n-1} + \sum_{i=0}^{n-2} 2^i\mathbf{y}_{i} + 2^{n-1}\mathbf{x}_{n-1} - \sum_{i=0}^{n-2} 2^i\mathbf{x}_{i} \geq 0
     \]
 
     \noindent
