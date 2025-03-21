@@ -176,7 +176,7 @@
     The `bvxor' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
 
     \begin{AletheX}
-        $i$. & \ctxsep & $(\lsymb{bvxor}\ x\ y) \approx [r_0,\dots,r_1] \land A$ & (\currule) \\
+        $i$. & \ctxsep & $(\lsymb{bvxor}\ x\ y) \approx [r_0,\dots,r_{n-1}] \land A$ & (\currule) \\
     \end{AletheX}
     The term ``$A$'' is the conjunction of these PseudoBoolean inequalities and the term \textbf{r} stands
     for the result of the `bvxor' operation between \textbf{x} and \textbf{y}, for $0 \le i < n$:
@@ -196,7 +196,7 @@
     The `bvand' operation over BitVectors with $n$ bits is expressed using PseudoBoolean inequalities by:
 
     \begin{AletheX}
-        $i$. & \ctxsep & $(\lsymb{bvand}\ x\ y) \approx [r_0,\dots,r_1] \land A$ & (\currule) \\
+        $i$. & \ctxsep & $(\lsymb{bvand}\ x\ y) \approx [r_0,\dots,r_{n-1}] \land A$ & (\currule) \\
     \end{AletheX}
     The term ``$A$'' is the conjunction of these PseudoBoolean inequalities and the term \textbf{r} stands
     for the result of the `bvand' operation between \textbf{x} and \textbf{y}, for $0 \le i < n$:
