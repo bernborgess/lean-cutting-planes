@@ -5,34 +5,50 @@
 (assume h1 (cl (= x #b01)))
 (assume h2 (cl (= (bvand x y) #b10)))
 
-(step t1 (cl (= x (pbbterm (! ((_ int_of 0) x) :named @x0) (! ((_ int_of 1) x) :named @x1)))) :rule pbblast_pbbvar)
-(step t2 (cl (= y (pbbterm (! ((_ int_of 0) y) :named @y0) (! ((_ int_of 1) y) :named @y1)))) :rule pbblast_pbbvar)
+(step t1 (cl (= x (pbbterm
+                    (! ((_ int_of 0) x) :named @x0)
+                    (! ((_ int_of 1) x) :named @x1)
+        ))) :rule pbblast_pbbvar)
 
-;; (step t3 (cl (=
-;;             (bvand (pbbterm x0 x1) (pbbterm y0 y1))
-;;             (pbbterm (choice ((z Int)) (and (>= (- z x0) 0) (>= (- z y0) 0) (>= (- z (+ x0 y0)) -1)))
-;;                      (choice ((z Int)) (and (>= (- z x1) 0) (>= (- z y1) 0) (>= (- z (+ x1 y1)) -1)))
-;;          ))) :rule pbblast_bvand)
+(step t2 (cl (= y (pbbterm
+                    (! ((_ int_of 0) y) :named @y0)
+                    (! ((_ int_of 1) y) :named @y1)
+        ))) :rule pbblast_pbbvar)
 
-(step t3 (cl (=
+(step t3 (cl (= (bvand x y)
+                (bvand (pbbterm x0 x1) (pbbterm y0 y1))
+        )) :rule cong :premises (t1 t2))
+
+(step t4 (cl (=
             (bvand (pbbterm x0 x1) (pbbterm y0 y1))
-            (pbbterm (! (choice ((z Int)) (and (>= (- z x0) 0) (>= (- z y0) 0) (>= (- z (+ x0 y0)) -1))) :named @r0)
-                     (! (choice ((z Int)) (and (>= (- z x1) 0) (>= (- z y1) 0) (>= (- z (+ x1 y1)) -1))) :named @r1)
-         ))) :rule pbblast_bvand)
+            (pbbterm
+                    (! (choice ((z Int)) (and (>= (- z x0) 0) (>= (- z y0) 0) (>= (- z (+ x0 y0)) -1))) :named @r0)
+                    (! (choice ((z Int)) (and (>= (- z x1) 0) (>= (- z y1) 0) (>= (- z (+ x1 y1)) -1))) :named @r1)
+        ))) :rule pbblast_bvand)
 
-(step t4 (cl (= #b10 (pbbterm 0 1))) :rule pbblast_pbbconst)
+(step t5 (cl (=
+            (bvand x y)
+            (pbbterm r0 r1)
+        )) :rule cong :premises (t3 t4))
 
-;; (step t5 (cl (= (= (pbbterm x0 x1) (pbbterm y0 y1))
-;;                 (= (- (+ (* 1 x0) (* 2 x1) 0)
-;;                       (+ (* 1 y0) (* 2 y1) 0))
-;;                 0)
-;;          )) :rule pbblast_bveq)
+(step t6 (cl (= #b10 (pbbterm 0 1))) :rule pbblast_pbbconst)
 
-(step t5 (cl (= (= (pbbterm r0 r1) (pbbterm 0 1))
+(step t7 (cl (= (= (bvand x y) #b10)
+                (= (pbbterm r0 r1) (pbbterm 0 1))
+        )) :rule cong :premises (t5 t6))
+
+(step t8 (cl (= (= (pbbterm r0 r1) (pbbterm 0 1))
                 (= (- (+ (* 1 r0) (* 2 r1) 0)
                       (+ (* 1 0) (* 2 1) 0))
                 0)
-         )) :rule pbblast_bveq)
+        )) :rule pbblast_bveq)
+
+(step t9 (cl (= (= (bvand x y) #b10) 
+                (= (- (+ (* 1 r0) (* 2 r1) 0)
+                      (+ (* 1 0) (* 2 1) 0))
+                0)
+        )) :rule trans :premises (t7 t8))
+
 
 ;; Go on with cutting planes...
 
