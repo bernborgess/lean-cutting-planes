@@ -50,21 +50,94 @@
         )) :rule trans :premises (t7 t8))
 
 
-;; Go on with cutting planes...
+;; TODO
+;; ? Some rule (refl?) will let us conclude (A, A=B) -> B
+(step t10 (cl (= (- (+ (* 1 r0) (* 2 r1) 0)
+                    (+ (* 1 0) (* 2 1) 0))
+                0)
+        ) :rule refl? :premises (h2 t9))
 
-;; (step t6 (cl) :rule cong :premises (t5 t6))
+;; TODO
+;; Normalizer steps have to be defined
+(step c1 (cl (>= (+
+                    (* 2 r1)
+                    (* 1 r0)
+                    (* 2 (- 1 (1)))
+                    (* 1 (- 1 (0)))
+                 0) 3
+        )) :rule cp_normalize? :premises (t10))
 
-;; (step t7
-;;   (cl
-;;     (and
-;;       (=
-;;         (bvand (pbbT @x0 @x1) (pbbT @y0 @y1))
-;;         (pbbT (! (_ intOf @r 0) :named @r0) (! (_ intOf @r 1) :named @r1))
-;;         )
-;;       (>= (- @x0 @r0) 0)
-;;       (>= (- @x1 @r1) 0)
-;;       (>= (- @y0 @r0) 0)
-;;       (>= (- @y1 @r1) 0)
-;;       (>= (- @r0 @x0 @y0) (- 1))
-;;       (>= (- @r1 @x1 @y1) (- 1))
-;;     )  :rule pbblast_step_bvand))
+;; TODO
+;; ? How to unwrap terms inside 'choice'?
+(step c2 (cl (>= (+
+                    (* 1 x1)
+                    (* 1 (- 1 r1))
+                 0) 1
+        )) :rule cp_choice_elim? :premises (t4))
+
+;; * Use the blasting + equality to get cp constraint
+(step c3 (cl (>= (+
+                    (* 1 (- 1 x1))
+                 0) 1
+        )) :rule cp_normalize? :premises (h1 t1))
+
+(step c4 (cl (>= (+
+                    (* 1 1)
+                 0) 1
+        )) :rule cp_normalize? :premises (t6))
+
+(step c5 (cl (>= (+
+                    (* 1 (- 1 r0))
+                 0) 0
+        )) :rule cp_literal)
+        ; rule that allows for any :normalized: X >= 0
+(step c6 (cl (>= (+
+                    (* 1 (- 1 0))
+                 0) 0
+        )) :rule cp_literal)
+
+;; * Starts with CP reasoning
+(step c7 (cl (>= (+
+                    (* 1 (- 1 r1))
+                 0) 1
+        )) :rule cp_addition :premises (c2 c3))
+
+(step c8 (cl (>= (+
+                    (* 2 (- 1 r1))
+                 0) 2
+        )) :rule cp_multiplication :premises (c7) :args (2))
+
+(step c9 (cl (>= (+
+                    (* 1 r0)
+                    (* 2 (- 1 (1)))
+                    (* 1 (- 1 (0)))
+                 0) 3
+        )) :rule cp_addition :premises (c1 c8))
+
+
+(step c10 (cl (>= (+
+                    (* 2 1)
+                 0) 2
+        )) :rule cp_multiplication :premises (c4) :args (2))
+
+(step c11 (cl (>= (+
+                    (* 1 r0)
+                    (* 1 (- 1 (0)))
+                 0) 3
+        )) :rule cp_addition :premises (c9 c10))
+
+(step c12 (cl (>= (+
+                    (* 1 (- 1 (0)))
+                 0) 2
+        )) :rule cp_addition :premises (c5 c11))
+
+
+(step c13 (cl (>= (+ 0) 1)) 
+        :rule cp_addition :premises (c6 c12))
+
+;; * Rule that finished the contradiction
+(step c13 (cl) 
+        :rule cp_fail :premises (c13))
+
+;; ! UNSAT!
+
