@@ -32,5 +32,11 @@
             ]
         }
     ],
-    "latex-workshop.latex.autoBuild.run": "onSave"
+    "latex-workshop.latex.autoBuild.run": "onSave",
+    "latex-workshop.formatting.latexindent.args": [
+        "-c",
+        "%DIR%/",
+        "%TMPFILE%",
+        "-y=defaultIndent: '%INDENT%',verbatimEnvironments:AletheVerb:1"
+    ]
 }
