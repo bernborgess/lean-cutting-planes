@@ -16,124 +16,108 @@
         ))) :rule pbblast_pbbvar)
 
 (step t3 (cl (= (bvand x y)
-                (bvand (pbbterm x0 x1) (pbbterm y0 y1))
+                (bvand (pbbterm @x0 @x1) (pbbterm @y0 @y1))
         )) :rule cong :premises (t1 t2))
 
 (step t4 (cl (=
-            (bvand (pbbterm x0 x1) (pbbterm y0 y1))
+            (bvand (pbbterm @x0 @x1) (pbbterm @y0 @y1))
             (pbbterm
-                    (! (choice ((z Int)) (and (>= (- z x0) 0) (>= (- z y0) 0) (>= (- z (+ x0 y0)) -1))) :named @r0)
-                    (! (choice ((z Int)) (and (>= (- z x1) 0) (>= (- z y1) 0) (>= (- z (+ x1 y1)) -1))) :named @r1)
+                    (! (choice ((z Int)) (and (>= @x0 z) (>= @y0 z) (>= z (+ @x0 @y0 -1)))) :named @r0)
+                    (! (choice ((z Int)) (and (>= @x1 z) (>= @y1 z) (>= z (+ @x1 @y1 -1)))) :named @r1)
         ))) :rule pbblast_bvand)
 
 (step t5 (cl (=
             (bvand x y)
-            (pbbterm r0 r1)
+            (pbbterm @r0 @r1)
         )) :rule cong :premises (t3 t4))
 
 (step t6 (cl (= #b10 (pbbterm 0 1))) :rule pbblast_pbbconst)
 
 (step t7 (cl (= (= (bvand x y) #b10)
-                (= (pbbterm r0 r1) (pbbterm 0 1))
+                (= (pbbterm @r0 @r1) (pbbterm 0 1))
         )) :rule cong :premises (t5 t6))
 
-(step t8 (cl (= (= (pbbterm r0 r1) (pbbterm 0 1))
-                (= (- (+ (* 1 r0) (* 2 r1) 0)
+(step t8 (cl (= (= (pbbterm @r0 @r1) (pbbterm 0 1))
+                (= (- (+ (* 1 @r0) (* 2 @r1) 0)
                       (+ (* 1 0) (* 2 1) 0))
                 0)
         )) :rule pbblast_bveq)
 
 (step t9 (cl (= (= (bvand x y) #b10) 
-                (= (- (+ (* 1 r0) (* 2 r1) 0)
+                (= (- (+ (* 1 @r0) (* 2 @r1) 0)
                       (+ (* 1 0) (* 2 1) 0))
                 0)
         )) :rule trans :premises (t7 t8))
 
-
 ;; TODO
 ;; ? Some rule (refl?) will let us conclude (A, A=B) -> B
-(step t10 (cl (= (- (+ (* 1 r0) (* 2 r1) 0)
+(step t10 (cl (= (- (+ (* 1 @r0) (* 2 @r1) 0)
                     (+ (* 1 0) (* 2 1) 0))
                 0)
         ) :rule refl? :premises (h2 t9))
 
+(step t11 (cl (and
+                (>= @x1 @r1)
+                (>= @y1 @r1)
+                (>= @r1 (+ @x1 @y1 -1)))
+          )) :rule pbblast_bvand_ith_bit :args (@x1 @y1))
+;; ? Doesn't this imply that the name of the blasted value is @r1?
+
+(step t12 (cl (>= @x1 @r1)) :rule and_0 :premises (t11))
+
 ;; TODO
 ;; Normalizer steps have to be defined
-(step c1 (cl (>= (+
-                    (* 2 r1)
-                    (* 1 r0)
+(step c1 (cl (>= (+ (* 2 @r1)
+                    (* 1 @r0)
                     (* 2 (- 1 (1)))
-                    (* 1 (- 1 (0)))
-                 0) 3
-        )) :rule cp_normalize? :premises (t10))
+                    (* 1 (- 1 (0))))
+                 3))
+    :rule cp_normalize :premises (t10))
 
-;; TODO
-;; ? How to unwrap terms inside 'choice'?
-(step c2 (cl (>= (+
-                    (* 1 x1)
-                    (* 1 (- 1 r1))
-                 0) 1
-        )) :rule cp_choice_elim? :premises (t4))
+(step c2 (cl (>= (+ (* 1 @x1)
+                    (* 1 (- 1 @r1)))
+                 1))
+    :rule cp_normalize :premises (t12))
 
 ;; * Use the blasting + equality to get cp constraint
-(step c3 (cl (>= (+
-                    (* 1 (- 1 x1))
-                 0) 1
-        )) :rule cp_normalize? :premises (h1 t1))
+(step c3 (cl (>= (* 1 (- 1 @x1)) 1))
+    :rule cp_normalize :premises (h1 t1))
 
-(step c4 (cl (>= (+
-                    (* 1 1)
-                 0) 1
-        )) :rule cp_normalize? :premises (t6))
+(step c4 (cl (>= (* 1 1) 1))
+    :rule cp_normalize :premises (t6))
 
-(step c5 (cl (>= (+
-                    (* 1 (- 1 r0))
-                 0) 0
-        )) :rule cp_literal)
-        ; rule that allows for any :normalized: X >= 0
-(step c6 (cl (>= (+
-                    (* 1 (- 1 0))
-                 0) 0
-        )) :rule cp_literal)
+(step c5 (cl (>= (* 1 (- 1 @r0)) 0))
+    :rule cp_literal :args (@r0))
+
+(step c6 (cl (>= (* 1 (- 1 0)) 0))
+    :rule cp_literal :args (0))
 
 ;; * Starts with CP reasoning
-(step c7 (cl (>= (+
-                    (* 1 (- 1 r1))
-                 0) 1
-        )) :rule cp_addition :premises (c2 c3))
+(step c7 (cl (>= (* 1 (- 1 @r1)) 1))
+    :rule cp_addition :premises (c2 c3))
 
-(step c8 (cl (>= (+
-                    (* 2 (- 1 r1))
-                 0) 2
-        )) :rule cp_multiplication :premises (c7) :args (2))
+(step c8 (cl (>= (* 2 (- 1 @r1)) 2))
+    :rule cp_multiplication :premises (c7) :args (2))
 
-(step c9 (cl (>= (+
-                    (* 1 r0)
+(step c9 (cl (>= (+ (* 1 @r0)
                     (* 2 (- 1 (1)))
-                    (* 1 (- 1 (0)))
-                 0) 3
-        )) :rule cp_addition :premises (c1 c8))
+                    (* 1 (- 1 (0))))
+                 3))
+    :rule cp_addition :premises (c1 c8))
 
+(step c10 (cl (>= (* 2 1) 2))
+    :rule cp_multiplication :premises (c4) :args (2))
 
-(step c10 (cl (>= (+
-                    (* 2 1)
-                 0) 2
-        )) :rule cp_multiplication :premises (c4) :args (2))
+(step c11 (cl (>= (+ (* 1 @r0)
+                     (* 1 (- 1 (0))))
+                  3))
+    :rule cp_addition :premises (c9 c10))
 
-(step c11 (cl (>= (+
-                    (* 1 r0)
-                    (* 1 (- 1 (0)))
-                 0) 3
-        )) :rule cp_addition :premises (c9 c10))
+(step c12 (cl (>= (* 1 (- 1 0)) 2))
+    :rule cp_addition :premises (c5 c11))
 
-(step c12 (cl (>= (+
-                    (* 1 (- 1 (0)))
-                 0) 2
-        )) :rule cp_addition :premises (c5 c11))
-
-
-(step c13 (cl (>= (+ 0) 1)) 
-        :rule cp_addition :premises (c6 c12))
+(step c13 (cl (>= 0 1)) 
+    :rule cp_addition :premises (c6 c12))
 
 ;; * Rule that finished the contradiction
 (step c13 (cl) 
