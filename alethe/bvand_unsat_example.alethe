@@ -1,83 +1,84 @@
-(set-logic QF_BV)
-(declare-const x (_ BitVec 2))
-(declare-const y (_ BitVec 2))
+;; (set-logic QF_BV)
+;; (declare-const x (_ BitVec 2))
+;; (declare-const y (_ BitVec 2))
 
-(assume h1 (cl (= x #b01)))
-(assume h2 (cl (= (bvand x y) #b10)))
+(assume h1 (= x #b01))
+(assume h2 (= (bvand x y) #b10))
 
-(step t1 (cl (= x (pbbterm
-                    (! ((_ int_of 0) x) :named @x0)
-                    (! ((_ int_of 1) x) :named @x1)
+(step t1 (cl (= x (@pbbterm
+                    (! ((_ @int_of 0) x) :named @x0)
+                    (! ((_ @int_of 1) x) :named @x1)
         ))) :rule pbblast_pbbvar)
 
-(step t2 (cl (= y (pbbterm
-                    (! ((_ int_of 0) y) :named @y0)
-                    (! ((_ int_of 1) y) :named @y1)
+(step t2 (cl (= y (@pbbterm
+                    (! ((_ @int_of 0) y) :named @y0)
+                    (! ((_ @int_of 1) y) :named @y1)
         ))) :rule pbblast_pbbvar)
 
 (step t3 (cl (= (bvand x y)
-                (bvand (pbbterm @x0 @x1) (pbbterm @y0 @y1))
+                (bvand (@pbbterm @x0 @x1) (@pbbterm @y0 @y1))
         )) :rule cong :premises (t1 t2))
 
 (step t4 (cl (=
-            (bvand (pbbterm @x0 @x1) (pbbterm @y0 @y1))
-            (pbbterm
+            (bvand (@pbbterm @x0 @x1) (@pbbterm @y0 @y1))
+            (@pbbterm
                     (! (choice ((z Int)) (and (>= @x0 z) (>= @y0 z) (>= z (+ @x0 @y0 -1)))) :named @r0)
                     (! (choice ((z Int)) (and (>= @x1 z) (>= @y1 z) (>= z (+ @x1 @y1 -1)))) :named @r1)
         ))) :rule pbblast_bvand)
 
 (step t5 (cl (=
             (bvand x y)
-            (pbbterm @r0 @r1)
-        )) :rule cong :premises (t3 t4))
+            (@pbbterm @r0 @r1)
+        )) :rule trans :premises (t3 t4))
 
-(step t6 (cl (= #b10 (pbbterm 0 1))) :rule pbblast_pbbconst)
+(step t6 (cl (= #b10 (@pbbterm 0 1))) :rule pbblast_pbbconst)
 
 (step t7 (cl (= (= (bvand x y) #b10)
-                (= (pbbterm @r0 @r1) (pbbterm 0 1))
+                (= (@pbbterm @r0 @r1) (@pbbterm 0 1))
         )) :rule cong :premises (t5 t6))
 
-(step t8 (cl (= (= (pbbterm @r0 @r1) (pbbterm 0 1))
-                (= (- (+ (* 1 @r0) (* 2 @r1) 0)
-                      (+ (* 1 0) (* 2 1) 0))
+(step t8 (cl (= (= (@pbbterm @r0 @r1) (@pbbterm 0 1))
+                (= (- (+ (* 1 @r0) (* 2 @r1))
+                      (+ (* 1 0) (* 2 1)))
                 0)
         )) :rule pbblast_bveq)
 
 (step t9 (cl (= (= (bvand x y) #b10) 
-                (= (- (+ (* 1 @r0) (* 2 @r1) 0)
-                      (+ (* 1 0) (* 2 1) 0))
+                (= (- (+ (* 1 @r0) (* 2 @r1))
+                      (+ (* 1 0) (* 2 1)))
                 0)
         )) :rule trans :premises (t7 t8))
 
-;; TODO
-;; ? Some rule (refl?) will let us conclude (A, A=B) -> B
-(step t10 (cl (= (- (+ (* 1 @r0) (* 2 @r1) 0)
-                    (+ (* 1 0) (* 2 1) 0))
-                0)
-        ) :rule refl? :premises (h2 t9))
+(step t10 (cl (not (= (bvand x y) #b10))
+              (= (- (+ (* 1 @r0) (* 2 @r1)) (+ (* 1 0) (* 2 1))) 0)
+          ) :rule equiv1 :premises (t9))
 
-(step t11 (cl (and
+(step t11 (cl (= (- (+ (* 1 @r0) (* 2 @r1))
+                    (+ (* 1 0) (* 2 1)))
+                0)
+        ) :rule resolution :premises (h2 t10))
+
+(step t12 (cl (and
                 (>= @x1 @r1)
                 (>= @y1 @r1)
                 (>= @r1 (+ @x1 @y1 -1)))
-          )) :rule pbblast_bvand_ith_bit :args (@x1 @y1))
-;; ? Doesn't this imply that the name of the blasted value is @r1?
+          ) :rule pbblast_bvand_ith_bit :args (@x1 @y1))
 
-(step t12 (cl (>= @x1 @r1)) :rule and_0 :premises (t11))
+(step t13 (cl (>= @x1 @r1)) :rule and :premises (t12) :args (0))
 
 ;; TODO
 ;; Normalizer steps have to be defined
 (step c1 (cl (>= (+ (* 2 @r1)
                     (* 1 @r0)
-                    (* 2 (- 1 (1)))
-                    (* 1 (- 1 (0))))
+                    (* 2 (- 1 1))
+                    (* 1 (- 1 0)))
                  3))
-    :rule cp_normalize :premises (t10))
+    :rule cp_normalize :premises (t11))
 
 (step c2 (cl (>= (+ (* 1 @x1)
                     (* 1 (- 1 @r1)))
                  1))
-    :rule cp_normalize :premises (t12))
+    :rule cp_normalize :premises (t13))
 
 ;; * Use the blasting + equality to get cp constraint
 (step c3 (cl (>= (* 1 (- 1 @x1)) 1))
@@ -96,12 +97,21 @@
 (step c7 (cl (>= (* 1 (- 1 @r1)) 1))
     :rule cp_addition :premises (c2 c3))
 
+;; [ERROR] checking failed on step 'c7' with rule 'cp_addition': expected term
+;; '(>= (* 1 (- 1 (choice ((z Int)) (and (>= ((_ @int_of 1) x) z)
+;;                                       (>= ((_ @int_of 1) y) z)
+;;                                       (>= z (+ ((_ @int_of 1) x) ((_ @int_of 1) y) -1))
+;; )))) 1)' to be integer constant Some(2)
+
+;; ? `choice` should not appear in the cutting planes rules...
+;; ? How to reduce the choice to an integer for the comparison?
+
 (step c8 (cl (>= (* 2 (- 1 @r1)) 2))
     :rule cp_multiplication :premises (c7) :args (2))
 
 (step c9 (cl (>= (+ (* 1 @r0)
-                    (* 2 (- 1 (1)))
-                    (* 1 (- 1 (0))))
+                    (* 2 (- 1 1))
+                    (* 1 (- 1 0)))
                  3))
     :rule cp_addition :premises (c1 c8))
 
@@ -109,7 +119,7 @@
     :rule cp_multiplication :premises (c4) :args (2))
 
 (step c11 (cl (>= (+ (* 1 @r0)
-                     (* 1 (- 1 (0))))
+                     (* 1 (- 1 0)))
                   3))
     :rule cp_addition :premises (c9 c10))
 
@@ -120,7 +130,7 @@
     :rule cp_addition :premises (c6 c12))
 
 ;; * Rule that finished the contradiction
-(step c13 (cl) 
+(step c14 (cl) 
         :rule cp_fail :premises (c13))
 
 ;; ! UNSAT!
