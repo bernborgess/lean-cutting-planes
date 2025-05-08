@@ -90,21 +90,12 @@
 (step c5 (cl (>= (* 1 (- 1 @r0)) 0))
     :rule cp_literal :args (@r0))
 
-(step c6 (cl (>= (* 1 (- 1 0)) 0))
+(step c6 (cl (>= (* 1 0) 0))
     :rule cp_literal :args (0))
 
 ;; * Starts with CP reasoning
 (step c7 (cl (>= (* 1 (- 1 @r1)) 1))
     :rule cp_addition :premises (c2 c3))
-
-;; [ERROR] checking failed on step 'c7' with rule 'cp_addition': expected term
-;; '(>= (* 1 (- 1 (choice ((z Int)) (and (>= ((_ @int_of 1) x) z)
-;;                                       (>= ((_ @int_of 1) y) z)
-;;                                       (>= z (+ ((_ @int_of 1) x) ((_ @int_of 1) y) -1))
-;; )))) 1)' to be integer constant Some(2)
-
-;; ? `choice` should not appear in the cutting planes rules...
-;; ? How to reduce the choice to an integer for the comparison?
 
 (step c8 (cl (>= (* 2 (- 1 @r1)) 2))
     :rule cp_multiplication :premises (c7) :args (2))
