@@ -103,3 +103,22 @@ theorem pb_bitblast_and_eq (x y : BitVec 2)
 
   rw [i9]
   sorry
+
+-- Rethinking bvand -> We can always `get` a `z` for these constraints
+theorem and_is_complete :
+  ∀ x y : ℕ, (x ≤ 1) ∧ (y ≤ 1) →
+  ∃ z, (x ≥ z) ∧ (y ≥ z) ∧ (z ≥ x + y - 1) := by
+  intro x y ⟨hx,hy⟩
+  cases' x with o
+  . use 0
+    simp
+    exact Nat.sub_eq_zero_of_le hy
+  . simp at hx
+    rw [hx]
+    simp
+    clear o hx
+    cases' y with p
+    . use 0
+    . use 1
+      simp at *
+      exact hy
