@@ -22,8 +22,8 @@
 (step t4 (cl (=
             (bvand (@pbbterm @x0 @x1) (@pbbterm @y0 @y1))
             (@pbbterm
-                    (! (choice ((z Int)) (and (>= @x0 z) (>= @y0 z) (>= z (+ @x0 @y0 -1)))) :named @r0)
-                    (! (choice ((z Int)) (and (>= @x1 z) (>= @y1 z) (>= z (+ @x1 @y1 -1)))) :named @r1)
+                    (! (choice ((z Int)) (and (>= @x0 z) (>= @y0 z) (>= (+ z 1) (+ @x0 @y0)))) :named @r0)
+                    (! (choice ((z Int)) (and (>= @x1 z) (>= @y1 z) (>= (+ z 1) (+ @x1 @y1)))) :named @r1)
         ))) :rule pbblast_bvand)
 
 (step t5 (cl (=
@@ -61,7 +61,7 @@
 (step t12 (cl (and
                 (>= @x1 @r1)
                 (>= @y1 @r1)
-                (>= @r1 (+ @x1 @y1 -1)))
+                (>= (+ @r1 1) (+ @x1 @y1)))
           ) :rule pbblast_bvand_ith_bit :args (@x1 @y1))
 
 (step t13 (cl (>= @x1 @r1)) :rule and :premises (t12) :args (0))
