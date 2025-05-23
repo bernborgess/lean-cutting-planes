@@ -122,6 +122,9 @@
 
 ;; TODO
 ;; ? How to conclude false from this?
+(step c14 (cl) 
+        :rule hole :premises (c13))
+
 
 ;; ! UNSAT!
 
