@@ -120,9 +120,8 @@
 (step c13 (cl (>= 0 1)) 
     :rule cp_addition :premises (c6 c12))
 
-;; * Rule that finished the contradiction
-(step c14 (cl) 
-        :rule cp_fail :premises (c13))
+;; TODO
+;; ? How to conclude false from this?
 
 ;; ! UNSAT!
 
