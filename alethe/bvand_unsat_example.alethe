@@ -117,10 +117,9 @@
 (step c12 (cl (>= (* 1 (- 1 0)) 2))
     :rule cp_addition :premises (c5 c11))
 
-(step c13 (cl (! (>= 0 1) :named @p_1)) 
+(step c13 (cl (>= 0 1)) 
     :rule cp_addition :premises (c6 c12))
 
-;; Need to develop this ending
-(step c14 (cl) :rule hole :premises (c13))
-;; ! UNSAT!
+(step c14 (cl (not (>= 0 1))) :rule la_tautology)
 
+(step c15 (cl) :rule resolution :premises (c13 c14))
