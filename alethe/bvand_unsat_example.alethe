@@ -120,11 +120,10 @@
 (step c13 (cl (! (>= 0 1) :named @p_1)) 
     :rule cp_addition :premises (c6 c12))
 
-(step c14 (cl (not (! (= @p_1 false) :named @p_3)) (! (not @p_1) :named @p_2) false) :rule equiv_pos2)
-(step c15 (cl @p_3) :rule all_simplify)
+(step c14 (cl (not (! (= @p_1 false) :named @p_2)) (not @p_1) false) :rule equiv_pos2)
+(step c15 (cl @p_2) :rule hole :args ("TRUST_THEORY_REWRITE" @p_2 3 7))
 (step c16 (cl false) :rule resolution :premises (c14 c15 c13))
 (step c17 (cl (not false)) :rule false)
 (step c18 (cl) :rule resolution :premises (c16 c17))
-
 ;; ! UNSAT!
 
