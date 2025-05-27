@@ -88,7 +88,7 @@
     :rule cp_normalize :premises (t6))
 
 (step c5 (cl (>= (* 1 (- 1 @r0)) 0))
-    :rule cp_literal :args (@r0))
+    :rule cp_literal :args ((- 1 @r0)))
 
 (step c6 (cl (>= (* 1 0) 0))
     :rule cp_literal :args (0))
@@ -117,14 +117,14 @@
 (step c12 (cl (>= (* 1 (- 1 0)) 2))
     :rule cp_addition :premises (c5 c11))
 
-(step c13 (cl (>= 0 1)) 
+(step c13 (cl (! (>= 0 1) :named @p_1)) 
     :rule cp_addition :premises (c6 c12))
 
-;; TODO
-;; ? How to conclude false from this?
-(step c14 (cl) 
-        :rule hole :premises (c13))
-
+(step c14 (cl (not (! (= @p_1 false) :named @p_3)) (! (not @p_1) :named @p_2) false) :rule equiv_pos2)
+(step c15 (cl @p_3) :rule all_simplify)
+(step c16 (cl false) :rule resolution :premises (c14 c15 c13))
+(step c17 (cl (not false)) :rule false)
+(step c18 (cl) :rule resolution :premises (c16 c17))
 
 ;; ! UNSAT!
 
