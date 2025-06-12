@@ -5,6 +5,17 @@
 (assume h1 (= x #b01))
 (assume h2 (= (bvand x y) #b10))
 
+;; The Plan
+
+;; ? From h1 you get
+;; TODO: a (>= (- 1 @x1) 1)
+
+;; ? From h2 you get
+;; TODO: b (>= (+ @x1 (-1 @r1)) 1)
+;; TODO: c (>= @r1 1)
+
+;; TODO: (>= 0 1)   :rule cp_addition :premises (a b c)
+
 (step t1 (cl (= x (@pbbterm
                     (! ((_ @int_of 0) x) :named @x0)
                     (! ((_ @int_of 1) x) :named @x1)
