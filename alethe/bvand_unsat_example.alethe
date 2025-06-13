@@ -3,6 +3,7 @@
 ;; (declare-const y (_ BitVec 2))
 
 (assume h1 (= x #b01))
+(assume h2 (= (bvand x y) #b10))
 
 ;; ? From h1 you get
 ;; a : (>= (- 1 @x1) 1)
@@ -25,7 +26,7 @@
     :rule pbblast_bveq)
 
 (step t6 (cl (not (= (@pbbterm @x0 @x1) (@pbbterm 1 0)))
-                (= (- (+ @x0 (* 2 @x1)) (+ 1 (* 2 0))) 0))
+             (= (- (+ @x0 (* 2 @x1)) (+ 1 (* 2 0))) 0))
     :rule equiv1 :premises (t5))
 
 (step t7 (cl (= (- (+ @x0 (* 2 @x1)) (+ 1 (* 2 0))) 0))
@@ -37,8 +38,8 @@
     :rule cp_normalize)
 
 (step t9 (cl (not (= (- (+ @x0 (* 2 @x1)) (+ 1 (* 2 0))) 0))
-                (and (>= (+ (* 1 @x0) (* 2 @x1)) 1)
-                     (>= (+ (* 1 (- 1 @x0)) (* 2 (- 1 @x1))) 2)))
+             (and (>= (+ (* 1 @x0) (* 2 @x1)) 1)
+                  (>= (+ (* 1 (- 1 @x0)) (* 2 (- 1 @x1))) 2)))
     :rule equiv1 :premises (t8))
 
 (step t10 (cl (and (>= (+ (* 1 @x0) (* 2 @x1)) 1)
@@ -59,9 +60,36 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;; t14 : ~x1 >= 1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(assume h2 (= (bvand x y) #b10))
+;; b (>= (+ @x1 (-1 @r1)) 1)
+
+(step t15 (cl (= (bvand x y)
+                 (@pbbterm
+                    (! (choice ((z Int)) (and (>= @x0 z) (>= ((_ @int_of 0) y) z) (>= (+ z 1) (+ @x0 ((_ @int_of 0) y))))) :named @r0)
+                    (! (choice ((z Int)) (and (>= @x1 z) (>= ((_ @int_of 1) y) z) (>= (+ z 1) (+ @x1 ((_ @int_of 1) y))))) :named @r1)
+        ))) :rule pbblast_bvand)
+
+(step t16 (cl (and (>= @x1 @r1)
+                   (>= ((_ @int_of 1) y) @r1)
+                   (>= (+ @r1 1) (+ @x1 ((_ @int_of 1) y))))
+          ) :rule pbblast_bvand_ith_bit :args (@x1 ((_ @int_of 1) y)))
+
+(step t17 (cl (>= @x1 @r1))
+    :rule and :premises (t16) :args (0))
+
+(step t18 (cl (= (>= @x1 @r1)
+                 (>= (+ @x1 (- 1 @r1)) 1)))
+    :rule cp_normalize)
+
+(step t19 (cl (not (>= @x1 @r1))
+              (>= (+ @x1 (- 1 @r1)) 1))
+    :rule equiv1 :premises (t18))
+
+(step t20 (cl (>= (+ @x1 (- 1 @r1)) 1))
+    :rule resolution :premises (t17 t19))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;; t20 : x1 + ~r1 >= 1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; ? From h2 you get
-;; TODO: b (>= (+ @x1 (-1 @r1)) 1)
 ;; TODO: c (>= @r1 1)
 
 ;; TODO: (>= 0 1)   :rule cp_addition :premises (a b c)
