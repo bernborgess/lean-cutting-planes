@@ -87,9 +87,52 @@
 (step t20 (cl (>= (+ @x1 (- 1 @r1)) 1))
     :rule resolution :premises (t17 t19))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;; t20 : x1 + ~r1 >= 1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;; t20 : x1 + ~r1 >= 1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; ? From h2 you get
 ;; TODO: c (>= @r1 1)
+(step t21 (cl (= #b10 (@pbbterm 0 1)))
+    :rule pbblast_pbbconst)
+
+(step t22 (cl (= (@pbbterm @r0 @r1) (@pbbterm 0 1)))
+    :rule trans :premises (h2 t15 t21))
+
+(step t23 (cl (= (= (@pbbterm @r0 @r1) (@pbbterm 0 1))
+                 (= (- (+ @r0 (* 2 @r1)) (+ 0 (* 2 1))) 0)))
+    :rule pbblast_bveq)
+
+(step t24 (cl (not (= (@pbbterm @r0 @r1) (@pbbterm 0 1)))
+              (= (- (+ @r0 (* 2 @r1)) (+ 0 (* 2 1))) 0))
+    :rule equiv1 :premises (t23))
+
+(step t25 (cl (= (- (+ @r0 (* 2 @r1)) (+ 0 (* 2 1))) 0))
+    :rule resolution :premises (t22 t24))
+
+(step t26 (cl (= (= (- (+ @r0 (* 2 @r1)) (+ 0 (* 2 1))) 0)
+                 (and (>= (+ (* 1 @r0) (* 2 @r1)) 2)
+                      (>= (+ (- 1 @r0) (* 2 (- 1 @r1))) 1))))
+    :rule cp_normalize)
+
+(step t27 (cl (not (= (- (+ @r0 (* 2 @r1)) (+ 0 (* 2 1))) 0))
+              (and (>= (+ (* 1 @r0) (* 2 @r1)) 2)
+                   (>= (+ (- 1 @r0) (* 2 (- 1 @r1))) 1)))
+    :rule equiv1 :premises (t26))
+
+(step t28 (cl (and (>= (+ (* 1 @r0) (* 2 @r1)) 2)
+                   (>= (+ (- 1 @r0) (* 2 (- 1 @r1))) 1)))
+    :rule resolution :premises (t25 t27))
+
+(step t29 (cl (>= (+ (* 1 @r0) (* 2 @r1)) 2))
+    :rule and :premises (t28) :args (0))
+
+(step t30 (cl (>= (* 1 (- 1 @r0)) 0))
+    :rule cp_literal :args ((- 1 @r0)))
+
+(step t31 (cl (>= (* 2 @r1) 1))
+    :rule cp_addition :premises (t29 t30))
+
+(step t32 (cl (>= (* 1 @r1) 1))
+    :rule cp_division :premises (t31) :args (2))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; t32 : r1 >= 1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; TODO: (>= 0 1)   :rule cp_addition :premises (a b c)
